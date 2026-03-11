@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Living Memory &amp; Alexandria: Technical Overview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#1a3a4a',
+        primaryTextColor: '#ffffff',
+        primaryBorderColor: '#4ea8c9',
+        lineColor: '#5bbad5',
+        secondaryColor: '#1a2633',
+        tertiaryColor: '#1e2d3d',
+        background: '#0f1820',
+        mainBkg: '#1a3a4a',
+        nodeBorder: '#4ea8c9',
+        nodeTextColor: '#ffffff',
+        clusterBkg: '#111e28',
+        clusterBorder: '#3a7a94',
+        titleColor: '#ffffff',
+        edgeLabelBackground: '#0f1820',
+        actorBkg: '#1a3a4a',
+        actorBorder: '#4ea8c9',
+        actorTextColor: '#ffffff',
+        actorLineColor: '#5bbad5',
+        signalColor: '#5bbad5',
+        signalTextColor: '#ffffff',
+        labelBoxBkgColor: '#1a3a4a',
+        labelBoxBorderColor: '#4ea8c9',
+        labelTextColor: '#ffffff',
+        loopTextColor: '#ffffff',
+        noteBkgColor: '#1e3040',
+        noteTextColor: '#ffffff',
+        noteBorderColor: '#4ea8c9',
+        activationBkgColor: '#1a3a4a',
+        activationBorderColor: '#4ea8c9',
+        sequenceNumberColor: '#ffffff',
+        fontSize: '15px',
+        fontFamily: 'Outfit, sans-serif'
+      }
+    });
+  </script>
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --bg-surface: #0f1319;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-hover: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-accent: rgba(78, 168, 201, 0.25);
+      --text: #e4e8ed;
+      --text-dim: #7e8a97;
+      --text-faint: #4a5568;
+      --accent: #4ea8c9;
+      --accent-dim: rgba(78, 168, 201, 0.15);
+      --red: #c75b5b;
+      --green: #6bab73;
+      --orange: #c9954e;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Outfit', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --pad: clamp(1.5rem, 4vw, 4rem);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0.5rem var(--pad) var(--pad);
+    }
+
+    /* Header */
+    header {
+      padding: clamp(2rem, 5vh, 4rem) var(--pad) clamp(1.5rem, 3vh, 2rem);
+      max-width: 900px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h3 {
+      font-family: var(--sans);
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    header h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    header .meta {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    header .meta strong { color: var(--text); font-weight: 500; }
+
+    /* Sections */
+    section {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    h3.sub {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1rem;
+      color: var(--text);
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      margin-bottom: 1.2rem;
+      max-width: 100%;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    em { font-style: italic; color: var(--accent); font-family: var(--serif); font-size: 1.05em; }
+
+    strong { font-weight: 500; color: var(--text); }
+
+    /* Rule */
+    .rule {
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Callout box */
+    .callout {
+      background: var(--bg-card);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.5rem 1.8rem;
+      margin: 2rem 0;
+    }
+
+    .callout p { margin-bottom: 0.8rem; }
+    .callout p:last-child { margin-bottom: 0; }
+
+    .callout.warning {
+      border-left-color: var(--orange);
+    }
+
+    .callout.success {
+      border-left-color: var(--green);
+    }
+
+    /* Diagram container */
+    .diagram {
+      margin: 2rem 0;
+      padding: 2rem;
+      background: #0f1820;
+      border: 1px solid rgba(78, 168, 201, 0.2);
+      border-radius: 12px;
+      overflow-x: auto;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.3s var(--ease);
+    }
+
+    .diagram:hover {
+      border-color: rgba(78, 168, 201, 0.4);
+    }
+
+    .diagram-label {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .diagram-label::after {
+      content: 'Click to enlarge';
+      font-size: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      opacity: 0.6;
+    }
+
+    .diagram .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Fullscreen mode for diagrams */
+    .diagram-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 12, 0.92);
+      z-index: 1999;
+      cursor: pointer;
+    }
+
+    .diagram-backdrop.active { display: block; }
+
+    .diagram-backdrop .close-hint {
+      position: fixed;
+      top: 1.5rem;
+      right: 2rem;
+      font-family: var(--sans);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .diagram.fullscreen {
+      position: fixed;
+      inset: 2rem;
+      z-index: 2000;
+      margin: 0;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: auto;
+      cursor: pointer;
+    }
+
+    .diagram.fullscreen .diagram-label::after {
+      content: 'Click or Esc to close';
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    th {
+      font-family: var(--sans);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-align: left;
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-dim);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    tr:hover td { background: var(--bg-card); }
+
+    td:first-child { color: var(--text); font-weight: 400; }
+
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .badge.built { background: rgba(107, 171, 115, 0.15); color: var(--green); }
+    .badge.progress { background: rgba(78, 168, 201, 0.15); color: var(--accent); }
+    .badge.planned { background: rgba(201, 149, 78, 0.15); color: var(--orange); }
+    .badge.vision { background: rgba(255,255,255,0.06); color: var(--text-dim); }
+
+    /* Step list */
+    .step-list {
+      list-style: none;
+      counter-reset: steps;
+      margin: 1.5rem 0;
+    }
+
+    .step-list li {
+      counter-increment: steps;
+      position: relative;
+      padding: 1rem 1rem 1rem 3.5rem;
+      margin-bottom: 0.5rem;
+      background: var(--bg-card);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .step-list li::before {
+      content: counter(steps);
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      width: 1.6rem;
+      text-align: center;
+    }
+
+    .step-list li strong { color: var(--text); }
+
+    /* Two-col layout */
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .cols { grid-template-columns: 1fr; }
+    }
+
+    /* Card grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      transition: all 0.3s var(--ease);
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+    }
+
+    .card h4 {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* Subtle grain */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.25;
+    }
+
+    /* High-contrast overrides for Mermaid SVGs */
+    .diagram svg text { fill: #ffffff !important; }
+    .diagram svg .edgeLabel text { fill: #ffffff !important; }
+    .diagram svg .label text { fill: #ffffff !important; }
+    .diagram svg .nodeLabel { color: #ffffff !important; }
+    .diagram svg .edgeLabel .label { background: #0f1820 !important; }
+    .diagram svg .cluster rect { stroke: #4ea8c9 !important; stroke-width: 1.5px !important; }
+    .diagram svg .node rect,
+    .diagram svg .node polygon,
+    .diagram svg .node circle { stroke: #4ea8c9 !important; stroke-width: 1.5px !important; }
+    .diagram svg .flowchart-link { stroke: #5bbad5 !important; stroke-width: 2px !important; }
+    .diagram svg .arrowheadPath { fill: #5bbad5 !important; }
+    .diagram svg marker path { fill: #5bbad5 !important; stroke: #5bbad5 !important; }
+    .diagram svg line { stroke: #5bbad5 !important; }
+
+    /* Sequence diagram contrast */
+    .diagram svg .actor { fill: #1a3a4a !important; stroke: #4ea8c9 !important; stroke-width: 1.5px !important; }
+    .diagram svg .actor-line { stroke: #5bbad5 !important; stroke-width: 1.5px !important; }
+    .diagram svg .messageLine0,
+    .diagram svg .messageLine1 { stroke: #5bbad5 !important; stroke-width: 1.5px !important; }
+    .diagram svg .messageText { fill: #ffffff !important; }
+    .diagram svg .note { fill: #1e3040 !important; stroke: #4ea8c9 !important; }
+    .diagram svg .noteText { fill: #ffffff !important; font-size: 13px !important; }
+    .diagram svg .labelBox { fill: #1a3a4a !important; stroke: #4ea8c9 !important; }
+    .diagram svg .labelText { fill: #ffffff !important; }
+    .diagram svg .loopText { fill: #ffffff !important; }
+    .diagram svg .loopLine { stroke: #4ea8c9 !important; }
+    .diagram svg .activation0,
+    .diagram svg .activation1,
+    .diagram svg .activation2 { fill: #1a3a4a !important; stroke: #4ea8c9 !important; }
+    .diagram svg rect.rect { fill: #1e3040 !important; stroke: #4ea8c9 !important; }
+    .diagram svg .sequenceNumber { fill: #ffffff !important; }
+
+    /* TOC */
+    .toc {
+      margin: 0.5rem 0 2rem;
+      padding: 1.5rem 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc;
+      margin: 0;
+      padding: 0;
+    }
+
+    .toc li {
+      counter-increment: toc;
+      padding: 0.4rem 0;
+      font-size: 0.95rem;
+    }
+
+    .toc li::before {
+      content: counter(toc) ".";
+      color: var(--accent);
+      font-weight: 500;
+      margin-right: 0.6rem;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+    }
+
+    .toc a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .toc a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h3>Technical Overview</h3>
+  <h1>Living Memory &amp; Alexandria</h1>
+  <div class="rule"></div>
+  <div class="meta">
+    <strong>Status:</strong> Level 4 (Agentic Memory) operational locally on the Project Development Tool (PDT). Level 5 (Alexandria) in design and planning.<br>
+    <strong>Date:</strong> March 2026
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <ol>
+      <li><a href="#exec">Executive Summary</a></li>
+      <li><a href="#built">What's Built and Running</a></li>
+      <li><a href="#arch">Architecture: M/L/P</a></li>
+      <li><a href="#loop">The Learning Loop (Step-by-Step)</a></li>
+      <li><a href="#digest">The Digestive Pipeline</a></li>
+      <li><a href="#retrieval">How Retrieval Works</a></li>
+      <li><a href="#graph">The Knowledge Graph</a></li>
+      <li><a href="#taxonomy">Agent Taxonomy</a></li>
+      <li><a href="#challenges">Honest Challenges</a></li>
+      <li><a href="#vision">Architecture Vision</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. EXECUTIVE SUMMARY -->
+  <section id="exec">
+    <div class="section-label">01</div>
+    <h2>Executive Summary</h2>
+    <div class="rule"></div>
+
+    <p>We've built a shared memory system for AI agents that lets them learn from each other's sessions, share precedent across workflows, and maintain that knowledge automatically. The system is in use locally on two workflows (core platform development and Salesforce development), where we're dogfooding it to prove out the architecture and fine-tune the real-world experience. The overall design has been pressure-tested against 18+ external sources from academia and industry, though the current implementation doesn't yet address all of the findings.</p>
+
+    <p>The architecture decomposes into three layers: <strong>Memory</strong> (storage), <strong>Learning</strong> (extraction and maintenance), and <strong>Personalization</strong> (serving the right knowledge to the right agent). We operate at Level 4 (agentic learning and memory) locally today. Level 5 (Alexandria: the org-wide knowledge library) is an aspirational vision that would require organizational buy-in and investment to pursue.</p>
+
+    <p>This document focuses on the architecture: how it works, step-by-step processes, honest challenges, and the vision for what it could become. For the business case and landscape context, see the companion decks (Alexandria pitch book and Memory, Context &amp; Graphs landscape primer).</p>
+  </section>
+
+  <!-- 2. WHAT'S BUILT -->
+  <section id="built">
+    <div class="section-label">02</div>
+    <h2>What's Built and Running</h2>
+    <div class="rule"></div>
+
+    <p>Everything below is built and running locally, used daily on the PDT and SFDC dev workflows. The goal is to employ it as a real use case, iterate, and prove out the architecture before any broader rollout.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>Status</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Lessons DB + connections + entities</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Single store, partitioned by workflow. SQLite with full schema.</td>
+        </tr>
+        <tr>
+          <td>Session lifecycle</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Register, getContext, do work, session-end reflection. HTTP API.</td>
+        </tr>
+        <tr>
+          <td>getContext (intelligent retrieval)</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Workflow-scoped, entity-anchored, token-budgeted, multi-pass (berrypicking).</td>
+        </tr>
+        <tr>
+          <td>Session-end reflection</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Agents write lessons, decision traces, guardrail suggestions at session end.</td>
+        </tr>
+        <tr>
+          <td>Digestive pipeline</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Reduce, Reflect, Reweave, Verify, Archive. Runs asynchronously post-session.</td>
+        </tr>
+        <tr>
+          <td>Forgetting by design</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Pruning, supersession, condensation, stale detection, demand-driven processing.</td>
+        </tr>
+        <tr>
+          <td>Multi-workflow support</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Core PDT (PCC) and SFDC dev share one framework, data partitioned by workflow.</td>
+        </tr>
+        <tr>
+          <td>Lesson connections (graph edges)</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Typed connections with optional reason text for propositional links.</td>
+        </tr>
+        <tr>
+          <td>Scratchpad + session summary</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Per-task state + recent work history. Created/loaded via API.</td>
+        </tr>
+        <tr>
+          <td>Dashboard (metrics + management)</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Living Memory metrics, backlog, session management, approval workflow.</td>
+        </tr>
+        <tr>
+          <td>Alexandria renderer</td>
+          <td><span class="badge planned">Design / POC</span></td>
+          <td>Scannable index + rendered claims with [[wiki-links]]. Concept proven on existing store.</td>
+        </tr>
+        <tr>
+          <td>Trust tiers + memory integrity</td>
+          <td><span class="badge planned">Planned</span></td>
+          <td>ADR written. Implementation in Phase 1 roadmap.</td>
+        </tr>
+        <tr>
+          <td>Episodic memory store</td>
+          <td><span class="badge planned">Planned</span></td>
+          <td>Design complete. Phase 2.</td>
+        </tr>
+        <tr>
+          <td>Org-wide Alexandria graph</td>
+          <td><span class="badge vision">Vision</span></td>
+          <td>Full knowledge graph, federated memory, trust-gated contributions.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 3. ARCHITECTURE -->
+  <section id="arch">
+    <div class="section-label">03</div>
+    <h2>Architecture: Memory / Learning / Personalization</h2>
+    <div class="rule"></div>
+
+    <p>The architecture spans three layers with explicit boundaries between them. Failures concentrate at those boundaries: conflating a retrieval problem (Personalization) with a storage problem (Memory) or an extraction problem (Learning) is the most common design mistake in agent memory systems.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">M/L/P Architecture with layer boundaries</div>
+      <pre class="mermaid">
+flowchart TB
+  subgraph P["<b>Personalization</b> — Real-time serving"]
+    direction LR
+    gc["getContext"]
+    rf["Retrieval filters"]
+    tb["Token budgets"]
+    pd["Progressive disclosure"]
+    gc --- rf --- tb --- pd
+  end
+
+  subgraph L["<b>Learning</b> — Async extraction"]
+    direction LR
+    refl["Session-end reflection"]
+    dp["Digestive pipeline"]
+    cond["Condensation"]
+    forg["Forgetting"]
+    refl --- dp --- cond --- forg
+  end
+
+  subgraph M["<b>Memory</b> — Storage infrastructure"]
+    direction LR
+    les["Lessons DB"]
+    conn["Connections"]
+    ent["Entities"]
+    sp["Scratchpads"]
+    les --- conn --- ent --- sp
+  end
+
+  P -->|"Usage signals + outcomes"| M
+  M -->|"Raw material"| L
+  L -->|"Structured knowledge"| P
+      </pre>
+    </div>
+
+    <div class="callout">
+      <p><strong>Key architectural distinction:</strong> Each layer has different failure modes and maintenance rhythms. A <strong>Memory</strong> failure is data loss. A <strong>Learning</strong> failure is a missed insight or false lesson. A <strong>Personalization</strong> failure is serving the wrong context. Separating them prevents misdiagnosis. The memory layer is an active participant in its own maintenance (agentic memory), not a passive store.</p>
+    </div>
+  </section>
+
+  <!-- 4. THE LEARNING LOOP -->
+  <section id="loop">
+    <div class="section-label">04</div>
+    <h2>The Learning Loop (Step-by-Step)</h2>
+    <div class="rule"></div>
+
+    <p>Every agent session follows the same lifecycle. The loop is the same whether the agent is working on a core platform ticket or a Salesforce development task.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Agent session lifecycle</div>
+      <pre class="mermaid">
+sequenceDiagram
+    participant Agent
+    participant API as HTTP API
+    participant Store as Learning Store
+    participant Pipeline as Digestive Pipeline
+
+    Agent->>API: POST /sessions (register)
+    API-->>Agent: Session ID + scratchpad
+
+    Agent->>API: GET /sessions/{id}/context
+    API->>Store: Query lessons, precedent (workflow-scoped)
+    Store-->>API: Relevant lessons + decision traces
+    API-->>Agent: Context payload (token-budgeted)
+
+    Note over Agent: Agent works (skills, tools, code)
+    Note over Agent: Updates scratchpad every 3-5 actions
+
+    Agent->>API: DELETE /sessions/{id} (end session)
+    Note over Agent: Includes: summary, reflection,<br/>lessons, decision traces
+
+    API->>Store: Write lessons + traces (scoped)
+    API->>Pipeline: Queue digestive processing
+    Pipeline->>Store: Reduce → Reflect → Reweave → Verify → Archive
+    Note over Store: Next getContext returns<br/>these lessons
+      </pre>
+    </div>
+
+    <ol class="step-list">
+      <li><strong>Register session.</strong> Agent identifies itself, declares what it's working on. System creates or loads a scratchpad (per-task state).</li>
+      <li><strong>Load context (getContext).</strong> System retrieves relevant lessons and precedent, scoped by workflow and task similarity, within a token budget. Optionally includes Alexandria index and rendered claims.</li>
+      <li><strong>Do the work.</strong> Agent uses skills, tools, and files. Updates scratchpad with state, decisions, and progress.</li>
+      <li><strong>End session with reflection.</strong> Agent submits: summary of what was done, structured reflection (what was learned, what to watch for), and optionally guardrail suggestions, knowledge capture, or warnings for future sessions.</li>
+      <li><strong>System writes and digests.</strong> Lessons and decision traces are stored (workflow-scoped). The digestive pipeline processes them asynchronously: extracting atomic claims, finding connections, updating existing knowledge, validating, and archiving source material.</li>
+      <li><strong>Next session benefits.</strong> The next agent's getContext returns these lessons. The loop compounds.</li>
+    </ol>
+  </section>
+
+  <!-- 5. DIGESTIVE PIPELINE -->
+  <section id="digest">
+    <div class="section-label">05</div>
+    <h2>The Digestive Pipeline</h2>
+    <div class="rule"></div>
+
+    <p>Raw knowledge entering the system is not yet useful. It is food, not capability. The digestive pipeline transforms it. Each phase runs in isolation with fresh context to prevent contamination between steps.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Five-phase digestive pipeline</div>
+      <pre class="mermaid">
+flowchart LR
+    R["<b>Reduce</b><br/>Raw → atomic claims"]
+    RE["<b>Reflect</b><br/>Find connections"]
+    RW["<b>Reweave</b><br/>Update existing"]
+    V["<b>Verify</b><br/>Schema + dedup"]
+    A["<b>Archive</b><br/>Mark processed"]
+    R --> RE --> RW --> V --> A
+      </pre>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>What it does</th>
+          <th>Analogy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Reduce</td>
+          <td>Extract atomic claims from source material. A 2000-word battlecard yields five entity-anchored claims. The rest is discarded.</td>
+          <td>Digestion: break down bulk into building blocks.</td>
+        </tr>
+        <tr>
+          <td>Reflect</td>
+          <td>Find connections. Where does each new claim link to what already exists? Connections make both claims more retrievable.</td>
+          <td>Cross-referencing: linking new knowledge to existing understanding.</td>
+        </tr>
+        <tr>
+          <td>Reweave</td>
+          <td>Backward maintenance. "If this existing claim were written today, knowing what we now know, what would be different?" New material strengthens existing structures.</td>
+          <td>Revision: the graph gets stronger claims, not just more claims.</td>
+        </tr>
+        <tr>
+          <td>Verify</td>
+          <td>Immune system. Schema validation, retrieval filter quality check, entity resolution, duplicate detection. Malformed claims never enter the graph.</td>
+          <td>Type checker: correctness checks on installed software.</td>
+        </tr>
+        <tr>
+          <td>Archive</td>
+          <td>Processed source material exits the active workspace. What remains is extracted value: clean, connected, integrated.</td>
+          <td>Waste removal: keep the nutrients, release the bulk.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 6. HOW RETRIEVAL WORKS -->
+  <section id="retrieval">
+    <div class="section-label">06</div>
+    <h2>How Retrieval Works</h2>
+    <div class="rule"></div>
+
+    <p>Retrieval is purpose-aware and token-budgeted. The same entity returns different claim subsets depending on the consumer's workflow and task.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">getContext retrieval flow</div>
+      <pre class="mermaid">
+flowchart TB
+    Q["Agent calls getContext<br/>(workflow, task, scopes)"]
+    F["Filter by workflow + scope<br/>(project → team → framework → org)"]
+    R["Rank by: priority × recency<br/>× tag match × value-per-token"]
+    B["Apply token budget<br/>(cap total context size)"]
+    BP["Berrypicking: multi-pass<br/>(reassess, refine, re-query)"]
+    A["Assemble response:<br/>lessons + precedent + (optional) Alexandria index"]
+
+    Q --> F --> R --> B --> BP --> A
+      </pre>
+    </div>
+
+    <div class="cols">
+      <div>
+        <h3 class="sub">Layered scope</h3>
+        <p>Retrieval spans four layers, from narrow to broad:</p>
+        <table>
+          <thead><tr><th>Layer</th><th>Scope</th></tr></thead>
+          <tbody>
+            <tr><td>Project</td><td>This task, this ticket</td></tr>
+            <tr><td>Team / domain</td><td>Shared best practices</td></tr>
+            <tr><td>Framework</td><td>Cross-workflow lessons</td></tr>
+            <tr><td>Organization</td><td>Entity graph, org-wide</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3 class="sub">Berrypicking</h3>
+        <p>Retrieval isn't always one-shot. The system can do multiple passes: an initial pass finds relevant lessons, the retrieval logic reassesses ("given what I found, what else do I need?"), and runs another pass with a refined query.</p>
+        <p>This mirrors how people actually look things up. The search evolves as understanding grows.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. THE KNOWLEDGE GRAPH -->
+  <section id="graph">
+    <div class="section-label">07</div>
+    <h2>The Knowledge Graph</h2>
+    <div class="rule"></div>
+
+    <p>The graph is entity-centric: it models the real things the organization cares about and the relationships between them. Entities are the nouns of institutional knowledge.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Knowledge Interchange Layer</div>
+      <pre class="mermaid">
+flowchart LR
+    subgraph SRC["Sources"]
+        direction TB
+        s1["Agent reflections"]
+        s2["Research"]
+        s3["Conversations"]
+        s4["Events"]
+    end
+
+    subgraph INC["Input Contract"]
+        c1["entity + claim +<br/>source + confidence +<br/>timestamp + author"]
+    end
+
+    subgraph KG["Knowledge Graph"]
+        direction TB
+        e["Entities"]
+        r["Relationships"]
+        kc["Claims"]
+        b["Backlinks"]
+        e --- r
+        r --- kc
+        kc --- b
+    end
+
+    subgraph OC["Output Contract"]
+        o1["Purpose-aware<br/>context assembly"]
+    end
+
+    subgraph CON["Consumers"]
+        direction TB
+        a1["Agents"]
+        a2["Dashboards"]
+        a3["Decision support"]
+        a4["Search"]
+    end
+
+    SRC --> INC --> KG --> OC --> CON
+      </pre>
+    </div>
+
+    <div class="callout">
+      <p><strong>Claims are installed capabilities.</strong> When an agent loads a knowledge claim, it gains a capability it didn't have before. A claim about competitive positioning enables the agent to reason about strategy. A vague claim is a buggy function. A stale claim is a regression. Quality gates are correctness checks on installed software, not tidiness conventions.</p>
+    </div>
+  </section>
+
+  <!-- 8. AGENT TAXONOMY -->
+  <section id="taxonomy">
+    <div class="section-label">08</div>
+    <h2>Agent Taxonomy</h2>
+    <div class="rule"></div>
+
+    <p>Not every agent should learn. The architecture serves four types of agents, distinguished by their relationship to knowledge. Moving along this spectrum is incremental.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Agent complexity spectrum</div>
+      <pre class="mermaid">
+flowchart LR
+    subgraph S["Stateless Tools"]
+        s1["Code formatter<br/>Data validator"]
+    end
+    subgraph C["Knowledge Consumers"]
+        c1["Pipeline reporter<br/>Meeting prep agent"]
+    end
+    subgraph L["Scoped Learners"]
+        l1["Coding assistant<br/>Sales assistant"]
+    end
+    subgraph F["Full-Metabolism Agents"]
+        f1["Strategic architect<br/>Business analyst"]
+    end
+
+    S -->|"Add graph reads"| C
+    C -->|"Add feedback loop"| L
+    L -->|"Add metabolic machinery"| F
+      </pre>
+    </div>
+
+    <table>
+      <thead><tr><th>Type</th><th>% of fleet</th><th>Reads graph</th><th>Learns</th><th>Full metabolism</th></tr></thead>
+      <tbody>
+        <tr><td>Stateless tools</td><td>65-70%</td><td>No</td><td>No</td><td>No</td></tr>
+        <tr><td>Knowledge consumers</td><td>20-25%</td><td>Yes</td><td>No</td><td>No</td></tr>
+        <tr><td>Scoped learners</td><td>5-10%</td><td>Domain slice</td><td>Bounded</td><td>No</td></tr>
+        <tr><td>Full-metabolism agents</td><td>1-3%</td><td>Full graph</td><td>Yes</td><td>Yes</td></tr>
+      </tbody>
+    </table>
+
+    <p>The key design choice: the graph must serve stateless tools and knowledge consumers (the majority) with minimal friction. A single API call returns what they need. No session registration, no scratchpad. The metabolic machinery exists for the 1-3% that justify it.</p>
+  </section>
+
+  <!-- 9. HONEST CHALLENGES -->
+  <section id="challenges">
+    <div class="section-label">09</div>
+    <h2>Honest Challenges</h2>
+    <div class="rule"></div>
+
+    <p>We pressure-tested the architecture against 18+ external sources across 6+ sessions. Five validated strengths. Seven critical gaps.</p>
+
+    <h3 class="sub">Validated strengths (protect these)</h3>
+    <div class="callout success">
+      <p><strong>Propositional framing</strong> ("Since [[X]], therefore Y"): no evaluated system has an equivalent.<br>
+      <strong>Memory evolution</strong> (decay, condensation, supersession): ahead of the field; most systems implement only formation and retrieval.<br>
+      <strong>Forgetting design:</strong> the most complete in any source evaluated.<br>
+      <strong>3D hierarchical token-level memory:</strong> placed at the apex of the 2026 academic survey's taxonomy.<br>
+      <strong>Session lifecycle + scratchpad:</strong> independently validated by Anthropic, MAPLE, and the academic survey.</p>
+    </div>
+
+    <h3 class="sub">Critical gaps (honest assessment)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Gap</th>
+          <th>Impact</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Episodic memory (case-based records)</td>
+          <td>Can't retrieve "what happened last time we tried this?" Only abstract lessons, not concrete episodes.</td>
+          <td><span class="badge planned">Designed</span></td>
+        </tr>
+        <tr>
+          <td>Context pressure for long-running agents</td>
+          <td>Session-boundary model breaks at 1+ hour sessions. We have a CLAUDE.md rule; we need architecture.</td>
+          <td><span class="badge planned">Planned</span></td>
+        </tr>
+        <tr>
+          <td>Memory integrity and trust model</td>
+          <td>No content trust tiers. No read-time validation. No write-event audit log sufficient for rollback. Defenses are write-time schema/format correctness only.</td>
+          <td><span class="badge planned">ADR written</span></td>
+        </tr>
+        <tr>
+          <td>Security / blast radius of poisoned claims</td>
+          <td>Alexandria's propositional framing means a poisoned claim is <em>reasoned from</em>, not just referenced. Higher epistemic authority means higher blast radius. Three attack vectors identified: direct lesson injection, reflection poisoning via compromised sessions, and digestive pipeline injection from external sources. Mitigations (trust tiers, audit log, read-time integrity checks) designed but not yet implemented.</td>
+          <td><span class="badge planned">Designed</span></td>
+        </tr>
+        <tr>
+          <td>Knowledge engineering discipline</td>
+          <td>We recognize "claims are installed capabilities" but haven't built the full engineering practices: dependency tracking, impact analysis, confidence-visible rendering, deprecation management.</td>
+          <td><span class="badge planned">Planned</span></td>
+        </tr>
+        <tr>
+          <td>Conflict resolution (clash)</td>
+          <td>When getContext returns contradictory lessons, no resolution logic. Agent receives contradictory signals with no guidance.</td>
+          <td><span class="badge planned">Planned</span></td>
+        </tr>
+        <tr>
+          <td>Event-triggered learning</td>
+          <td>Critical failures wait for session-end batch. Same mistake can recur before the next reflection.</td>
+          <td><span class="badge planned">Designed</span></td>
+        </tr>
+        <tr>
+          <td>No quantitative benchmarks</td>
+          <td>Can't quantitatively prove "memory helps" or "graph beats filesystem." Letta scores 74% on LoCoMo with a plain filesystem.</td>
+          <td><span class="badge planned">Research</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout warning">
+      <p><strong>The benchmarking reality:</strong> For simple retrieval, the mechanism doesn't matter. Agents search well with any tool. Our graph's value is not faster retrieval. It is <em>discovery</em> (connections not sought), <em>reasoning</em> (propositional claims as installed capabilities), <em>evolution</em> (forgetting at scale), and <em>governance</em> (trust tiers). These don't show up on standard benchmarks. They show up in enterprise, multi-agent, cross-domain scenarios. We need to build evaluation methods that test what we're actually good at.</p>
+    </div>
+  </section>
+
+  <!-- 10. ARCHITECTURE VISION -->
+  <section id="vision">
+    <div class="section-label">10</div>
+    <h2>Architecture Vision</h2>
+    <div class="rule"></div>
+
+    <p>The vision (pending organizational buy-in) is federated memory with two tiers and a governed bridge. Local developers keep their lightweight, file-based memory that works for them. The organizational tier would provide the shared, governed knowledge graph. Quality gates apply at the promotion boundary, not at local writes.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Current state to target state</div>
+      <pre class="mermaid">
+flowchart TB
+    subgraph today["Current State (operational)"]
+        L3["Living Memory store<br/>(lessons, connections, entities)"]
+        L4["Agentic learning loop<br/>(getContext, reflection, shared)"]
+        L3 --> L4
+    end
+
+    subgraph target["Target State (vision)"]
+        local["<b>Local tier</b><br/>.md files, git-backed<br/>personal/team scope"]
+        bridge["<b>Bridge</b><br/>Quality gates at<br/>promotion boundary"]
+        org["<b>Organizational tier</b><br/>Alexandria graph<br/>governed, cross-domain"]
+        trust["Trust tiers + integrity<br/>audit log, rollback"]
+        episodic["Episodic memory<br/>exemplars, provenance"]
+        event["Event-triggered learning<br/>failure → immediate capture"]
+        local <-->|"query / promote"| bridge
+        bridge <-->|"governed"| org
+        org --> trust
+        org --> episodic
+    end
+
+    L4 -.->|"feeds"| bridge
+    L3 -.->|"foundation"| org
+      </pre>
+    </div>
+
+    <h3 class="sub">The federated principle</h3>
+    <p>The filesystem-vs-graph divide is not either/or. Individual developers use lightweight, file-based memory (markdown in a workspace, git-backed). Organizations need governed, cross-domain knowledge. The architecture serves both without forcing one onto the other.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>Local tier</h4>
+        <p>.md files in workspace, git-backed, personal/team scope. Slash commands (/note, /remember). Low ceremony, high velocity. No quality gates at local writes.</p>
+      </div>
+      <div class="card">
+        <h4>Organizational tier</h4>
+        <p>Alexandria knowledge graph. Cross-domain, propositional, governed, forgetting-enabled. Claims become installed capabilities.</p>
+      </div>
+    </div>
+    <div style="max-width: 480px; margin: 0 auto;">
+      <div class="card" style="text-align: center;">
+        <h4>Bidirectional bridge</h4>
+        <p>Local projects query Alexandria for best practices and precedent. Local learnings promote to Alexandria when they have organizational value. Quality gates apply at the promotion boundary.</p>
+      </div>
+    </div>
+
+    <h3 class="sub">The Knowledge Interchange Layer</h3>
+    <p>Any team publishes knowledge into the graph through one contract: <strong>{entity, claim, source, confidence, timestamp, author}</strong>. Teams don't change their tools. Users post and query from Slack. Customer engagement is actively managed in SFDC. Gemini transcripts get parsed. Each team moves at their own pace. The framework grows by accretion, not revolution.</p>
+  </section>
+
+  <!-- 11. ROADMAP -->
+  <section id="roadmap">
+    <div class="section-label">11</div>
+    <h2>Roadmap</h2>
+    <div class="rule"></div>
+
+    <p>Five phases, derived from 45 recommendations across 18+ pressure-test sources. This roadmap is aspirational, contingent on organizational buy-in and prioritization. Phase 1 represents near-term improvements to the existing local system.</p>
+
+    <div class="diagram">
+      <div class="diagram-label">Phase dependency overview</div>
+      <pre class="mermaid">
+flowchart LR
+    P1["<b>Phase 1</b><br/>Core Quality +<br/>Safety"]
+    P2["<b>Phase 2</b><br/>Episodic Memory +<br/>Context Pressure"]
+    P3["<b>Phase 3</b><br/>Intelligence +<br/>Quality"]
+    P4["<b>Phase 4</b><br/>Infrastructure<br/>Evolution"]
+    P5["<b>Phase 5</b><br/>Knowledge<br/>Engineering"]
+
+    P1 --> P2
+    P1 --> P3
+    P2 --> P4
+    P3 --> P4
+    P4 --> P5
+      </pre>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Goal</th>
+          <th>Key deliverables</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Core Quality &amp; Safety</strong></td>
+          <td>Close the most dangerous gap (memory integrity) and implement highest-value improvements.</td>
+          <td>Decay tiers + RetentionConfig. Trust tiers + audit log. Event-triggered learning. Contribution quality gates. Read-before-write discipline.</td>
+        </tr>
+        <tr>
+          <td><strong>2. Episodic Memory &amp; Context Pressure</strong></td>
+          <td>Close the two structural gaps identified across multiple independent sources.</td>
+          <td>Episodic memory store (exemplars linked to lessons). Context pressure events for long-running agents. Conflict resolution layer. Sub-agent memory hierarchy.</td>
+        </tr>
+        <tr>
+          <td><strong>3. Intelligence &amp; Quality</strong></td>
+          <td>Deepen memory quality, provenance, and the learning loop.</td>
+          <td>Quality scoring on claims. Memory strengthening (not just forgetting). Offline consolidation cycle. Source provenance. Confidence-visible rendering in Alexandria.</td>
+        </tr>
+        <tr>
+          <td><strong>4. Infrastructure Evolution</strong></td>
+          <td>Architectural changes that enable the next level of capability.</td>
+          <td>Entity and event node types. Skills-as-memory-tier. Claim journal + versioning. Living Memory as a Service (federated memory).</td>
+        </tr>
+        <tr>
+          <td><strong>5. Knowledge Engineering</strong></td>
+          <td>Build the engineering discipline that "claims are installed capabilities" demands.</td>
+          <td>Dependency tracking. Blast radius queries. Active deprecation notices. Evaluation framework. Memory explainability.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <p><strong>The strategic opportunity:</strong> The industry is converging on graphs, agents, learning loops, and forgetting. No one in the evaluated landscape is building the full knowledge engineering discipline (Phase 5): dependency tracking, impact analysis, capability testing, deprecation management for knowledge claims. If the organization chooses to invest here, it moves from a novel framing to a novel discipline, genuinely unprecedented and difficult to replicate.</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="diagram-backdrop" id="diagramBackdrop">
+  <div class="close-hint">Click or press Esc to close</div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const backdrop = document.getElementById('diagramBackdrop');
+    let activeDiagram = null;
+
+    function closeDiagram() {
+      if (activeDiagram) {
+        activeDiagram.classList.remove('fullscreen');
+        activeDiagram = null;
+      }
+      backdrop.classList.remove('active');
+    }
+
+    document.querySelectorAll('.diagram').forEach(d => {
+      d.addEventListener('click', (e) => {
+        if (d.classList.contains('fullscreen')) {
+          closeDiagram();
+        } else {
+          closeDiagram();
+          d.classList.add('fullscreen');
+          backdrop.classList.add('active');
+          activeDiagram = d;
+        }
+        e.stopPropagation();
+      });
+    });
+
+    backdrop.addEventListener('click', closeDiagram);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeDiagram();
+    });
+  });
+</script>
+
+</body>
+</html>
