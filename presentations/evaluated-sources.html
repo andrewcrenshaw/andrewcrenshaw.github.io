@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Living Memory &amp; Alexandria: Evaluated Sources Supplement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --bg-surface: #0f1319;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-hover: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-accent: rgba(78, 168, 201, 0.25);
+      --text: #e4e8ed;
+      --text-dim: #7e8a97;
+      --text-faint: #4a5568;
+      --accent: #4ea8c9;
+      --accent-dim: rgba(78, 168, 201, 0.15);
+      --red: #c75b5b;
+      --green: #6bab73;
+      --orange: #c9954e;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Outfit', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --pad: clamp(1.5rem, 4vw, 4rem);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0.5rem var(--pad) var(--pad);
+    }
+
+    header {
+      padding: clamp(2rem, 5vh, 4rem) var(--pad) clamp(1.5rem, 3vh, 2rem);
+      max-width: 960px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h3 {
+      font-family: var(--sans);
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    header h1 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    header .meta {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    header .meta strong { color: var(--text); font-weight: 500; }
+
+    .rule {
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    section {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.01em;
+    }
+
+    h3.sub {
+      font-family: var(--serif);
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 2rem 0 0.8rem;
+      color: var(--text);
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+      max-width: 100%;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    em { font-style: italic; color: var(--accent); font-family: var(--serif); font-size: 1.05em; }
+
+    strong { font-weight: 500; color: var(--text); }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(78, 168, 201, 0.3);
+      transition: border-color 0.2s;
+    }
+
+    a:hover { border-color: var(--accent); }
+
+    .callout {
+      background: var(--bg-card);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .callout p { margin-bottom: 0.6rem; }
+    .callout p:last-child { margin-bottom: 0; }
+
+    /* Source cards */
+    .source {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 0.8rem;
+      transition: all 0.3s var(--ease);
+    }
+
+    .source:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+    }
+
+    .source-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .source-title {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .source-type {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .type-paper { background: rgba(78, 168, 201, 0.15); color: var(--accent); }
+    .type-oss { background: rgba(107, 171, 115, 0.15); color: var(--green); }
+    .type-industry { background: rgba(201, 149, 78, 0.15); color: var(--orange); }
+    .type-internal { background: rgba(255, 255, 255, 0.06); color: var(--text-dim); }
+
+    .source-author {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .source-summary {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    .source-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+    }
+
+    .source-links a {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      background: var(--accent-dim);
+      border-radius: 4px;
+      border-bottom: none;
+      color: var(--accent);
+      transition: background 0.2s;
+    }
+
+    .source-links a:hover { background: rgba(78, 168, 201, 0.25); }
+
+    .source-contribution {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      margin-top: 0.4rem;
+      font-style: italic;
+    }
+
+    /* Claims table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    th {
+      font-family: var(--sans);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.65rem;
+      color: var(--accent);
+      text-align: left;
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-dim);
+      vertical-align: top;
+      line-height: 1.5;
+      font-size: 0.85rem;
+    }
+
+    tr:hover td { background: var(--bg-card); }
+
+    td:first-child { color: var(--text); font-weight: 400; }
+
+    /* Grain */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.25;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h3>Supplement</h3>
+  <h1>Evaluated Sources &amp; References</h1>
+  <div class="rule"></div>
+  <div class="meta">
+    <strong>Companion to:</strong> Living Memory &amp; Alexandria Technical Overview<br>
+    <strong>Evaluation period:</strong> February &ndash; March 2026 (6+ sessions)<br>
+    <strong>Date:</strong> March 2026
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ABOUT -->
+  <section>
+    <div class="section-label">About this document</div>
+    <h2>How to Read This Supplement</h2>
+    <div class="rule"></div>
+
+    <p>The technical overview makes claims about the state of the field, validated strengths, and gaps. This supplement provides the sources behind those claims so readers can evaluate them independently.</p>
+
+    <p>Between February and March 2026, we conducted a structured pressure-test of the Living Memory and Alexandria architecture against <strong>20+ external sources</strong> spanning academic papers, open-source projects, industry articles, and commercial products. Each source was evaluated in a dedicated document that compares its approach to ours, identifies what we should adopt, and notes where our design diverges.</p>
+
+    <p>Not all original source materials are preserved (some were live demos, videos, or paywalled content). Where external links exist, they are included below. Our evaluation documents are available in the project repository under <code>docs/research/</code>.</p>
+  </section>
+
+  <!-- KEY CLAIMS -->
+  <section>
+    <div class="section-label">Claim traceability</div>
+    <h2>Key Claims and Their Sources</h2>
+    <div class="rule"></div>
+
+    <p>Claims from the technical overview, mapped to the sources that support or challenge them.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Claim</th>
+          <th>Supporting sources</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Propositional framing has no evaluated equivalent</td>
+          <td>MIE, Cognee, Letta/MemGPT, Hindsight, MAPLE, Memory Survey, CrewAI</td>
+          <td>MIE stores flat text; Cognee uses triplets; Letta uses filesystem; Hindsight uses embeddings. None render claims with explicit reasoning chains.</td>
+        </tr>
+        <tr>
+          <td>Memory evolution (decay, condensation, supersession) ahead of the field</td>
+          <td>Engram, Cognee, Memory Survey, Letta/MemGPT, MAPLE</td>
+          <td>Engram has decay tiers (closest). Cognee has memify (spaced repetition). Most systems implement formation and retrieval only, not evolution.</td>
+        </tr>
+        <tr>
+          <td>Forgetting design is the most complete evaluated</td>
+          <td>Memory Survey, Engram, MAPLE, Letta/MemGPT</td>
+          <td>Memory Survey places forgetting at the apex of its taxonomy. Engram has partial decay. No evaluated system has our full forgetting pipeline (pruning + supersession + condensation + stale detection).</td>
+        </tr>
+        <tr>
+          <td>3D hierarchical token-level memory at the apex of the 2026 survey's taxonomy</td>
+          <td>Memory in the Age of Agents Survey (Hu et al.)</td>
+          <td>The survey's taxonomy has six levels; our design maps to the highest. Direct correspondence documented in evaluation.</td>
+        </tr>
+        <tr>
+          <td>Session lifecycle validated independently</td>
+          <td>Anthropic Memory Tool, MAPLE, Memory Survey</td>
+          <td>Anthropic uses context editing + auto-injected prompts. MAPLE uses M/L/P with session boundaries. Survey validates lifecycle as a design pattern.</td>
+        </tr>
+        <tr>
+          <td>No one is building the full knowledge engineering discipline</td>
+          <td>All 20+ sources</td>
+          <td>No evaluated system treats knowledge claims as installed capabilities requiring dependency tracking, impact analysis, capability testing, and deprecation management. This is an absence claim; future sources may disprove it.</td>
+        </tr>
+        <tr>
+          <td>Memory poisoning amplifies blast radius via propositional framing</td>
+          <td>Memory Poisoning Threat Model (internal), ATHF</td>
+          <td>Internal analysis. ATHF's LOCK pattern validates the need for trust boundaries on procedural memory.</td>
+        </tr>
+        <tr>
+          <td>For simple retrieval, mechanism doesn't matter (Letta 74% on LoCoMo with filesystem)</td>
+          <td>Letta/MemGPT, Hindsight</td>
+          <td>Letta's LoCoMo results. Hindsight scores higher (TEMPR) but uses a different benchmark. The point: graph value is in discovery, reasoning, and evolution, not speed.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ACADEMIC PAPERS -->
+  <section>
+    <div class="section-label">Academic &amp; research papers</div>
+    <h2>Papers and Surveys</h2>
+    <div class="rule"></div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">MAPLE: Memory, Learning, Personalization Framework</span>
+        <span class="source-type type-paper">Paper</span>
+      </div>
+      <div class="source-author">Deepak Babu Piskala &mdash; ALA 2026 @ AAMAS 2026</div>
+      <div class="source-summary">Introduced the M/L/P decomposition we adopted for our architecture. Context rot taxonomy (poisoning, distraction, confusion, clash). Validated hierarchical token-level memory and event-triggered learning. Source of our conflict resolution gap identification.</div>
+      <div class="source-links">
+        <a href="https://github.com/prdeepakbabu/maple-framework" target="_blank">GitHub</a>
+        <a href="https://arxiv.org/abs/2602.13581" target="_blank">arXiv:2602.13581</a>
+      </div>
+      <div class="source-contribution">Contributed: M/L/P architecture, context rot taxonomy, event-triggered learning design</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Memory in the Age of Agents (Survey)</span>
+        <span class="source-type type-paper">Paper</span>
+      </div>
+      <div class="source-author">Hu et al. &mdash; NUS, Fudan, Renmin, Peking, Oxford, Georgia Tech</div>
+      <div class="source-summary">Comprehensive 2026 survey establishing the Forms-Functions-Dynamics taxonomy for agent memory. Places 3D hierarchical token-level memory at the apex. Validates session lifecycle, forgetting-as-architecture, and episodic memory as a structural gap across the field.</div>
+      <div class="source-links">
+        <a href="https://github.com/Shichun-Liu/Agent-Memory-Paper-List" target="_blank">Paper list (GitHub)</a>
+      </div>
+      <div class="source-contribution">Contributed: Taxonomy placement, episodic memory gap validation, offline consolidation cycle</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ALMA: Learning to Continually Learn via Meta-learning Agentic Memory Designs</span>
+        <span class="source-type type-paper">Paper</span>
+      </div>
+      <div class="source-author">zksha</div>
+      <div class="source-summary">Meta-learns memory designs as executable code. Reflect-generate-verify and examine-before-commit patterns. AlfWorld/TextWorld benchmarks. Validated our approach to memory as active architecture, not passive storage.</div>
+      <div class="source-links">
+        <a href="https://github.com/zksha/alma" target="_blank">GitHub</a>
+      </div>
+      <div class="source-contribution">Contributed: Reflect-generate-verify pattern, examine-before-commit discipline</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Everything is Context: Agentic File System</span>
+        <span class="source-type type-paper">Paper</span>
+      </div>
+      <div class="source-author">Xu et al. &mdash; CSIRO Data61, ArcBlock, U Tasmania, UNSW</div>
+      <div class="source-summary">File-system abstraction for context engineering. Introduced Constructor/Updater/Evaluator vocabulary. Validated the concept of context manifest (what was selected, excluded, and why).</div>
+      <div class="source-links">
+        <a href="https://github.com/AIGNE-io/aigne-framework" target="_blank">AIGNE framework (GitHub)</a>
+      </div>
+      <div class="source-contribution">Contributed: "Context Evaluator" as named architectural role, context manifest concept</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Cornelius: Agentic Note-Taking (24 Articles)</span>
+        <span class="source-type type-paper">Article series</span>
+      </div>
+      <div class="source-author">Cornelius (@molt_cornelius)</div>
+      <div class="source-summary">24-article series on knowledge management. Article 24 ("What Search Cannot Find") crystallized the graph-vs-search distinction: search retrieves what you ask for; graph traversal discovers what you didn't know to ask. Foundation for our knowledge graph architecture.</div>
+      <div class="source-contribution">Contributed: Graph-vs-search framing, metabolism metaphor, Alexandria naming inspiration</div>
+    </div>
+  </section>
+
+  <!-- OPEN SOURCE PROJECTS -->
+  <section>
+    <div class="section-label">Open-source projects</div>
+    <h2>Open-Source Implementations</h2>
+    <div class="rule"></div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Letta / MemGPT</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">UC Berkeley; letta-ai</div>
+      <div class="source-summary">OS-inspired virtual context management. MemFS (Context Repositories) with git-backed memory. Scores 74% on LoCoMo with filesystem-only approach. Critical benchmark: proved that for simple retrieval, the mechanism doesn't matter. Our graph's value must come from discovery, reasoning, and evolution.</div>
+      <div class="source-links">
+        <a href="https://github.com/letta-ai/letta" target="_blank">GitHub</a>
+        <a href="https://arxiv.org/abs/2310.08560" target="_blank">arXiv:2310.08560</a>
+      </div>
+      <div class="source-contribution">Contributed: Benchmarking gap identification, filesystem-vs-graph strategic framing</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Cognee</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">topoteretes</div>
+      <div class="source-summary">Hybrid RAG knowledge engine with knowledge graph construction from unstructured data. Memify (spaced repetition, decay) for memory strengthening. Identified our gap: we have forgetting but not the inverse (demand-driven increase of retrieval probability).</div>
+      <div class="source-links">
+        <a href="https://github.com/topoteretes/cognee" target="_blank">GitHub</a>
+      </div>
+      <div class="source-contribution">Contributed: Memory strengthening gap, knowledge quality evaluation layer concept</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Engram</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">Terronex-dev</div>
+      <div class="source-summary">TypeScript neural memory format with decay tiers, quality metadata, and HNSW indexing. Hierarchical temporal multi-modal memory. Closest to our decay architecture. Validated our approach; we adopted their DecayConfig concept.</div>
+      <div class="source-links">
+        <a href="https://github.com/Terronex-dev/engram" target="_blank">GitHub</a>
+        <a href="https://www.npmjs.com/package/@terronex/engram" target="_blank">npm</a>
+      </div>
+      <div class="source-contribution">Contributed: Decay tiers design, time decay in retrieval, quality block pattern</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">MIE (Memory Intelligence Engine)</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">Kraklabs</div>
+      <div class="source-summary">Go-based memory graph with five typed nodes (Facts, Decisions, Entities, Events, Topics). MCP server. CozoDB backend. Agent-as-Evaluator pattern. Confirmed our propositional framing advantage: MIE stores flat text; we store claims with reasoning chains.</div>
+      <div class="source-links">
+        <a href="https://github.com/kraklabs/mie" target="_blank">GitHub</a>
+      </div>
+      <div class="source-contribution">Contributed: Confirmed propositional framing differentiation, Agent-as-Evaluator pattern</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">CIE (Code Intelligence Engine)</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">Kraklabs</div>
+      <div class="source-summary">Code intelligence engine with CozoDB backend, Tree-sitter parsing, 20+ MCP tools. Operational complement to MIE. Architecture reference for how code-specific knowledge could integrate with a general knowledge graph.</div>
+      <div class="source-links">
+        <a href="https://github.com/kraklabs/cie" target="_blank">GitHub</a>
+      </div>
+      <div class="source-contribution">Contributed: Architecture reference for code-specific knowledge integration</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">memU</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">NevaMind-AI</div>
+      <div class="source-summary">24/7 proactive memory framework with two-bot architecture. Scores 92% on LoCoMo. Memory-as-filesystem metaphor. Demonstrated that proactive memory (suggesting relevant context unprompted) is valuable and feasible.</div>
+      <div class="source-links">
+        <a href="https://github.com/NevaMind-AI/memU" target="_blank">GitHub</a>
+        <a href="https://memu.so" target="_blank">Website</a>
+      </div>
+      <div class="source-contribution">Contributed: Proactive memory concept, LoCoMo benchmark reference</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ATHF (Agentic Threat Hunting Framework)</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">Nebulock-Inc</div>
+      <div class="source-summary">LOCK pattern for agent trust boundaries. MITRE ATT&amp;CK coverage mapping. Domain-specific application of our agentic memory pattern in cybersecurity. Validated the need for trust boundaries on procedural memory (skills).</div>
+      <div class="source-links">
+        <a href="https://github.com/Nebulock-Inc/agentic-threat-hunting-framework" target="_blank">GitHub</a>
+        <a href="https://pypi.org/project/agentic-threat-hunting-framework/" target="_blank">PyPI</a>
+        <a href="https://nebulock.io/blog/agentic-threat-hunting-framework" target="_blank">Blog</a>
+      </div>
+      <div class="source-contribution">Contributed: LOCK pattern for trust boundaries, skill signature verification concept</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">QMD v2</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">tobi</div>
+      <div class="source-summary">Optional P-layer retrieval with vault search and SDK. Evaluated as potential retrieval component. Decision: keep boundary with getContext; QMD operates at a different layer.</div>
+      <div class="source-links">
+        <a href="https://github.com/tobi/qmd" target="_blank">GitHub</a>
+      </div>
+      <div class="source-contribution">Contributed: Confirmed getContext retrieval boundary is correct</div>
+    </div>
+  </section>
+
+  <!-- INDUSTRY / COMMERCIAL -->
+  <section>
+    <div class="section-label">Industry &amp; commercial</div>
+    <h2>Industry Sources</h2>
+    <div class="rule"></div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Hindsight (Vectorize)</span>
+        <span class="source-type type-industry">Commercial</span>
+      </div>
+      <div class="source-author">Vectorize, Inc.</div>
+      <div class="source-summary">Retain/recall/reflect architecture with TEMPR (semantic, BM25, graph, temporal) retrieval. LongMemEval SOTA. Closest production analogue to our architecture. Identified temporal retrieval and reflect-style API as gaps in our design.</div>
+      <div class="source-links">
+        <a href="https://hindsight.vectorize.io/" target="_blank">Website</a>
+        <a href="https://hindsight.vectorize.io/developer/retrieval" target="_blank">Retrieval docs</a>
+        <a href="https://hindsight.vectorize.io/developer/rag-vs-hindsight" target="_blank">RAG comparison</a>
+        <a href="https://github.com/vectorize-io/hindsight" target="_blank">GitHub</a>
+      </div>
+      <div class="source-contribution">Contributed: Temporal retrieval gap, reflect-style API design, closest commercial analogue</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Anthropic Memory Tool</span>
+        <span class="source-type type-industry">Commercial</span>
+      </div>
+      <div class="source-author">Anthropic</div>
+      <div class="source-summary">memory_20250818: file-system model with context editing and auto-injected prompts. Validated session lifecycle pattern independently. Our architecture is ahead on structured learning, forgetting, and knowledge graph; Anthropic is ahead on seamless tool integration.</div>
+      <div class="source-links">
+        <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool" target="_blank">Documentation</a>
+        <a href="https://github.com/anthropics/anthropic-sdk-typescript/blob/main/examples/tools-helpers-memory.ts" target="_blank">SDK example (GitHub)</a>
+      </div>
+      <div class="source-contribution">Contributed: Independent validation of session lifecycle, context injection pattern</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">LangChain Agent Builder Memory</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">LangChain</div>
+      <div class="source-summary">Memory-as-filesystem approach following the COALA framework. Validated /remember commands, scheduled reflection, and agent-suggested compaction as practical patterns.</div>
+      <div class="source-links">
+        <a href="https://blog.langchain.com/how-we-built-agent-builders-memory-system/" target="_blank">Blog post</a>
+      </div>
+      <div class="source-contribution">Contributed: Validated slash commands, scheduled reflection, compaction suggestions</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">CrewAI Cognitive Memory</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">Jo&atilde;o Moura, CrewAI</div>
+      <div class="source-summary">Encode/consolidate/recall/extract/forget pipeline. Retrieval confidence scoring. Evidence gaps tracking. Composite scoring for claim quality. Validated our pipeline phases; introduced evidence_gaps as a concept we should consider.</div>
+      <div class="source-contribution">Contributed: Retrieval confidence concept, evidence gaps tracking pattern</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Context Graphs: AI's Trillion Dollar Opportunity</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">Jaya Gupta &amp; Ashu Garg, Foundation Capital</div>
+      <div class="source-summary">VC thesis on context graphs as the next infrastructure layer for AI. Distinguishes systems of record (current state) from context graphs (decision traces: why, who, when, what precedent). Our architecture aligns with this framing through decision traces and entity-anchored claims.</div>
+      <div class="source-links">
+        <a href="https://foundationcapital.com/context-graphs-ais-trillion-dollar-opportunity/" target="_blank">Article</a>
+      </div>
+      <div class="source-contribution">Contributed: Context graph framing, validation of decision traces as architectural primitive</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Google Always-On Memory Agent</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">Google Cloud</div>
+      <div class="source-summary">Single-user consolidation agent with timer-based memory. Uses Gemini 2.0 Flash. No entity graph, no multi-agent, no forgetting. Reference point for the simplest viable memory agent; our architecture addresses the gaps this design doesn't attempt.</div>
+      <div class="source-links">
+        <a href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/agents/always-on-memory-agent" target="_blank">GitHub</a>
+      </div>
+      <div class="source-contribution">Contributed: Baseline reference for minimal viable memory agent</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Monigatti: Memory in AI Agents</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">Leonie Monigatti</div>
+      <div class="source-summary">Taxonomy overview covering CoALA and Letta frameworks. Distinction between "agent memory" (passive store) and "agentic memory" (self-managing). Ecosystem map of memory implementations. Identified episodic memory as a structural gap across the field.</div>
+      <div class="source-links">
+        <a href="https://www.leoniemonigatti.com/blog/memory-in-ai-agents.html" target="_blank">Blog post</a>
+      </div>
+      <div class="source-contribution">Contributed: Agent vs agentic memory distinction, episodic memory gap, ecosystem mapping</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">McGowan: Personal Agent Memory System</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">Christopher McGowan</div>
+      <div class="source-summary">Practical demonstration of /nap, /wake, /take note commands for agent memory. Pre-compaction checkpoint pattern. Validated the federated memory principle: lightweight local memory bridged to a governed store.</div>
+      <div class="source-contribution">Contributed: Slash command patterns, nap/wake lifecycle, federated memory principle</div>
+    </div>
+  </section>
+
+  <!-- INTERNAL ANALYSIS -->
+  <section>
+    <div class="section-label">Internal analysis</div>
+    <h2>Internal Evaluations</h2>
+    <div class="rule"></div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Memory Poisoning Threat Model</span>
+        <span class="source-type type-internal">Internal</span>
+      </div>
+      <div class="source-summary">Internal threat analysis identifying three attack vectors (direct injection, reflection poisoning, digestive pipeline injection) and the blast radius amplification from propositional framing. Led to the Memory Integrity and Trust Model ADR and Phase 1 safety roadmap.</div>
+      <div class="source-contribution">Contributed: Trust tiers design, audit log requirements, security gap identification</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">8 RAG Architectures Framework Evaluation</span>
+        <span class="source-type type-internal">Internal</span>
+      </div>
+      <div class="source-summary">Mapped eight RAG architecture patterns (Naive through Agentic) against our design. Identified gaps in Adaptive routing, Corrective RAG (read-time validation), and HyDE for semantic discovery. Confirmed our positioning beyond standard RAG patterns.</div>
+      <div class="source-contribution">Contributed: RAG evolution framing, Corrective RAG gap, Adaptive routing design</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Consolidated Pressure-Test Synthesis</span>
+        <span class="source-type type-internal">Internal</span>
+      </div>
+      <div class="source-summary">Master synthesis document consolidating findings from all sessions into 45 recommendations (R1-R44) and 25 design items (D1-D25). Established the seven critical gaps, five validated strengths, and the phased roadmap.</div>
+      <div class="source-contribution">Contributed: Roadmap structure, gap prioritization, strength validation</div>
+    </div>
+  </section>
+
+  <!-- EVALUATION METHODOLOGY -->
+  <section>
+    <div class="section-label">Methodology</div>
+    <h2>How We Evaluated</h2>
+    <div class="rule"></div>
+
+    <p>Each source was evaluated using a consistent approach:</p>
+
+    <div class="callout">
+      <p><strong>1. Understand the source</strong> on its own terms: what problem does it solve, for whom, with what trade-offs?</p>
+      <p><strong>2. Map to our architecture:</strong> where does it overlap, where does it diverge, where does it address a gap we have?</p>
+      <p><strong>3. Identify adoptable patterns:</strong> what should we take from this source? What's the minimal useful adoption?</p>
+      <p><strong>4. Pressure-test our assumptions:</strong> does this source invalidate or weaken any of our architectural bets?</p>
+      <p><strong>5. Document honestly:</strong> where the source is ahead of us, say so. Where we're ahead, explain why with evidence.</p>
+    </div>
+
+    <h3 class="sub">Limitations</h3>
+    <p>This is not a formal systematic review. Sources were selected based on relevance, availability, and discovery during active research, not from a comprehensive literature search. Some sources were evaluated from blog posts or README files, not from peer-reviewed publications. The evaluation was conducted by a small team and reflects our architectural perspective. We encourage readers to evaluate the original sources independently and draw their own conclusions.</p>
+  </section>
+
+</div>
+
+</body>
+</html>
