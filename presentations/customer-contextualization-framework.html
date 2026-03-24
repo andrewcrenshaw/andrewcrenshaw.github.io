@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Contextualization Framework</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-hover: rgba(255, 255, 255, 0.07);
+      --text: #e8e4df;
+      --text-dim: #8a857e;
+      --accent: #c9a54e;
+      --accent-dim: rgba(201, 165, 78, 0.15);
+      --accent-glow: rgba(201, 165, 78, 0.08);
+      --red: #c75b5b;
+      --green: #6bab73;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Outfit', -apple-system, sans-serif;
+      --pad: clamp(2rem, 6vw, 5rem);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .slide {
+      min-height: 100vh;
+      padding: var(--pad);
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, var(--accent-glow) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(201, 165, 78, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .slide-content.wide { max-width: 1200px; }
+    .slide-content.narrow { max-width: 800px; }
+
+    .rule {
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .rule.center { margin-left: auto; margin-right: auto; }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 400;
+      line-height: 1.05;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-family: var(--sans);
+      font-size: clamp(0.75rem, 1.2vw, 0.85rem);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      line-height: 1.7;
+      color: var(--text-dim);
+      max-width: 680px;
+    }
+
+    em { font-style: italic; color: var(--accent); font-family: var(--serif); }
+
+    .big-quote {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--text);
+      font-style: italic;
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .big-quote::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.2em;
+      bottom: 0.2em;
+      width: 3px;
+      background: var(--accent);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.4s var(--ease);
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(201, 165, 78, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      display: block;
+      color: var(--accent);
+    }
+
+    .card h4 {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-dim);
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      font-size: clamp(0.85rem, 1.2vw, 1rem);
+    }
+
+    .compare-table th {
+      font-family: var(--sans);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-align: left;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .compare-table td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-dim);
+      vertical-align: top;
+    }
+
+    .compare-table tr:hover td {
+      background: var(--bg-card);
+    }
+
+    .compare-table .highlight {
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .flow-loop {
+      max-width: 900px;
+      margin: 3rem auto 2rem;
+    }
+
+    .flow-top-row, .flow-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .flow-connector {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 2rem;
+    }
+
+    .flow-connector-arrow {
+      color: var(--accent);
+      opacity: 0.4;
+      font-size: 1.2rem;
+    }
+
+    .flow-step {
+      text-align: center;
+      padding: 1.4rem 1.2rem;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      flex: 1;
+      max-width: 180px;
+      transition: all 0.4s var(--ease);
+    }
+
+    .flow-step:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .flow-step .step-label {
+      font-family: var(--sans);
+      font-weight: 500;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .flow-step .step-name {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .flow-step .step-desc {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    .flow-arrow-inline {
+      color: var(--accent);
+      font-size: 1.2rem;
+      padding: 0 0.6rem;
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+
+    .flow-loop-label {
+      text-align: center;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      opacity: 0.5;
+      margin-top: 0.4rem;
+    }
+
+    @media (max-width: 768px) {
+      .flow-top-row, .flow-bottom-row {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      .flow-step { max-width: 280px; width: 100%; }
+      .flow-arrow-inline { transform: rotate(90deg); padding: 0.3rem 0; }
+      .flow-connector { flex-direction: column; padding: 0.5rem 0; }
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .two-col { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    .layer-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 2rem 0;
+      max-width: 600px;
+    }
+
+    .layer {
+      padding: 1.2rem 5.5rem 1.2rem 1.5rem;
+      border-left: 3px solid var(--accent);
+      background: var(--bg-card);
+      position: relative;
+      transition: all 0.3s var(--ease);
+    }
+
+    .layer:first-child {
+      border-radius: 10px 10px 0 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .layer:last-child {
+      border-radius: 0 0 10px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .layer:hover { background: var(--bg-card-hover); }
+
+    .layer-name {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .layer-desc {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+    }
+
+    .layer-tag {
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      opacity: 0.7;
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .before, .after {
+      padding: 2rem;
+      border-radius: 12px;
+    }
+
+    .before {
+      background: rgba(199, 91, 91, 0.06);
+      border: 1px solid rgba(199, 91, 91, 0.15);
+    }
+
+    .after {
+      background: rgba(107, 171, 115, 0.06);
+      border: 1px solid rgba(107, 171, 115, 0.15);
+    }
+
+    .before h4, .after h4 {
+      font-family: var(--sans);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+    }
+
+    .before h4 { color: var(--red); }
+    .after h4 { color: var(--green); }
+
+    .before li, .after li {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+      list-style: none;
+      padding-left: 1.2rem;
+      position: relative;
+    }
+
+    .before li::before {
+      content: '\00d7';
+      position: absolute;
+      left: 0;
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    .after li::before {
+      content: '\2192';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+    }
+
+    @media (max-width: 768px) {
+      .before-after { grid-template-columns: 1fr; }
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 3rem;
+      margin: 2.5rem 0;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .stat-number {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.12s; }
+    .reveal-delay-2 { transition-delay: 0.24s; }
+    .reveal-delay-3 { transition-delay: 0.36s; }
+    .reveal-delay-4 { transition-delay: 0.48s; }
+    .reveal-delay-5 { transition-delay: 0.6s; }
+
+    .nav-dots {
+      position: fixed;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      transition: all 0.3s var(--ease);
+      border: none;
+      padding: 0;
+    }
+
+    .nav-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    .nav-dot:hover { background: rgba(255, 255, 255, 0.4); }
+
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--accent);
+      z-index: 200;
+      transition: width 0.3s var(--ease);
+    }
+
+    .keyboard-hint {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      opacity: 0.4;
+      letter-spacing: 0.1em;
+      z-index: 100;
+    }
+
+    .title-slide { text-align: center; }
+
+    .title-slide h1 {
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .title-slide .subtitle {
+      font-family: var(--serif);
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      color: var(--text-dim);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .title-slide .rule { margin: 1.5rem auto; }
+
+    .close-slide { text-align: center; }
+
+    .close-slide h2 {
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      margin-bottom: 1rem;
+    }
+
+    .close-slide p {
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.5;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { transition: opacity 0.3s ease; transform: none; }
+      .reveal.visible { transform: none; }
+    }
+
+    .card-grid.three-col {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 900px) {
+      .card-grid.three-col { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-dots, .keyboard-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar" id="progressBar"></div>
+  <nav class="nav-dots" id="navDots"></nav>
+  <div class="keyboard-hint">&uarr; &darr; or scroll</div>
+
+  <!-- SLIDE 1: Title -->
+  <section class="slide title-slide" data-slide="0">
+    <div class="slide-content">
+      <h3 class="reveal">Customer Intelligence</h3>
+      <h1 class="reveal reveal-delay-1">Customer<br>Contextualization<br>Framework</h1>
+      <div class="rule center reveal reveal-delay-2"></div>
+      <p class="subtitle reveal reveal-delay-3" style="margin: 0 auto; text-align: center;">AI-enabled contextualization and engagement across every channel, so every touchpoint knows the customer.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: The Problem -->
+  <section class="slide" data-slide="1">
+    <div class="slide-content">
+      <h3 class="reveal">The Problem</h3>
+      <h2 class="reveal reveal-delay-1">Every touchpoint is an island.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="before-after reveal reveal-delay-3">
+        <div class="before">
+          <h4>What happens today</h4>
+          <ul>
+            <li>Websites, email campaigns, registration forms, webinars, surveys, and digital products each operate in isolation</li>
+            <li>Customers don't always recognize they're engaging with the same organization</li>
+            <li>No shared context between channels: one team's insight is invisible to another's touchpoint</li>
+            <li>Engagement data is trapped in silos, unable to inform decisions at the moment they matter</li>
+            <li>Every new campaign or product launch starts from zero customer understanding</li>
+          </ul>
+        </div>
+        <div class="after">
+          <h4>What unified context enables</h4>
+          <ul>
+            <li>A single intelligence layer that knows the customer across every channel</li>
+            <li>Relevant, timely interactions that build on previous engagement, not repeat it</li>
+            <li>Customer problems surfaced and solved proactively, before they escalate</li>
+            <li>Insights and recommendations that help customers make better decisions</li>
+            <li>More value extracted from the platform, services, and supporting materials</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: The Insight -->
+  <section class="slide" data-slide="2">
+    <div class="slide-content narrow">
+      <h3 class="reveal">The Insight</h3>
+      <h2 class="reveal reveal-delay-1">Context is the product.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="big-quote reveal reveal-delay-3" style="margin-bottom: 2rem;">
+        The framework that knows who the customer is, what they've done, and what they need next transforms every channel from a broadcast medium into a conversation.
+      </div>
+      <p class="reveal reveal-delay-4">
+        This isn't a CDP or a marketing automation tool. It's a contextualization architecture: a system that unifies identity, behavioral signals, and structured rules to deliver <em>relevance at the moment of engagement</em>, across any channel, including AI-powered workflows.
+      </p>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: Architecture Overview -->
+  <section class="slide" data-slide="3">
+    <div class="slide-content wide">
+      <h3 class="reveal">Architecture</h3>
+      <h2 class="reveal reveal-delay-1">Five layers powering<br>contextual intelligence.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="two-col reveal reveal-delay-3">
+        <div>
+          <div class="layer-stack">
+            <div class="layer">
+              <div class="layer-name">Rules Engine</div>
+              <div class="layer-desc">Declarative logic triggered by signals and profile tags</div>
+              <div class="layer-tag">When</div>
+            </div>
+            <div class="layer">
+              <div class="layer-name">Messaging Engine</div>
+              <div class="layer-desc">Structured deliverables, CTAs, and actionable content</div>
+              <div class="layer-tag">What</div>
+            </div>
+            <div class="layer">
+              <div class="layer-name">Orchestration Layer</div>
+              <div class="layer-desc">Deduplication, prioritization, suppression, and scheduling</div>
+              <div class="layer-tag">How</div>
+            </div>
+            <div class="layer">
+              <div class="layer-name">Experience Layer</div>
+              <div class="layer-desc">Frontend delivery: web, modals, email, forms, AI agents</div>
+              <div class="layer-tag">Where</div>
+            </div>
+            <div class="layer">
+              <div class="layer-name">Relevance Scoring</div>
+              <div class="layer-desc">Content-based filtering using profile similarity and signal weight</div>
+              <div class="layer-tag">Rank</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p style="margin-bottom: 1.5rem;">
+            Each layer is independently addressable via API: systems can query for contextual suggestions at runtime, or the framework can push proactive engagement based on rule evaluation.
+          </p>
+          <p style="margin-bottom: 1.5rem;">
+            Two primary modes of operation:
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+            <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Targeted Outbound</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">Campaign-based delivery with personalized, contextual suggestions driven by rules and behavioral data.</div>
+            </div>
+            <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Real-Time Request</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">API-driven retrieval for runtime contextualization across any engagement surface, including agentic AI workflows.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: Identity Resolution -->
+  <section class="slide" data-slide="4">
+    <div class="slide-content wide">
+      <h3 class="reveal">Identity Resolution</h3>
+      <h2 class="reveal reveal-delay-1">One person, many contexts,<br>one source of truth.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2" style="margin-bottom: 2rem;">
+        The customer profile is the authoritative record for each person. A single individual may engage across multiple institutional contexts and roles&mdash;an instructor at one institution, a student at another, or both simultaneously. Every activity, order, and support interaction is tagged with product and course context, building an integrated picture that powers every downstream decision.
+      </p>
+      <div class="card-grid three-col reveal reveal-delay-3">
+        <div class="card">
+          <span class="card-icon">01</span>
+          <h4>Unified Profile</h4>
+          <p>A single profile record per person links every system identity&mdash;IAM accounts, CRM records, platform logins&mdash;with global attributes like opt-in status, tags, and country. The profile is the root of all contextual intelligence.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">02</span>
+          <h4>Multi-Context Identity</h4>
+          <p>One person can hold multiple engagement contexts: an instructor at Institution&nbsp;A teaching biochemistry, and a student at Institution&nbsp;B taking statistics. Each context carries its own institutional affiliation, courses taught or taken, and role-specific tags.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">03</span>
+          <h4>Course&ndash;Product Graph</h4>
+          <p>Every course (e.g., biochemistry) has a unique Course&nbsp;ID mapped to all titles&mdash;ours and competitors&mdash;as well as instructor resources, surveys, and marketing campaigns. Products are ISBNs. This reference data graph is what makes precision targeting possible.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">04</span>
+          <h4>Activity Tagging</h4>
+          <p>Every explicit action&mdash;placing an order, logging a support case, requesting a demo, downloading resources&mdash;is automatically tagged with both product (ISBN) and course (Course&nbsp;ID) context, producing structured data that feeds tags, signals, and the rules engine.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">05</span>
+          <h4>Signals as Behavior</h4>
+          <p>Signals capture what the person did or didn't do: demoed a product, sampled a title, completed a survey, requested help. Signal processing enriches each event with course and product context, building a behavioral fingerprint that sharpens with every interaction.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">06</span>
+          <h4>AI-Powered Orchestration</h4>
+          <p>AI consumes the full identity graph&mdash;profile, contexts, signals, course&ndash;product mappings&mdash;to determine what the customer should see next: what will interest them, where they need assistance, and how they can extract more value from the platform and its resources.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: Tags & Signals -->
+  <section class="slide" data-slide="5">
+    <div class="slide-content wide">
+      <h3 class="reveal">The Intelligence Layer</h3>
+      <h2 class="reveal reveal-delay-1">Tags describe. Signals move.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="two-col reveal reveal-delay-3">
+        <div>
+          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Tags</h4>
+          <p style="margin-bottom: 1.5rem;">Standardized attributes derived from product usage, orders, support cases, survey data, and profile declarations. Tags are the customer's state.</p>
+          <table class="compare-table" style="margin-top: 0;">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Examples</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="highlight">Role</td>
+                <td>Instructor, Student, Administrator, Decision-Maker</td>
+              </tr>
+              <tr>
+                <td class="highlight">Product</td>
+                <td>Active adopter, trial user, lapsed, multi-product</td>
+              </tr>
+              <tr>
+                <td class="highlight">Engagement</td>
+                <td>Webinar attendee, event registrant, content downloader</td>
+              </tr>
+              <tr>
+                <td class="highlight">Lifecycle</td>
+                <td>New user, renewal window, at-risk, champion</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Signals</h4>
+          <p style="margin-bottom: 1.5rem;">User activities enriched with context: the events that trigger rules and feed the relevance engine. Signals are the customer's momentum.</p>
+          <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+            <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Behavioral</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">Page views, feature usage, content downloads, search queries, session patterns</div>
+            </div>
+            <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Transactional</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">Orders, renewals, trials started, demos requested, support cases opened</div>
+            </div>
+            <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Engagement</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">Email opens, webinar attendance, survey completions, campaign responses</div>
+            </div>
+            <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Lifecycle</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">Adoption milestones, churn indicators, expansion signals, advocacy actions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: The Contextualization Loop -->
+  <section class="slide" data-slide="6">
+    <div class="slide-content wide">
+      <h3 class="reveal">How It Works</h3>
+      <h2 class="reveal reveal-delay-1">The contextualization loop.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="flow-loop reveal reveal-delay-3">
+        <div class="flow-top-row">
+          <div class="flow-step">
+            <div class="step-label">01</div>
+            <div class="step-name">Identify</div>
+            <div class="step-desc">Resolve identity, load profile tags</div>
+          </div>
+          <span class="flow-arrow-inline">&rarr;</span>
+          <div class="flow-step">
+            <div class="step-label">02</div>
+            <div class="step-name">Evaluate</div>
+            <div class="step-desc">Match signals against rules and conditions</div>
+          </div>
+          <span class="flow-arrow-inline">&rarr;</span>
+          <div class="flow-step">
+            <div class="step-label">03</div>
+            <div class="step-name">Score</div>
+            <div class="step-desc">Rank content by relevance and priority</div>
+          </div>
+        </div>
+        <div class="flow-connector" style="padding: 0.6rem 2rem;">
+          <span class="flow-connector-arrow" style="margin-left: 3.5rem;">&uarr;</span>
+          <div style="flex:1"></div>
+          <span class="flow-connector-arrow" style="margin-right: 3.5rem;">&darr;</span>
+        </div>
+        <div class="flow-bottom-row">
+          <div class="flow-step">
+            <div class="step-label">05</div>
+            <div class="step-name">Learn</div>
+            <div class="step-desc">Capture engagement, update signals and tags</div>
+          </div>
+          <span class="flow-arrow-inline">&larr;</span>
+          <div class="flow-step">
+            <div class="step-label">04</div>
+            <div class="step-name">Deliver</div>
+            <div class="step-desc">Render contextual experience in the right channel</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-loop-label">every interaction enriches the next</div>
+      <p class="reveal reveal-delay-4" style="text-align: center; margin: 1.5rem auto 0;">
+        Every engagement event feeds back as a new signal. Tags update. Rules re-evaluate. The customer's context sharpens with every touchpoint, and the next interaction is more relevant than the last.
+      </p>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: Rules Engine -->
+  <section class="slide" data-slide="7">
+    <div class="slide-content">
+      <h3 class="reveal">Rules Engine</h3>
+      <h2 class="reveal reveal-delay-1">Declarative logic that<br>powers contextual decisions.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="two-col reveal reveal-delay-3">
+        <div>
+          <p style="margin-bottom: 1.5rem;">
+            Rules are the decision layer: structured conditions that evaluate a customer's profile, signals, and context to determine what content, action, or experience to surface. Rules are composable, prioritized, and auditable.
+          </p>
+          <table class="compare-table" style="margin-top: 0;">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="highlight">Conditions</td>
+                <td>Tag matches, signal thresholds, date ranges, cohort membership</td>
+              </tr>
+              <tr>
+                <td class="highlight">Actions</td>
+                <td>Surface content, trigger messaging, update tags, notify systems</td>
+              </tr>
+              <tr>
+                <td class="highlight">Priority</td>
+                <td>Weighted scoring to resolve conflicts when multiple rules match</td>
+              </tr>
+              <tr>
+                <td class="highlight">Suppression</td>
+                <td>Frequency caps, deduplication, and cooldown windows</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Example</h4>
+          <div style="background: var(--bg-card); border-radius: 12px; padding: 1.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; line-height: 1.8; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.06);">
+            <span style="color: var(--accent);">if</span> tag = "active_adopter"<br>
+            <span style="color: var(--accent);">and</span> signal = "renewal_window_open"<br>
+            <span style="color: var(--accent);">and</span> days_until_renewal &lt; 60<br>
+            <span style="color: var(--accent);">then</span> surface "renewal_resources"<br>
+            <span style="color: var(--accent);">priority</span> = 85<br>
+            <span style="color: var(--accent);">suppress</span> = 7 days<br>
+            <span style="color: var(--accent);">channel</span> = [web, email, agent]
+          </div>
+          <p style="font-size: 0.85rem; margin-top: 1rem;">
+            Rules support both proactive push (scheduled evaluation) and real-time pull (API request from any channel at the moment of engagement).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: Relevance Scoring -->
+  <section class="slide" data-slide="8">
+    <div class="slide-content">
+      <h3 class="reveal">Relevance Scoring</h3>
+      <h2 class="reveal reveal-delay-1">Not just rules.<br>Ranked relevance.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2" style="margin-bottom: 2rem;">
+        Beyond binary rule matching, the scoring engine uses content-based filtering to rank all eligible content by how closely it aligns with the customer's profile, behavior, and current context.
+      </p>
+      <div class="card-grid reveal reveal-delay-3">
+        <div class="card">
+          <span class="card-icon">&#9670;</span>
+          <h4>Profile Similarity</h4>
+          <p>Content metadata matched against customer tags and attributes using embedding similarity, producing a relevance score that adapts as the profile evolves.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">&#9670;</span>
+          <h4>Signal Weighting</h4>
+          <p>Recent behavioral signals amplify or suppress relevance: a customer actively exploring a topic area sees more depth, not more breadth.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">&#9670;</span>
+          <h4>Composite Ranking</h4>
+          <p>A weighted formula combines metadata similarity and signal weight into a single relevance score, returning recommendations in rank order with full auditability.</p>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-4" style="margin-top: 2rem; padding: 1.2rem 1.5rem; background: var(--bg-card); border-radius: 10px; border-left: 3px solid var(--accent); max-width: 500px;">
+        <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; color: var(--text);">
+          Relevance = <em style="font-family: inherit;">&alpha;</em> &times; Metadata Similarity + <em style="font-family: inherit;">&beta;</em> &times; Signal Weight
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: Cross-Channel -->
+  <section class="slide" data-slide="9">
+    <div class="slide-content">
+      <h3 class="reveal">Cross-Channel Delivery</h3>
+      <h2 class="reveal reveal-delay-1">Every surface, one intelligence.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2" style="margin-bottom: 1.5rem;">The same contextualization powers every touchpoint. The experience layer adapts the delivery format; the intelligence stays consistent.</p>
+      <table class="compare-table reveal reveal-delay-3">
+        <thead>
+          <tr>
+            <th>Channel</th>
+            <th>How context is applied</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="highlight">Website</td>
+            <td>Contextual banners, personalized resource recommendations, dynamic content blocks</td>
+            <td>Returning adopter sees renewal timeline and new features, not generic marketing</td>
+          </tr>
+          <tr>
+            <td class="highlight">Email</td>
+            <td>Segment-of-one content selection, triggered sequences, contextualized CTAs</td>
+            <td>At-risk account receives targeted success resources, not a sales push</td>
+          </tr>
+          <tr>
+            <td class="highlight">Product</td>
+            <td>In-app modals, guided workflows, contextual help surfaces</td>
+            <td>New user gets onboarding guidance tied to their specific course and role</td>
+          </tr>
+          <tr>
+            <td class="highlight">AI Agents</td>
+            <td>API-driven context retrieval for agentic workflows and conversational interfaces</td>
+            <td>Support agent pulls customer context, history, and recommended actions in real time</td>
+          </tr>
+          <tr>
+            <td class="highlight">Events</td>
+            <td>Registration enrichment, personalized follow-up, session recommendations</td>
+            <td>Webinar attendee receives discipline-specific resources, not generic recordings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: What Changes -->
+  <section class="slide" data-slide="10">
+    <div class="slide-content">
+      <h3 class="reveal">What Changes</h3>
+      <h2 class="reveal reveal-delay-1">From broadcast to conversation.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="two-col reveal reveal-delay-3">
+        <div>
+          <table class="compare-table" style="margin-top: 0;">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Before</th>
+                <th>After</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="highlight">Identity</td>
+                <td>Fragmented across systems</td>
+                <td>Unified, resolved at every touchpoint</td>
+              </tr>
+              <tr>
+                <td class="highlight">Targeting</td>
+                <td>Broad segments, manual lists</td>
+                <td>Signal-driven, rule-evaluated, individually ranked</td>
+              </tr>
+              <tr>
+                <td class="highlight">Channels</td>
+                <td>Each operates independently</td>
+                <td>Shared intelligence, channel-adapted delivery</td>
+              </tr>
+              <tr>
+                <td class="highlight">AI Readiness</td>
+                <td>No structured data for agents</td>
+                <td>API-first context for any AI workflow</td>
+              </tr>
+              <tr>
+                <td class="highlight">Learning</td>
+                <td>Static: set and forget</td>
+                <td>Every interaction enriches the next</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div class="stat-row" style="flex-direction: column; gap: 1.5rem;">
+            <div class="stat">
+              <div class="stat-number">5</div>
+              <div class="stat-label">Architectural layers: Rules, Messaging, Orchestration, Experience, Relevance Scoring</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">1</div>
+              <div class="stat-label">Unified customer identity across every system and channel</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">&infin;</div>
+              <div class="stat-label">Extensible: every new channel, product, or AI agent connects to the same intelligence</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: Close -->
+  <section class="slide close-slide" data-slide="11">
+    <div class="slide-content narrow">
+      <h3 class="reveal">Customer Contextualization</h3>
+      <h2 class="reveal reveal-delay-1">Relevance at every touchpoint.<br>Intelligence across every channel.<br><em>One customer, one context.</em></h2>
+      <div class="rule center reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-3" style="font-size: clamp(1.1rem, 1.8vw, 1.3rem); color: var(--text-dim); margin-top: 1.5rem;">
+        A contextualization architecture that unifies identity, behavioral signals, and structured rules to deliver relevance at the moment of engagement, powering AI-enabled personalization across any channel.
+      </p>
+      <p class="reveal reveal-delay-4" style="margin-top: 2rem; font-family: var(--serif); font-size: 1.3rem; color: var(--accent); font-style: italic;">
+        Every touchpoint knows the customer. Every interaction makes the next one better.
+      </p>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const slides = document.querySelectorAll('.slide');
+      const navDots = document.getElementById('navDots');
+      const progressBar = document.getElementById('progressBar');
+
+      slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.classList.add('nav-dot');
+        dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        dot.addEventListener('click', () => {
+          slides[i].scrollIntoView({ behavior: 'smooth' });
+        });
+        navDots.appendChild(dot);
+      });
+
+      const dots = document.querySelectorAll('.nav-dot');
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const idx = parseInt(entry.target.dataset.slide);
+              dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+              const pct = ((idx + 1) / slides.length) * 100;
+              progressBar.style.width = pct + '%';
+            }
+
+            const reveals = entry.target.querySelectorAll('.reveal');
+            if (entry.isIntersecting) {
+              reveals.forEach((el) => el.classList.add('visible'));
+            } else {
+              reveals.forEach((el) => el.classList.remove('visible'));
+            }
+          });
+        },
+        { threshold: 0.35 }
+      );
+
+      slides.forEach((s) => observer.observe(s));
+
+      document.addEventListener('keydown', (e) => {
+        const current = [...slides].findIndex((s) => {
+          const r = s.getBoundingClientRect();
+          return r.top >= -100 && r.top < window.innerHeight / 2;
+        });
+        if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          const next = Math.min(current + 1, slides.length - 1);
+          slides[next].scrollIntoView({ behavior: 'smooth' });
+        }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const prev = Math.max(current - 1, 0);
+          slides[prev].scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
