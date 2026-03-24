@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Memory Problem in Multi-Agent Systems — Andrew Crenshaw</title>
+  <meta name="description" content="Why a dozen fast agents without shared memory is just expensive repetition. Observations from building multi-agent systems for real enterprise work.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --bg-surface: #0f1319;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-accent: rgba(78, 168, 201, 0.25);
+      --text: #e4e8ed;
+      --text-dim: #7e8a97;
+      --text-faint: #4a5568;
+      --accent: #4ea8c9;
+      --accent-dim: rgba(78, 168, 201, 0.15);
+      --accent-glow: rgba(78, 168, 201, 0.08);
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Outfit', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --pad: clamp(1.5rem, 5vw, 5rem);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.25;
+    }
+
+    /* Top bar */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 500;
+      padding: 1rem var(--pad);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 14, 20, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .top-bar .name {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .top-bar .back-link {
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .top-bar .back-link:hover { color: var(--accent); }
+
+    /* Article layout */
+    .article-wrapper {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 8rem var(--pad) 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .article-label {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+
+    .article-title {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+    }
+
+    .article-subtitle {
+      font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+      color: var(--text-dim);
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+    }
+
+    .rule {
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+      margin-bottom: 2.5rem;
+    }
+
+    /* Hero image */
+    .article-hero {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+
+    /* Article body */
+    .article-body p {
+      font-size: clamp(0.95rem, 1.3vw, 1.08rem);
+      line-height: 1.85;
+      color: var(--text-dim);
+      max-width: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .article-body p strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .article-body p em {
+      font-style: italic;
+      color: var(--accent);
+      font-family: var(--serif);
+      font-size: 1.05em;
+    }
+
+    .article-body .callout {
+      background: var(--bg-card);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* Footer */
+    .article-footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .article-footer a {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--accent);
+      transition: opacity 0.3s;
+    }
+
+    .article-footer a:hover { opacity: 0.7; }
+
+    .article-footer .date {
+      font-size: 0.78rem;
+      color: var(--text-faint);
+    }
+
+    /* Fade-in animation */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.6s var(--ease) forwards;
+    }
+
+    .fade-in-d1 { animation-delay: 0.1s; }
+    .fade-in-d2 { animation-delay: 0.2s; }
+    .fade-in-d3 { animation-delay: 0.3s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/" class="name">Andrew Crenshaw</a>
+  <a href="/#writing" class="back-link">&larr; Back to Writing</a>
+</div>
+
+<article class="article-wrapper">
+  <div class="article-label fade-in">Lessons from Building</div>
+  <h1 class="article-title fade-in fade-in-d1">The Memory Problem in Multi-Agent Systems</h1>
+  <p class="article-subtitle fade-in fade-in-d2">Why a dozen fast agents without shared memory is just expensive repetition.</p>
+  <div class="rule fade-in fade-in-d2"></div>
+
+  <img src="/images/sharedmemory.jpg" alt="Shared memory architecture diagram" class="article-hero fade-in fade-in-d3">
+
+  <div class="article-body fade-in fade-in-d3">
+    <p>Most AI agent demos use one agent doing one thing.</p>
+
+    <p>I spent the past several months building a development framework where a dozen specialized AI agents work against a shared backlog. They write code, run tests, generate documentation, and review each other's work, with humans approving at every checkpoint.</p>
+
+    <p>The models are good enough. The prompting patterns are well-documented. Getting a single agent to produce useful output is largely a solved problem. What isn't solved is what happens when agents need to build on each other's work over time.</p>
+
+    <div class="callout">When agents don't share memory, every task starts from zero. An agent that solved a problem yesterday has no idea what happened when a different agent refactored the code this morning. You end up with a team that never gets smarter.</div>
+
+    <p>Each agent is individually capable, but collectively they're starting over every single time.</p>
+
+    <p>The pattern I kept hitting: Agent A discovers that a particular integration has a subtle constraint. Agent A finishes its task. Agent B picks up related work the next day and walks straight into the same constraint, wastes the same time, makes the same mistake. Multiply that across a dozen agents and weeks of work, and you're burning a significant portion of your speed advantage on rediscovery.</p>
+
+    <p><strong>The real unlock in multi-agent systems isn't better prompts or bigger models.</strong> It's building the memory infrastructure that lets agents learn from each other's work and retain what matters across sessions.</p>
+
+    <p>I'll be writing more about what I've learned: the architecture patterns that worked, the governance challenges I didn't anticipate, and the things that broke in ways I couldn't have predicted from reading papers.</p>
+
+    <p>If you're building multi-agent systems for real enterprise work — not demos — I'd love to hear what you're running into.</p>
+  </div>
+
+  <div class="article-footer">
+    <a href="/#writing">&larr; All posts</a>
+    <span class="date">2026</span>
+  </div>
+</article>
+
+</body>
+</html>
