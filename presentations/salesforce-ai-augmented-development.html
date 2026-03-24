@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce AI-Augmented Development</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-hover: rgba(255, 255, 255, 0.07);
+      --text: #e8e4df;
+      --text-dim: #8a857e;
+      --accent: #6bce7b;
+      --accent-dim: rgba(107, 206, 123, 0.15);
+      --accent-glow: rgba(107, 206, 123, 0.08);
+      --red: #c75b5b;
+      --green: #6bab73;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Outfit', -apple-system, sans-serif;
+      --pad: clamp(2rem, 6vw, 5rem);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .slide {
+      min-height: 100vh;
+      padding: var(--pad);
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, var(--accent-glow) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(201, 165, 78, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .slide-content.wide { max-width: 1200px; }
+    .slide-content.narrow { max-width: 800px; }
+
+    .rule { width: 40px; height: 2px; background: var(--accent); margin-bottom: 1.5rem; }
+    .rule.center { margin-left: auto; margin-right: auto; }
+
+    h1 { font-family: var(--serif); font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 400; line-height: 1.05; color: var(--text); letter-spacing: -0.02em; }
+    h2 { font-family: var(--serif); font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 400; line-height: 1.15; color: var(--text); letter-spacing: -0.01em; }
+    h3 { font-family: var(--sans); font-size: clamp(0.75rem, 1.2vw, 0.85rem); font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 1rem; }
+    p { font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.7; color: var(--text-dim); max-width: 680px; }
+    em { font-style: italic; color: var(--accent); font-family: var(--serif); }
+
+    .big-quote {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--text);
+      font-style: italic;
+      position: relative;
+      padding-left: 2rem;
+    }
+    .big-quote::before { content: ''; position: absolute; left: 0; top: 0.2em; bottom: 0.2em; width: 3px; background: var(--accent); }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .card { background: var(--bg-card); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 2rem; transition: all 0.4s var(--ease); }
+    .card:hover { background: var(--bg-card-hover); border-color: rgba(107, 206, 123, 0.15); transform: translateY(-2px); }
+    .card-icon { font-size: 1.6rem; margin-bottom: 1rem; display: block; color: var(--accent); }
+    .card h4 { font-family: var(--serif); font-size: 1.35rem; font-weight: 600; margin-bottom: 0.6rem; color: var(--text); }
+    .card p { font-size: 0.95rem; line-height: 1.6; color: var(--text-dim); }
+
+    .compare-table { width: 100%; border-collapse: collapse; margin-top: 2rem; font-size: clamp(0.85rem, 1.2vw, 1rem); }
+    .compare-table th { font-family: var(--sans); font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; color: var(--accent); text-align: left; padding: 1rem 1.2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .compare-table td { padding: 1rem 1.2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); color: var(--text-dim); vertical-align: top; }
+    .compare-table tr:hover td { background: var(--bg-card); }
+    .compare-table .highlight { color: var(--text); font-weight: 400; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; margin-top: 2rem; }
+    @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; gap: 2rem; } }
+
+    .layer-stack { display: flex; flex-direction: column; gap: 0; margin: 2rem 0; max-width: 600px; }
+    .layer { padding: 1.2rem 5.5rem 1.2rem 1.5rem; border-left: 3px solid var(--accent); background: var(--bg-card); position: relative; transition: all 0.3s var(--ease); }
+    .layer:first-child { border-radius: 10px 10px 0 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+    .layer:last-child { border-radius: 0 0 10px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+    .layer:hover { background: var(--bg-card-hover); }
+    .layer-name { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; color: var(--text); }
+    .layer-desc { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.2rem; }
+    .layer-tag { font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); opacity: 0.7; position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%); }
+
+    .before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+    .before, .after { padding: 2rem; border-radius: 12px; }
+    .before { background: rgba(199, 91, 91, 0.06); border: 1px solid rgba(199, 91, 91, 0.15); }
+    .after { background: rgba(107, 171, 115, 0.06); border: 1px solid rgba(107, 171, 115, 0.15); }
+    .before h4, .after h4 { font-family: var(--sans); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem; }
+    .before h4 { color: var(--red); }
+    .after h4 { color: var(--green); }
+    .before li, .after li { font-size: 0.95rem; color: var(--text-dim); margin-bottom: 0.5rem; list-style: none; padding-left: 1.2rem; position: relative; }
+    .before li::before { content: '\00d7'; position: absolute; left: 0; color: var(--red); font-weight: 600; }
+    .after li::before { content: '\2192'; position: absolute; left: 0; color: var(--green); }
+    @media (max-width: 768px) { .before-after { grid-template-columns: 1fr; } }
+
+    .flow-loop { max-width: 900px; margin: 3rem auto 2rem; }
+    .flow-top-row { display: flex; align-items: center; justify-content: center; gap: 0; }
+    .flow-step { text-align: center; padding: 1.2rem 0.8rem; background: var(--bg-card); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; flex: 1; max-width: 140px; transition: all 0.4s var(--ease); }
+    .flow-step:hover { border-color: var(--accent); background: var(--accent-dim); }
+    .flow-step .step-label { font-family: var(--sans); font-weight: 500; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.2rem; }
+    .flow-step .step-name { font-family: var(--serif); font-size: 1.05rem; font-weight: 600; color: var(--text); }
+    .flow-step .step-desc { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.2rem; line-height: 1.4; }
+    .flow-arrow-inline { color: var(--accent); font-size: 1.2rem; padding: 0 0.4rem; opacity: 0.4; flex-shrink: 0; }
+    @media (max-width: 768px) {
+      .flow-top-row { flex-direction: column; gap: 0.8rem; }
+      .flow-step { max-width: 280px; width: 100%; }
+      .flow-arrow-inline { transform: rotate(90deg); padding: 0.3rem 0; }
+    }
+
+    .stat-row { display: flex; gap: 3rem; margin: 2.5rem 0; flex-wrap: wrap; }
+    .stat { flex: 1; min-width: 180px; }
+    .stat-number { font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 0.3rem; }
+    .stat-label { font-size: 0.9rem; color: var(--text-dim); line-height: 1.4; }
+
+    .mode-card { background: var(--bg-card); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 1.5rem; transition: all 0.4s var(--ease); }
+    .mode-card:hover { background: var(--bg-card-hover); border-color: rgba(107, 206, 123, 0.15); }
+    .mode-range { font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--accent); line-height: 1; }
+    .mode-name { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; color: var(--text); margin: 0.4rem 0 0.3rem; }
+    .mode-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; }
+    .mode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-top: 2rem; }
+    @media (max-width: 900px) { .mode-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .mode-grid { grid-template-columns: 1fr; } }
+
+    .code-block { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 1.5rem; font-family: 'Courier New', monospace; font-size: 0.8rem; line-height: 1.8; color: var(--text-dim); }
+    .code-kw { color: var(--accent); }
+    .code-comment { color: rgba(138, 133, 126, 0.6); font-style: italic; }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.12s; }
+    .reveal-delay-2 { transition-delay: 0.24s; }
+    .reveal-delay-3 { transition-delay: 0.36s; }
+    .reveal-delay-4 { transition-delay: 0.48s; }
+    .reveal-delay-5 { transition-delay: 0.6s; }
+
+    .nav-dots { position: fixed; right: 1.5rem; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 100; }
+    .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); cursor: pointer; transition: all 0.3s var(--ease); border: none; padding: 0; }
+    .nav-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+    .nav-dot:hover { background: rgba(255, 255, 255, 0.4); }
+    .progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: var(--accent); z-index: 200; transition: width 0.3s var(--ease); }
+    .keyboard-hint { position: fixed; bottom: 1.5rem; right: 1.5rem; font-size: 0.7rem; color: var(--text-dim); opacity: 0.4; letter-spacing: 0.1em; z-index: 100; }
+    .title-slide { text-align: center; }
+    .title-slide h1 { font-size: clamp(2.8rem, 8vw, 5.5rem); letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+    .title-slide .subtitle { font-family: var(--serif); font-size: clamp(1.2rem, 2.5vw, 1.8rem); color: var(--text-dim); font-style: italic; font-weight: 400; }
+    .title-slide .rule { margin: 1.5rem auto; }
+    .close-slide { text-align: center; }
+    .close-slide h2 { font-size: clamp(2.2rem, 5.5vw, 3.8rem); margin-bottom: 1rem; }
+    .close-slide p { margin: 0 auto; text-align: center; }
+
+    body::after { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 1000; opacity: 0.5; }
+    @media (prefers-reduced-motion: reduce) { .reveal { transition: opacity 0.3s ease; transform: none; } .reveal.visible { transform: none; } }
+    @media (max-width: 768px) { .nav-dots, .keyboard-hint { display: none; } }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar" id="progressBar"></div>
+  <nav class="nav-dots" id="navDots"></nav>
+  <div class="keyboard-hint">&uarr; &darr; or scroll</div>
+
+  <!-- SLIDE 1: Title -->
+  <section class="slide title-slide" data-slide="0">
+    <div class="slide-content">
+      <h3 class="reveal">Enterprise Salesforce</h3>
+      <h1 class="reveal reveal-delay-1">AI-Augmented<br>Development</h1>
+      <div class="rule center reveal reveal-delay-2"></div>
+      <p class="subtitle reveal reveal-delay-3" style="margin: 0 auto; text-align: center;">Multi-agent orchestration that transforms how enterprise Salesforce is built: from ticket to deployed code, with calibrated human oversight at every step.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: The Problem -->
+  <section class="slide" data-slide="1">
+    <div class="slide-content">
+      <h3 class="reveal">The Problem</h3>
+      <h2 class="reveal reveal-delay-1">Brownfield Salesforce development<br>is slow and fragile.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="before-after reveal reveal-delay-3">
+        <div class="before">
+          <h4>What happens today</h4>
+          <ul>
+            <li>Highly customized orgs with years of accumulated automation, triggers, and flows that interact in undocumented ways</li>
+            <li>Every change risks breaking existing functionality across objects, processes, and integrations</li>
+            <li>Developers spend hours understanding current state before writing a line of code</li>
+            <li>Manual ticket interpretation, manual metadata inspection, manual test writing</li>
+            <li>Knowledge lives in individuals; when they rotate off, context is lost</li>
+          </ul>
+        </div>
+        <div class="after">
+          <h4>What AI augmentation enables</h4>
+          <ul>
+            <li>Automated discovery of existing metadata, automation, and dependencies before any code is written</li>
+            <li>Confidence scoring that calibrates human involvement to actual risk</li>
+            <li>AI agents that build objects, triggers, flows, and tests using the developer's own credentials</li>
+            <li>Compounding institutional memory: every session's learnings improve the next</li>
+            <li>Parallel development sessions that accelerate delivery without sacrificing quality</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: The Approach -->
+  <section class="slide" data-slide="2">
+    <div class="slide-content narrow">
+      <h3 class="reveal">The Approach</h3>
+      <h2 class="reveal reveal-delay-1">Augmentation, not replacement.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="big-quote reveal reveal-delay-3" style="margin-bottom: 2rem;">
+        The developer remains accountable. AI agents work under the developer's credentials, at a collaboration depth calibrated to the complexity and risk of each task.
+      </div>
+      <p class="reveal reveal-delay-4">
+        This is not a code generator. It's a <em>development workflow</em> that orchestrates AI agents across the full lifecycle: ticket evaluation, brownfield discovery, implementation, testing, review, and knowledge capture. The human controls the collaboration intensity. The system compounds what it learns.
+      </p>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: The Workflow -->
+  <section class="slide" data-slide="3">
+    <div class="slide-content wide">
+      <h3 class="reveal">The Workflow</h3>
+      <h2 class="reveal reveal-delay-1">Ticket to deployed code.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="flow-loop reveal reveal-delay-3">
+        <div class="flow-top-row">
+          <div class="flow-step">
+            <div class="step-label">01</div>
+            <div class="step-name">Import</div>
+            <div class="step-desc">Pull tickets from Jira into the workflow board</div>
+          </div>
+          <span class="flow-arrow-inline">&rarr;</span>
+          <div class="flow-step">
+            <div class="step-label">02</div>
+            <div class="step-name">Evaluate</div>
+            <div class="step-desc">LLM-powered confidence scoring against agent capabilities</div>
+          </div>
+          <span class="flow-arrow-inline">&rarr;</span>
+          <div class="flow-step">
+            <div class="step-label">03</div>
+            <div class="step-name">Discover</div>
+            <div class="step-desc">Retrieve metadata, run tests, document current state</div>
+          </div>
+          <span class="flow-arrow-inline">&rarr;</span>
+          <div class="flow-step">
+            <div class="step-label">04</div>
+            <div class="step-name">Develop</div>
+            <div class="step-desc">AI agent builds in Cursor with Salesforce MCP</div>
+          </div>
+          <span class="flow-arrow-inline">&rarr;</span>
+          <div class="flow-step">
+            <div class="step-label">05</div>
+            <div class="step-name">Review</div>
+            <div class="step-desc">Code, config, tests, coverage. Approve or revise</div>
+          </div>
+          <span class="flow-arrow-inline">&rarr;</span>
+          <div class="flow-step">
+            <div class="step-label">06</div>
+            <div class="step-name">Ship</div>
+            <div class="step-desc">Check in to Jira with session notes and status</div>
+          </div>
+        </div>
+      </div>
+      <p class="reveal reveal-delay-4" style="text-align: center; margin: 1.5rem auto 0;">
+        Each step is non-blocking: the developer can import tickets, run evaluations, and launch discovery on multiple items in parallel. The kanban board shows real-time status across all active work.
+      </p>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: Confidence Scoring -->
+  <section class="slide" data-slide="4">
+    <div class="slide-content">
+      <h3 class="reveal">Confidence Scoring</h3>
+      <h2 class="reveal reveal-delay-1">Calibrated autonomy,<br>not blind trust.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="two-col reveal reveal-delay-3">
+        <div>
+          <p style="margin-bottom: 1.5rem;">
+            Before any code is written, the system evaluates each ticket against the AI agent's capabilities and the target org's complexity. An LLM analyzes the requirements, acceptance criteria, and brownfield state of the connected sandbox to produce a confidence score that determines the collaboration mode.
+          </p>
+          <p style="margin-bottom: 1.5rem;">
+            The developer can refine the score by answering targeted questions about ambiguities, scope, and risk. Higher confidence unlocks more autonomy; lower confidence triggers more checkpoints.
+          </p>
+          <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent); margin-top: 1rem;">
+            <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Brownfield Analysis</div>
+            <div style="font-size: 0.85rem; color: var(--text-dim);">For tickets that modify existing objects or automation, the system queries the connected sandbox in real time to assess affected metadata, dependencies, and test coverage before scoring.</div>
+          </div>
+        </div>
+        <div>
+          <div class="layer-stack">
+            <div class="layer">
+              <div class="layer-name">85&ndash;100%</div>
+              <div class="layer-desc">Well-understood, low-risk. AI works independently.</div>
+              <div class="layer-tag">Autonomous</div>
+            </div>
+            <div class="layer">
+              <div class="layer-name">70&ndash;84%</div>
+              <div class="layer-desc">Periodic checkpoints at major sections.</div>
+              <div class="layer-tag">Spot Check</div>
+            </div>
+            <div class="layer">
+              <div class="layer-name">50&ndash;69%</div>
+              <div class="layer-desc">Architecture review required, plus optional component checkpoints.</div>
+              <div class="layer-tag">Guided</div>
+            </div>
+            <div class="layer">
+              <div class="layer-name">0&ndash;49%</div>
+              <div class="layer-desc">Human leads design decisions. AI assists with implementation.</div>
+              <div class="layer-tag">Pair</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: Collaboration Modes -->
+  <section class="slide" data-slide="5">
+    <div class="slide-content wide">
+      <h3 class="reveal">Collaboration Modes</h3>
+      <h2 class="reveal reveal-delay-1">Four modes. One principle:<br>the right oversight for the risk.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="mode-grid reveal reveal-delay-3">
+        <div class="mode-card">
+          <div class="mode-range">85+</div>
+          <div class="mode-name">Autonomous</div>
+          <div class="mode-desc">AI works independently with minimal human involvement. Best for well-understood, low-risk tasks like new custom objects with clear specs.</div>
+        </div>
+        <div class="mode-card">
+          <div class="mode-range">70&ndash;84</div>
+          <div class="mode-name">Spot Check</div>
+          <div class="mode-desc">AI works with periodic checkpoints at completion of major sections. Human reviews focus areas flagged by the agent.</div>
+        </div>
+        <div class="mode-card">
+          <div class="mode-range">50&ndash;69</div>
+          <div class="mode-name">Guided Review</div>
+          <div class="mode-desc">Architecture checkpoint required before implementation. Optional checkpoints at object, junction, tabs, and pre-submit stages.</div>
+        </div>
+        <div class="mode-card">
+          <div class="mode-range">0&ndash;49</div>
+          <div class="mode-name">Pair Programming</div>
+          <div class="mode-desc">Human leads design decisions, AI assists with implementation. Frequent checkpoints. No guessing on ambiguous requirements.</div>
+        </div>
+      </div>
+      <p class="reveal reveal-delay-4" style="margin-top: 2rem;">
+        Across all modes, the agent never resolves ambiguous requirements by default. When a ticket allows more than one valid interpretation, the agent documents the ambiguity, proposes options, and waits for the developer's decision.
+      </p>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: Brownfield Discovery -->
+  <section class="slide" data-slide="6">
+    <div class="slide-content">
+      <h3 class="reveal">Brownfield Discovery</h3>
+      <h2 class="reveal reveal-delay-1">Understand before you build.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2" style="margin-bottom: 2rem;">
+        On highly customized Salesforce instances, the cost of breaking existing automation is high. Discovery is mandatory: the agent evaluates the current state of the org before writing any code.
+      </p>
+      <div class="card-grid reveal reveal-delay-3">
+        <div class="card">
+          <span class="card-icon">01</span>
+          <h4>Connect &amp; Retrieve</h4>
+          <p>Agent connects to the target sandbox via Salesforce MCP or CLI, retrieves metadata for objects, flows, triggers, and classes in the ticket's scope. Documents what exists and flags unexpected dependencies.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">02</span>
+          <h4>Test &amp; Assess</h4>
+          <p>Optionally runs existing Apex tests covering the affected area. Documents pass/fail results and coverage gaps. If many tests fail, the agent halts and waits for the developer's decision before proceeding.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">03</span>
+          <h4>Document &amp; Refine</h4>
+          <p>Produces a structured discovery artifact stored on the backlog item: current state, risks, constraints, and test results. If scope needs adjustment, the agent proposes refined acceptance criteria or new child tickets.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: The Development Session -->
+  <section class="slide" data-slide="7">
+    <div class="slide-content">
+      <h3 class="reveal">The Development Session</h3>
+      <h2 class="reveal reveal-delay-1">AI builds. Developer controls.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="two-col reveal reveal-delay-3">
+        <div>
+          <p style="margin-bottom: 1.5rem;">
+            The workflow generates a structured prompt from the Jira ticket, confidence evaluation, and discovery artifact. The developer pastes it into a Cursor agent session, and the AI begins implementation.
+          </p>
+          <p style="margin-bottom: 1.5rem;">
+            The agent works locally in the IDE and directly in the Salesforce sandbox via the Salesforce MCP server and CLI, using the developer's OAuth credentials. The developer sees every action, approves tool usage, and provides input at checkpoints determined by the collaboration mode.
+          </p>
+          <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+            <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Parallel Sessions</div>
+            <div style="font-size: 0.85rem; color: var(--text-dim);">Multiple tickets can be developed simultaneously in separate agent sessions, as long as they don't have direct dependencies. The kanban board tracks all active work.</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">What the agent delivers</div>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="padding: 0.8rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); font-size: 0.9rem;">Custom objects &amp; fields</div>
+              <div style="font-size: 0.8rem; color: var(--text-dim);">Created and deployed to the sandbox</div>
+            </div>
+            <div style="padding: 0.8rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); font-size: 0.9rem;">Automation</div>
+              <div style="font-size: 0.8rem; color: var(--text-dim);">Triggers, handlers, flows, and validation rules</div>
+            </div>
+            <div style="padding: 0.8rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); font-size: 0.9rem;">Tests</div>
+              <div style="font-size: 0.8rem; color: var(--text-dim);">TDD: Apex test classes written first, covering positive, negative, and bulk scenarios</div>
+            </div>
+            <div style="padding: 0.8rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
+              <div style="font-weight: 500; color: var(--text); font-size: 0.9rem;">Page layouts &amp; permissions</div>
+              <div style="font-size: 0.8rem; color: var(--text-dim);">Layouts, tabs, permission sets, and app visibility configured</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: The Review Loop -->
+  <section class="slide" data-slide="8">
+    <div class="slide-content">
+      <h3 class="reveal">Review &amp; Ship</h3>
+      <h2 class="reveal reveal-delay-1">Structured review,<br>traceable delivery.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="two-col reveal reveal-delay-3">
+        <div>
+          <p style="margin-bottom: 1.5rem;">
+            When the AI agent completes implementation, the ticket moves to Review automatically. The review panel shows a structured summary of everything that was delivered: code, configuration, tests, and Apex coverage.
+          </p>
+          <p style="margin-bottom: 1.5rem;">
+            The developer logs into the sandbox to verify, run additional tests, or make adjustments. From the review panel, they can either request changes (with instructions for the AI agent) or approve and check in the ticket to Jira.
+          </p>
+          <p>
+            Check-in updates the Jira ticket status, adds session notes and deliverable details as a comment, and attributes the work to the developer via 3LO OAuth.
+          </p>
+        </div>
+        <div>
+          <div class="code-block">
+            <span class="code-comment">// Review panel summary</span><br>
+            <span class="code-kw">ticket</span>: ASO26-45<br>
+            <span class="code-kw">status</span>: review<br><br>
+            <span class="code-kw">objects</span>: HE_Service_Provider__c,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HE_Provider_Institution__c<br>
+            <span class="code-kw">fields</span>: 12 custom fields<br>
+            <span class="code-kw">tabs</span>: 2 deployed<br>
+            <span class="code-kw">layouts</span>: 2 with all fields<br>
+            <span class="code-kw">permissions</span>: HE Objects - Review<br>
+            <span class="code-kw">tests</span>: 4 classes, 18 methods<br>
+            <span class="code-kw">coverage</span>: 92%<br><br>
+            <span class="code-comment">// Developer action</span><br>
+            <span class="code-kw">approve</span> &rarr; check in to Jira<br>
+            <span class="code-kw">revise</span>&nbsp; &rarr; instructions for agent
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: Living Memory -->
+  <section class="slide" data-slide="9">
+    <div class="slide-content">
+      <h3 class="reveal">Living Memory</h3>
+      <h2 class="reveal reveal-delay-1">Every session compounds<br>for the next developer.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2" style="margin-bottom: 2rem;">
+        Two sources of learning feed a persistent lessons database after every ticket: what was discovered about the org (constraints, test gaps, dependencies) and what was learned during development (guardrail suggestions, decisions, warnings). Future work on related areas automatically receives this context.
+      </p>
+      <div class="card-grid reveal reveal-delay-3">
+        <div class="card">
+          <span class="card-icon">&#9670;</span>
+          <h4>Discovery Learnings</h4>
+          <p>What exists in the org, what constraints were found, what tests cover (or don't), and what risks to watch for. Stored on the backlog item and ingested at review.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">&#9670;</span>
+          <h4>Development Learnings</h4>
+          <p>Guardrail suggestions, knowledge captured during implementation, decisions made, and warnings for future work. Extracted from the agent's session reflection.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">&#9670;</span>
+          <h4>Compounding Context</h4>
+          <p>Lessons are tagged by project, workflow type, and scope. When a future ticket touches a related area, the agent automatically receives prior context: "what we already know about this area."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: Close -->
+  <section class="slide close-slide" data-slide="10">
+    <div class="slide-content narrow">
+      <h3 class="reveal">Salesforce AI-Augmented Development</h3>
+      <h2 class="reveal reveal-delay-1">Calibrated autonomy.<br>Compounding intelligence.<br><em>Developer-controlled delivery.</em></h2>
+      <div class="rule center reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-3" style="font-size: clamp(1.1rem, 1.8vw, 1.3rem); color: var(--text-dim); margin-top: 1.5rem;">
+        A development workflow that orchestrates AI agents across the full Salesforce lifecycle: from Jira ticket through brownfield discovery, confidence-calibrated implementation, structured review, and knowledge capture that compounds across the team.
+      </p>
+      <p class="reveal reveal-delay-4" style="margin-top: 2rem; font-family: var(--serif); font-size: 1.3rem; color: var(--accent); font-style: italic;">
+        The developer stays accountable. The system gets smarter with every session.
+      </p>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const slides = document.querySelectorAll('.slide');
+      const navDots = document.getElementById('navDots');
+      const progressBar = document.getElementById('progressBar');
+
+      slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.classList.add('nav-dot');
+        dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        dot.addEventListener('click', () => { slides[i].scrollIntoView({ behavior: 'smooth' }); });
+        navDots.appendChild(dot);
+      });
+
+      const dots = document.querySelectorAll('.nav-dot');
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const idx = parseInt(entry.target.dataset.slide);
+              dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+              progressBar.style.width = ((idx + 1) / slides.length) * 100 + '%';
+            }
+            const reveals = entry.target.querySelectorAll('.reveal');
+            if (entry.isIntersecting) { reveals.forEach((el) => el.classList.add('visible')); }
+            else { reveals.forEach((el) => el.classList.remove('visible')); }
+          });
+        },
+        { threshold: 0.35 }
+      );
+
+      slides.forEach((s) => observer.observe(s));
+
+      document.addEventListener('keydown', (e) => {
+        const current = [...slides].findIndex((s) => {
+          const r = s.getBoundingClientRect();
+          return r.top >= -100 && r.top < window.innerHeight / 2;
+        });
+        if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          slides[Math.min(current + 1, slides.length - 1)].scrollIntoView({ behavior: 'smooth' });
+        }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          slides[Math.max(current - 1, 0)].scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
