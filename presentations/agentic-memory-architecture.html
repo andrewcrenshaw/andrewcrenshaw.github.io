@@ -504,8 +504,8 @@
   <h1>Living Memory &amp; Alexandria</h1>
   <div class="rule"></div>
   <div class="meta">
-    <strong>Status:</strong> Level 4 (Agentic Memory) operational locally on the Project Development Tool (PDT). Level 5 (Alexandria) in design and planning.<br>
-    <strong>Date:</strong> March 2026
+    <strong>Status:</strong> Level 4 (Agentic Memory) operational on the Project Development Tool (PDT). Level 5 (Alexandria) in progress for personal and intra-team use. Living Wiki compiler rendering auto-promoted knowledge. Pattern validated across a second platform (Strata &mdash; 8-agent job search OS with governed PostgreSQL).<br>
+    <strong>Date:</strong> April 2026 &mdash; <em>updated from March 2026</em>
   </div>
 </header>
 
@@ -524,7 +524,6 @@
       <li><a href="#taxonomy">Agent Taxonomy</a></li>
       <li><a href="#challenges">Honest Challenges</a></li>
       <li><a href="#vision">Architecture Vision</a></li>
-      <li><a href="#roadmap">Roadmap</a></li>
     </ol>
   </nav>
 
@@ -534,9 +533,9 @@
     <h2>Executive Summary</h2>
     <div class="rule"></div>
 
-    <p>We've built a shared memory system for AI agents that lets them learn from each other's sessions, share precedent across workflows, and maintain that knowledge automatically. The system is in use locally on two workflows (core platform development and Salesforce development), where we're dogfooding it to prove out the architecture and fine-tune the real-world experience. The overall design has been pressure-tested against 18+ external sources from academia and industry, though the current implementation doesn't yet address all of the findings.</p>
+    <p>We've built a shared memory system for AI agents that lets them learn from each other's sessions, share precedent across workflows, and maintain that knowledge automatically. The system is in active use on two workflows (core platform development and Salesforce development), where we're dogfooding it to prove out the architecture and fine-tune the real-world experience. The overall design has been pressure-tested against 30+ external sources from academia, industry, and thought leadership, though the current implementation doesn't yet address all of the findings.</p>
 
-    <p>The architecture decomposes into three layers: <strong>Memory</strong> (storage), <strong>Learning</strong> (extraction and maintenance), and <strong>Personalization</strong> (serving the right knowledge to the right agent). We operate at Level 4 (agentic learning and memory) locally today. Level 5 (Alexandria: the org-wide knowledge library) is an aspirational vision that would require organizational buy-in and investment to pursue.</p>
+    <p>The architecture decomposes into three layers: <strong>Memory</strong> (storage), <strong>Learning</strong> (extraction and maintenance), and <strong>Personalization</strong> (serving the right knowledge to the right agent). We operate at Level 4 (agentic learning and memory) today. Level 5 (Alexandria: the full knowledge library with propositional claims and graph traversal) is currently being built for personal and intra-team use, architected to scale.</p>
 
     <p>This document focuses on the architecture: how it works, step-by-step processes, honest challenges, and the vision for what it could become. For the business case and landscape context, see the companion decks (Alexandria pitch book and Memory, Context &amp; Graphs landscape primer).</p>
   </section>
@@ -547,8 +546,9 @@
     <h2>What's Built and Running</h2>
     <div class="rule"></div>
 
-    <p>Everything below is built and running locally, used daily on the PDT and SFDC dev workflows. The goal is to employ it as a real use case, iterate, and prove out the architecture before any broader rollout.</p>
+    <p>Everything below is built and running, used daily on the PDT and SFDC dev workflows. The goal is to employ it as a real use case, iterate, and prove out the architecture before any broader rollout.</p>
 
+    <h3 class="sub">Memory &amp; Learning Core</h3>
     <table>
       <thead>
         <tr>
@@ -561,27 +561,32 @@
         <tr>
           <td>Lessons DB + connections + entities</td>
           <td><span class="badge built">Built</span></td>
-          <td>Single store, partitioned by workflow. SQLite with full schema.</td>
+          <td>Consolidated agent-state store (SQLite), partitioned by workflow. Write-coalescing with debounced persistence and incremental export.</td>
+        </tr>
+        <tr>
+          <td>Decision traces DB</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Durable audit trail of agent decisions &mdash; what was decided, why, what alternatives were considered. Queryable via HTTP API.</td>
         </tr>
         <tr>
           <td>Session lifecycle</td>
           <td><span class="badge built">Built</span></td>
-          <td>Register, getContext, do work, session-end reflection. HTTP API.</td>
+          <td>Register, getContext, do work, session-end reflection. Full HTTP API with WebSocket broadcasting.</td>
         </tr>
         <tr>
           <td>getContext (intelligent retrieval)</td>
           <td><span class="badge built">Built</span></td>
-          <td>Workflow-scoped, entity-anchored, token-budgeted, multi-pass (berrypicking).</td>
+          <td>Workflow-scoped, entity-anchored, token-budgeted, multi-pass (berrypicking). Context selector with precedent matching.</td>
         </tr>
         <tr>
           <td>Session-end reflection</td>
           <td><span class="badge built">Built</span></td>
-          <td>Agents write lessons, decision traces, guardrail suggestions at session end.</td>
+          <td>Agents write lessons, decision traces, guardrail suggestions at session end. Structured knowledge capture, not free-form.</td>
         </tr>
         <tr>
           <td>Digestive pipeline</td>
           <td><span class="badge built">Built</span></td>
-          <td>Reduce, Reflect, Reweave, Verify, Archive. Runs asynchronously post-session.</td>
+          <td>Reduce, Reflect, Reweave, Verify, Archive. Runs asynchronously post-session via worker pool.</td>
         </tr>
         <tr>
           <td>Forgetting by design</td>
@@ -591,45 +596,133 @@
         <tr>
           <td>Multi-workflow support</td>
           <td><span class="badge built">Built</span></td>
-          <td>Core PDT (PCC) and SFDC dev share one framework, data partitioned by workflow.</td>
-        </tr>
-        <tr>
-          <td>Lesson connections (graph edges)</td>
-          <td><span class="badge built">Built</span></td>
-          <td>Typed connections with optional reason text for propositional links.</td>
+          <td>Core PDT (PCC) and SFDC dev share one framework, data partitioned by workflow. Workflow engine with pluggable adapters.</td>
         </tr>
         <tr>
           <td>Scratchpad + session summary</td>
           <td><span class="badge built">Built</span></td>
-          <td>Per-task state + recent work history. Created/loaded via API.</td>
+          <td>Per-task state + recent work history. Created/loaded via API. File-backed state &mdash; the NLAH paper's #1 most valuable harness module.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">Harness Engineering &amp; Governance</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>Status</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Evaluator system (LLM + criteria)</td>
+          <td><span class="badge built">Built</span></td>
+          <td>LLM-based evaluator with ISC criteria parser and verifier. Auto-pass/fail/escalate decisions on backlog items. Aligns with Anthropic's capability vs regression eval distinction.</td>
+        </tr>
+        <tr>
+          <td>Verifier alignment logging</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Tracks whether evaluator decisions match human reviewer decisions. Directly implements the NLAH paper's critical finding: verification layers that diverge from the evaluator's acceptance criteria reduce quality.</td>
+        </tr>
+        <tr>
+          <td>Guardrail system (proposals + accumulation)</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Agent-proposed guardrails with human review. Self-improvement loop: failures generate guardrail updates. Per-agent guardrail files.</td>
+        </tr>
+        <tr>
+          <td>Failure taxonomy</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Named failure modes with recovery actions (context exhaustion, loop detection, verification divergence, tool failure, etc.). NLAH's sixth required harness component.</td>
+        </tr>
+        <tr>
+          <td>Golden principles</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Codified mechanical rules for codebase consistency. Per OpenAI's harness pattern: opinionated rules that agents can self-enforce.</td>
+        </tr>
+        <tr>
+          <td>Eval suites + regression framework</td>
+          <td><span class="badge built">Built</span></td>
+          <td>YAML-defined eval suites with grader registry, regression sources, and result tracking. Fixtures for reproducible evaluation.</td>
+        </tr>
+        <tr>
+          <td>Orchestration coordination</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Multi-agent coordination with collision detection, session isolation, and bounded authority. Prevents concurrent conflicts.</td>
+        </tr>
+        <tr>
+          <td>Approval queue + human-in-the-loop</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Full approval workflow with JWT auth, review routing, and WebSocket-based real-time updates. Human review at the highest-leverage points.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub">Alexandria &amp; Knowledge Presentation</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>Status</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Alexandria renderer / Living Wiki</td>
+          <td><span class="badge built">Built</span></td>
+          <td>WikiCompiler renders auto-promoted lessons into a scannable wiki with [[wiki-links]], cross-references, and topic grouping. Incremental compilation on file change.</td>
+        </tr>
+        <tr>
+          <td>Wiki quality gates</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Configurable promotion thresholds. Claims must meet confidence and quality gates before entering the wiki. Write-time validation, not post-hoc cleanup.</td>
+        </tr>
+        <tr>
+          <td>Wiki curator + scheduler</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Automated curation: scheduled synthesis reports, staleness detection, and maintenance passes. The wiki maintains itself.</td>
         </tr>
         <tr>
           <td>Dashboard (metrics + management)</td>
           <td><span class="badge built">Built</span></td>
-          <td>Living Memory metrics, backlog, session management, approval workflow.</td>
+          <td>Living Memory metrics, backlog, session management, approval workflow, real-time session monitoring.</td>
         </tr>
         <tr>
-          <td>Alexandria renderer</td>
-          <td><span class="badge planned">Design / POC</span></td>
-          <td>Scannable index + rendered claims with [[wiki-links]]. Concept proven on existing store.</td>
-        </tr>
-        <tr>
-          <td>Trust tiers + memory integrity</td>
-          <td><span class="badge planned">Planned</span></td>
-          <td>ADR written. Implementation in Phase 1 roadmap.</td>
-        </tr>
-        <tr>
-          <td>Episodic memory store</td>
-          <td><span class="badge planned">Planned</span></td>
-          <td>Design complete. Phase 2.</td>
-        </tr>
-        <tr>
-          <td>Org-wide Alexandria graph</td>
-          <td><span class="badge vision">Vision</span></td>
-          <td>Full knowledge graph, federated memory, trust-gated contributions.</td>
+          <td>Lesson connections (graph edges)</td>
+          <td><span class="badge built">Built</span></td>
+          <td>Typed connections with optional reason text for propositional links. Backlinks for bidirectional traversal.</td>
         </tr>
       </tbody>
     </table>
+
+    <h3 class="sub">In Progress &amp; Vision</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>Status</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Trust tiers + memory integrity</td>
+          <td><span class="badge planned">Designed</span></td>
+          <td>ADR written. Content trust tiers, read-time validation, and write-event audit log sufficient for rollback.</td>
+        </tr>
+        <tr>
+          <td>Alexandria knowledge graph</td>
+          <td><span class="badge vision">Building</span></td>
+          <td>Full propositional knowledge graph with entity-centric claims, graph traversal, and progressive disclosure. Being built for personal and intra-team use, architected for scale.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout success">
+      <p><strong>Cross-platform validation:</strong> The M/L/P architecture has now been validated on two entirely different platforms. On the PDT (TypeScript / Node.js / SQLite), agents coordinate through a shared backlog with living memory. On Strata (Python / FastAPI / PostgreSQL + pgvector), eight governed agents collaborate through scoped repositories with decision traces. The same architectural principles &mdash; governed writes, learning loops, cost-conscious inference &mdash; apply naturally to both. This gives us confidence the patterns are transferable, not framework-specific.</p>
+    </div>
   </section>
 
   <!-- 3. ARCHITECTURE -->
@@ -641,10 +734,10 @@
     <p>The architecture spans three layers with explicit boundaries between them. Failures concentrate at those boundaries: conflating a retrieval problem (Personalization) with a storage problem (Memory) or an extraction problem (Learning) is the most common design mistake in agent memory systems.</p>
 
     <div class="diagram">
-      <div class="diagram-label">M/L/P Architecture with layer boundaries</div>
+      <div class="diagram-label">M/L/P Architecture with layer boundaries and intellectual provenance</div>
       <pre class="mermaid">
 flowchart TB
-  subgraph P["<b>Personalization</b> — Real-time serving"]
+  subgraph P["<b>Personalization</b> — Real-time serving<br/><i>Context engineering (Cherny)</i>"]
     direction LR
     gc["getContext"]
     rf["Retrieval filters"]
@@ -653,7 +746,7 @@ flowchart TB
     gc --- rf --- tb --- pd
   end
 
-  subgraph L["<b>Learning</b> — Async extraction"]
+  subgraph L["<b>Learning</b> — Async extraction<br/><i>Structured artifacts (PAL, Karpathy)</i>"]
     direction LR
     refl["Session-end reflection"]
     dp["Digestive pipeline"]
@@ -662,13 +755,14 @@ flowchart TB
     refl --- dp --- cond --- forg
   end
 
-  subgraph M["<b>Memory</b> — Storage infrastructure"]
+  subgraph M["<b>Memory</b> — Storage infrastructure<br/><i>Vault as identity (Cornelius), File-backed state (NLAH)</i>"]
     direction LR
     les["Lessons DB"]
     conn["Connections"]
     ent["Entities"]
     sp["Scratchpads"]
-    les --- conn --- ent --- sp
+    dt["Decision traces"]
+    les --- conn --- ent --- sp --- dt
   end
 
   P -->|"Usage signals + outcomes"| M
@@ -678,7 +772,7 @@ flowchart TB
     </div>
 
     <div class="callout">
-      <p><strong>Key architectural distinction:</strong> Each layer has different failure modes and maintenance rhythms. A <strong>Memory</strong> failure is data loss. A <strong>Learning</strong> failure is a missed insight or false lesson. A <strong>Personalization</strong> failure is serving the wrong context. Separating them prevents misdiagnosis. The memory layer is an active participant in its own maintenance (agentic memory), not a passive store.</p>
+      <p><strong>Standing on strong shoulders.</strong> This architecture didn't emerge in isolation. It synthesizes ideas from <strong>Karpathy</strong> (Software 2.0, LLM OS &mdash; the model is the program, memory is the file system), <strong>Cherny</strong> (context engineering as a systems-level discipline, not prompt crafting), <strong>PAL</strong> (structured code-as-reasoning artifacts, not free-form prose), <strong>Cornelius</strong> (the vault constitutes identity &mdash; "the vault is the riverbed, the sessions are the water"), and <strong>NLAH/Pan et al.</strong> (six-component harness decomposition, file-backed state as the #1 most valuable module). The M/L/P naming draws from MAPLE. Each layer has different failure modes and maintenance rhythms. The memory layer is an active participant in its own maintenance (agentic memory), not a passive store.</p>
     </div>
   </section>
 
@@ -721,12 +815,12 @@ sequenceDiagram
     </div>
 
     <ol class="step-list">
-      <li><strong>Register session.</strong> Agent identifies itself, declares what it's working on. System creates or loads a scratchpad (per-task state).</li>
-      <li><strong>Load context (getContext).</strong> System retrieves relevant lessons and precedent, scoped by workflow and task similarity, within a token budget. Optionally includes Alexandria index and rendered claims.</li>
-      <li><strong>Do the work.</strong> Agent uses skills, tools, and files. Updates scratchpad with state, decisions, and progress.</li>
+      <li><strong>Register session.</strong> Agent identifies itself, declares what it's working on. System creates or loads a scratchpad (per-task state). Per Cornelius: the vault encounter IS identity &mdash; the agent becomes itself by reading what previous sessions left behind.</li>
+      <li><strong>Load context (getContext).</strong> System retrieves relevant lessons and precedent, scoped by workflow and task similarity, within a token budget (Cherny's context engineering). Optionally includes Alexandria index and rendered claims.</li>
+      <li><strong>Do the work.</strong> Agent uses skills, tools, and files. Updates scratchpad with state, decisions, and progress. Following PAL's insight: agents produce structured artifacts (code, scratchpads, decision traces), not free-form prose. Code-as-reasoning.</li>
       <li><strong>End session with reflection.</strong> Agent submits: summary of what was done, structured reflection (what was learned, what to watch for), and optionally guardrail suggestions, knowledge capture, or warnings for future sessions.</li>
       <li><strong>System writes and digests.</strong> Lessons and decision traces are stored (workflow-scoped). The digestive pipeline processes them asynchronously: extracting atomic claims, finding connections, updating existing knowledge, validating, and archiving source material.</li>
-      <li><strong>Next session benefits.</strong> The next agent's getContext returns these lessons. The loop compounds.</li>
+      <li><strong>Next session benefits.</strong> The next agent's getContext returns these lessons. The loop compounds. Per Karpathy's LLM OS: the knowledge store is the file system of the agent operating system; each session is a process that reads from and writes to it.</li>
     </ol>
   </section>
 
@@ -940,72 +1034,59 @@ flowchart LR
     <h2>Honest Challenges</h2>
     <div class="rule"></div>
 
-    <p>We pressure-tested the architecture against 18+ external sources across 6+ sessions. Five validated strengths. Seven critical gaps.</p>
+    <p>We pressure-tested the architecture against 30+ external sources across 10+ sessions. Seven validated strengths. Five remaining gaps.</p>
 
     <h3 class="sub">Validated strengths (protect these)</h3>
     <div class="callout success">
-      <p><strong>Propositional framing</strong> ("Since [[X]], therefore Y"): no evaluated system has an equivalent.<br>
+      <p><strong>Propositional framing</strong> ("Since [[X]], therefore Y"): no evaluated system has an equivalent. Cornelius's "notes as callable functions" framing independently converges with this approach.<br>
       <strong>Memory evolution</strong> (decay, condensation, supersession): ahead of the field; most systems implement only formation and retrieval.<br>
       <strong>Forgetting design:</strong> the most complete in any source evaluated.<br>
       <strong>3D hierarchical token-level memory:</strong> placed at the apex of the 2026 academic survey's taxonomy.<br>
-      <strong>Session lifecycle + scratchpad:</strong> independently validated by Anthropic, MAPLE, and the academic survey.</p>
+      <strong>Session lifecycle + scratchpad:</strong> independently validated by Anthropic, MAPLE, NLAH (file-backed state is the #1 most valuable harness module), and the academic survey.<br>
+      <strong>Harness engineering:</strong> failure taxonomy, golden principles, evaluator system with verifier alignment logging, and eval suites &mdash; all built and running. Implements all six NLAH required components (Contracts, Roles, Stage Structure, Adapters, State Semantics, Failure Taxonomy).<br>
+      <strong>Context engineering as architecture:</strong> token-budgeted getContext, berrypicking retrieval, progressive disclosure, and workflow-scoped serving. Per Cherny: the bottleneck isn't the model; it's the context the model receives.</p>
     </div>
 
-    <h3 class="sub">Critical gaps (honest assessment)</h3>
+    <h3 class="sub">Remaining gaps (honest assessment)</h3>
     <table>
       <thead>
         <tr>
           <th>Gap</th>
           <th>Impact</th>
-          <th>Status</th>
+          <th>How we close it</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Episodic memory (case-based records)</td>
-          <td>Can't retrieve "what happened last time we tried this?" Only abstract lessons, not concrete episodes.</td>
-          <td><span class="badge planned">Designed</span></td>
-        </tr>
-        <tr>
-          <td>Context pressure for long-running agents</td>
-          <td>Session-boundary model breaks at 1+ hour sessions. We have a CLAUDE.md rule; we need architecture.</td>
-          <td><span class="badge planned">Planned</span></td>
-        </tr>
-        <tr>
           <td>Memory integrity and trust model</td>
           <td>No content trust tiers. No read-time validation. No write-event audit log sufficient for rollback. Defenses are write-time schema/format correctness only.</td>
-          <td><span class="badge planned">ADR written</span></td>
+          <td>ADR written. Trust tiers, audit log, and read-time integrity checks designed. Implementation is the next priority for the knowledge graph layer.</td>
         </tr>
         <tr>
           <td>Security / blast radius of poisoned claims</td>
-          <td>Alexandria's propositional framing means a poisoned claim is <em>reasoned from</em>, not just referenced. Higher epistemic authority means higher blast radius. Three attack vectors identified: direct lesson injection, reflection poisoning via compromised sessions, and digestive pipeline injection from external sources. Mitigations (trust tiers, audit log, read-time integrity checks) designed but not yet implemented.</td>
-          <td><span class="badge planned">Designed</span></td>
+          <td>Alexandria's propositional framing means a poisoned claim is <em>reasoned from</em>, not just referenced. Higher epistemic authority means higher blast radius. Three attack vectors identified: direct lesson injection, reflection poisoning, and pipeline injection.</td>
+          <td>Mitigations designed (trust tiers + audit log + integrity checks). The harness engineering layer (guardrails, eval system, verifier alignment) provides the governance structure; trust tiers extend it to knowledge claims.</td>
         </tr>
         <tr>
-          <td>Knowledge engineering discipline</td>
-          <td>We recognize "claims are installed capabilities" but haven't built the full engineering practices: dependency tracking, impact analysis, confidence-visible rendering, deprecation management.</td>
-          <td><span class="badge planned">Planned</span></td>
+          <td>Context pressure for long-running agents</td>
+          <td>Session-boundary model works well for bounded tasks. Breaks at 1+ hour sessions. We have context rotation signals and a failure taxonomy entry; we need architectural support.</td>
+          <td>HumanLayer's Research&rarr;Plan&rarr;Implement workflow (context compaction between phases) addresses this. Our existing scratchpad rotation and context budget zones (40-60% target) are partial solutions. Full architectural support &mdash; mid-session reflection triggers &mdash; is next.</td>
         </tr>
         <tr>
           <td>Conflict resolution (clash)</td>
           <td>When getContext returns contradictory lessons, no resolution logic. Agent receives contradictory signals with no guidance.</td>
-          <td><span class="badge planned">Planned</span></td>
-        </tr>
-        <tr>
-          <td>Event-triggered learning</td>
-          <td>Critical failures wait for session-end batch. Same mistake can recur before the next reflection.</td>
-          <td><span class="badge planned">Designed</span></td>
+          <td>Design in progress. The knowledge graph's typed connections enable contradiction detection (CONTRADICTS edge type). Resolution requires either recency-wins, confidence-wins, or escalate-to-human logic. Per NLAH: verifier alignment data (which we now collect) can inform which resolution strategy matches human judgment.</td>
         </tr>
         <tr>
           <td>No quantitative benchmarks</td>
           <td>Can't quantitatively prove "memory helps" or "graph beats filesystem." Letta scores 74% on LoCoMo with a plain filesystem.</td>
-          <td><span class="badge planned">Research</span></td>
+          <td>We now have eval suites infrastructure (YAML-defined tasks, grader registry, result tracking). Need to build memory-specific eval tasks that test what we're actually good at: discovery, reasoning, evolution, and governance &mdash; not just retrieval speed.</td>
         </tr>
       </tbody>
     </table>
 
     <div class="callout warning">
-      <p><strong>The benchmarking reality:</strong> For simple retrieval, the mechanism doesn't matter. Agents search well with any tool. Our graph's value is not faster retrieval. It is <em>discovery</em> (connections not sought), <em>reasoning</em> (propositional claims as installed capabilities), <em>evolution</em> (forgetting at scale), and <em>governance</em> (trust tiers). These don't show up on standard benchmarks. They show up in enterprise, multi-agent, cross-domain scenarios. We need to build evaluation methods that test what we're actually good at.</p>
+      <p><strong>The benchmarking reality:</strong> For simple retrieval, the mechanism doesn't matter. Agents search well with any tool. Our graph's value is not faster retrieval. It is <em>discovery</em> (connections not sought), <em>reasoning</em> (propositional claims as installed capabilities), <em>evolution</em> (forgetting at scale), and <em>governance</em> (trust tiers). These don't show up on standard benchmarks. They show up in multi-agent, cross-domain scenarios. We need to build evaluation methods that test what we're actually good at.</p>
     </div>
   </section>
 
@@ -1015,7 +1096,7 @@ flowchart LR
     <h2>Architecture Vision</h2>
     <div class="rule"></div>
 
-    <p>The vision (pending organizational buy-in) is federated memory with two tiers and a governed bridge. Local developers keep their lightweight, file-based memory that works for them. The organizational tier would provide the shared, governed knowledge graph. Quality gates apply at the promotion boundary, not at local writes.</p>
+    <p>The vision is federated memory with two tiers and a governed bridge. We're building this for personal and intra-team use today, architected to scale. The local tier is operational. The organizational tier is where the knowledge graph, propositional claims, and graph traversal live. Quality gates apply at the promotion boundary, not at local writes.</p>
 
     <div class="diagram">
       <div class="diagram-label">Current state to target state</div>
@@ -1024,20 +1105,19 @@ flowchart TB
     subgraph today["Current State (operational)"]
         L3["Living Memory store<br/>(lessons, connections, entities)"]
         L4["Agentic learning loop<br/>(getContext, reflection, shared)"]
+        harness["Harness engineering<br/>(evals, guardrails, failure taxonomy)"]
         L3 --> L4
+        L4 --> harness
     end
 
-    subgraph target["Target State (vision)"]
-        local["<b>Local tier</b><br/>.md files, git-backed<br/>personal/team scope"]
-        bridge["<b>Bridge</b><br/>Quality gates at<br/>promotion boundary"]
-        org["<b>Organizational tier</b><br/>Alexandria graph<br/>governed, cross-domain"]
-        trust["Trust tiers + integrity<br/>audit log, rollback"]
-        episodic["Episodic memory<br/>exemplars, provenance"]
-        event["Event-triggered learning<br/>failure → immediate capture"]
+    subgraph target["Target State (in progress)"]
+        local["<b>Local tier</b><br/>.md files, git-backed<br/>personal/team scope<br/><i>Cornelius: vault as identity</i>"]
+        bridge["<b>Bridge</b><br/>Quality gates at<br/>promotion boundary<br/><i>Wiki gates (built)</i>"]
+        org["<b>Alexandria graph</b><br/>Propositional claims<br/>graph traversal<br/><i>Karpathy: LLM OS file system</i>"]
+        ctx["<b>Context serving</b><br/>Token-budgeted<br/>berrypicking, disclosure<br/><i>Cherny: context engineering</i>"]
         local <-->|"query / promote"| bridge
         bridge <-->|"governed"| org
-        org --> trust
-        org --> episodic
+        org --> ctx
     end
 
     L4 -.->|"feeds"| bridge
@@ -1046,94 +1126,30 @@ flowchart TB
     </div>
 
     <h3 class="sub">The federated principle</h3>
-    <p>The filesystem-vs-graph divide is not either/or. Individual developers use lightweight, file-based memory (markdown in a workspace, git-backed). Organizations need governed, cross-domain knowledge. The architecture serves both without forcing one onto the other.</p>
+    <p>The filesystem-vs-graph divide is not either/or. Individual developers use lightweight, file-based memory (markdown in a workspace, git-backed). Per Cornelius: "the vault is the riverbed, the sessions are the water." The graph tier provides the governed, cross-domain knowledge layer. The architecture serves both without forcing one onto the other.</p>
 
     <div class="card-grid">
       <div class="card">
-        <h4>Local tier</h4>
-        <p>.md files in workspace, git-backed, personal/team scope. Slash commands (/note, /remember). Low ceremony, high velocity. No quality gates at local writes.</p>
+        <h4>Local tier (Cornelius's vault)</h4>
+        <p>.md files in workspace, git-backed, personal/team scope. Slash commands (/note, /remember). The agent becomes itself by reading what previous sessions left behind. Low ceremony, high velocity. No quality gates at local writes.</p>
       </div>
       <div class="card">
-        <h4>Organizational tier</h4>
-        <p>Alexandria knowledge graph. Cross-domain, propositional, governed, forgetting-enabled. Claims become installed capabilities.</p>
+        <h4>Alexandria graph (Karpathy's LLM OS)</h4>
+        <p>Knowledge graph as the "file system" of the agent operating system. Cross-domain, propositional, governed, forgetting-enabled. Claims become installed capabilities. Agents are processes; the graph is the shared state they read from and write to.</p>
       </div>
     </div>
     <div style="max-width: 480px; margin: 0 auto;">
       <div class="card" style="text-align: center;">
         <h4>Bidirectional bridge</h4>
-        <p>Local projects query Alexandria for best practices and precedent. Local learnings promote to Alexandria when they have organizational value. Quality gates apply at the promotion boundary.</p>
+        <p>Local projects query Alexandria for best practices and precedent. Local learnings promote to Alexandria when they have broader value. Quality gates (wiki gates, confidence thresholds) apply at the promotion boundary. Per PAL: structured artifacts flow upward, not free-form prose.</p>
       </div>
     </div>
 
     <h3 class="sub">The Knowledge Interchange Layer</h3>
-    <p>Any team publishes knowledge into the graph through one contract: <strong>{entity, claim, source, confidence, timestamp, author}</strong>. Teams don't change their tools. Users post and query from Slack. Customer engagement is actively managed in SFDC. Gemini transcripts get parsed. Each team moves at their own pace. The framework grows by accretion, not revolution.</p>
-  </section>
-
-  <!-- 11. ROADMAP -->
-  <section id="roadmap">
-    <div class="section-label">11</div>
-    <h2>Roadmap</h2>
-    <div class="rule"></div>
-
-    <p>Five phases, derived from 45 recommendations across 18+ pressure-test sources. This roadmap is aspirational, contingent on organizational buy-in and prioritization. Phase 1 represents near-term improvements to the existing local system.</p>
-
-    <div class="diagram">
-      <div class="diagram-label">Phase dependency overview</div>
-      <pre class="mermaid">
-flowchart LR
-    P1["<b>Phase 1</b><br/>Core Quality +<br/>Safety"]
-    P2["<b>Phase 2</b><br/>Episodic Memory +<br/>Context Pressure"]
-    P3["<b>Phase 3</b><br/>Intelligence +<br/>Quality"]
-    P4["<b>Phase 4</b><br/>Infrastructure<br/>Evolution"]
-    P5["<b>Phase 5</b><br/>Knowledge<br/>Engineering"]
-
-    P1 --> P2
-    P1 --> P3
-    P2 --> P4
-    P3 --> P4
-    P4 --> P5
-      </pre>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Phase</th>
-          <th>Goal</th>
-          <th>Key deliverables</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>1. Core Quality &amp; Safety</strong></td>
-          <td>Close the most dangerous gap (memory integrity) and implement highest-value improvements.</td>
-          <td>Decay tiers + RetentionConfig. Trust tiers + audit log. Event-triggered learning. Contribution quality gates. Read-before-write discipline.</td>
-        </tr>
-        <tr>
-          <td><strong>2. Episodic Memory &amp; Context Pressure</strong></td>
-          <td>Close the two structural gaps identified across multiple independent sources.</td>
-          <td>Episodic memory store (exemplars linked to lessons). Context pressure events for long-running agents. Conflict resolution layer. Sub-agent memory hierarchy.</td>
-        </tr>
-        <tr>
-          <td><strong>3. Intelligence &amp; Quality</strong></td>
-          <td>Deepen memory quality, provenance, and the learning loop.</td>
-          <td>Quality scoring on claims. Memory strengthening (not just forgetting). Offline consolidation cycle. Source provenance. Confidence-visible rendering in Alexandria.</td>
-        </tr>
-        <tr>
-          <td><strong>4. Infrastructure Evolution</strong></td>
-          <td>Architectural changes that enable the next level of capability.</td>
-          <td>Entity and event node types. Skills-as-memory-tier. Claim journal + versioning. Living Memory as a Service (federated memory).</td>
-        </tr>
-        <tr>
-          <td><strong>5. Knowledge Engineering</strong></td>
-          <td>Build the engineering discipline that "claims are installed capabilities" demands.</td>
-          <td>Dependency tracking. Blast radius queries. Active deprecation notices. Evaluation framework. Memory explainability.</td>
-        </tr>
-      </tbody>
-    </table>
+    <p>Any source publishes knowledge into the graph through one contract: <strong>{entity, claim, source, confidence, timestamp, author}</strong>. Per Cornelius: notes aren't reminders &mdash; they're callable functions. A well-formed claim is a capability the agent gains on load. The framework grows by accretion, not revolution.</p>
 
     <div class="callout">
-      <p><strong>The strategic opportunity:</strong> The industry is converging on graphs, agents, learning loops, and forgetting. No one in the evaluated landscape is building the full knowledge engineering discipline (Phase 5): dependency tracking, impact analysis, capability testing, deprecation management for knowledge claims. If the organization chooses to invest here, it moves from a novel framing to a novel discipline, genuinely unprecedented and difficult to replicate.</p>
+      <p><strong>The strategic opportunity:</strong> The industry is converging on graphs, agents, learning loops, and forgetting. No one in the evaluated landscape is building the full knowledge engineering discipline: dependency tracking, impact analysis, capability testing, deprecation management for knowledge claims. This moves from a novel framing to a novel discipline &mdash; genuinely unprecedented and difficult to replicate.</p>
     </div>
   </section>
 

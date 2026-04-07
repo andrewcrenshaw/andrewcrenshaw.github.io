@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Inference at the Edge: Gemma on Mac Minis — Andrew Crenshaw</title>
+  <meta name="description" content="Deploying quantized models across a LAN cluster with Tailscale mesh, shadow-mode calibration, and the economics of cloud vs. local.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --bg-surface: #0f1319;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-accent: rgba(78, 168, 201, 0.25);
+      --text: #e4e8ed;
+      --text-dim: #7e8a97;
+      --text-faint: #4a5568;
+      --accent: #4ea8c9;
+      --accent-dim: rgba(78, 168, 201, 0.15);
+      --accent-glow: rgba(78, 168, 201, 0.08);
+      --green: #6bab73;
+      --orange: #c9954e;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Outfit', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --pad: clamp(1.5rem, 5vw, 5rem);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.25;
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 1rem var(--pad);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 14, 20, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .top-bar .name { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; color: var(--text); text-decoration: none; }
+    .top-bar .back-link { font-size: 0.8rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; transition: color 0.3s; }
+    .top-bar .back-link:hover { color: var(--accent); }
+
+    .article-wrapper { max-width: 720px; margin: 0 auto; padding: 8rem var(--pad) 4rem; position: relative; z-index: 1; }
+    .article-label { font-family: var(--sans); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 0.8rem; }
+    .article-title { font-family: var(--serif); font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; line-height: 1.15; color: var(--text); letter-spacing: -0.01em; margin-bottom: 1rem; }
+    .article-subtitle { font-size: clamp(0.95rem, 1.3vw, 1.1rem); color: var(--text-dim); margin-bottom: 2.5rem; max-width: 600px; }
+    .rule { width: 40px; height: 2px; background: var(--accent); margin-bottom: 2.5rem; }
+
+    .article-body p { font-size: clamp(0.95rem, 1.3vw, 1.08rem); line-height: 1.85; color: var(--text-dim); max-width: none; margin-bottom: 1.5rem; }
+    .article-body p strong { color: var(--text); font-weight: 500; }
+    .article-body p em { font-style: italic; color: var(--accent); font-family: var(--serif); font-size: 1.05em; }
+    .article-body h3 { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--text); }
+
+    .callout { background: var(--bg-card); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.2rem 1.5rem; margin: 2rem 0; font-size: 0.95rem; color: var(--text); line-height: 1.7; }
+    .callout.orange { border-left-color: var(--orange); }
+
+    .data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; }
+    .data-table th { font-family: var(--sans); font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; color: var(--accent); text-align: left; padding: 0.8rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .data-table td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-dim); vertical-align: top; line-height: 1.5; }
+    .data-table td:first-child { color: var(--text); font-weight: 400; }
+
+    .article-footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .article-footer a { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; color: var(--accent); transition: opacity 0.3s; }
+    .article-footer a:hover { opacity: 0.7; }
+    .article-footer .date { font-size: 0.78rem; color: var(--text-faint); }
+
+    .fade-in { opacity: 0; transform: translateY(20px); animation: fadeUp 0.6s var(--ease) forwards; }
+    .fade-in-d1 { animation-delay: 0.1s; }
+    .fade-in-d2 { animation-delay: 0.2s; }
+    .fade-in-d3 { animation-delay: 0.3s; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/" class="name">Andrew Crenshaw</a>
+  <a href="/#writing" class="back-link">&larr; Back to Writing</a>
+</div>
+
+<article class="article-wrapper">
+  <div class="article-label fade-in">Lessons from Building</div>
+  <h1 class="article-title fade-in fade-in-d1">Local Inference at the Edge: Gemma on Mac Minis</h1>
+  <p class="article-subtitle fade-in fade-in-d2">Deploying quantized models across a LAN cluster with Tailscale mesh, shadow-mode calibration, and the economics of cloud vs. local.</p>
+  <div class="rule fade-in fade-in-d2"></div>
+
+  <div class="article-body fade-in fade-in-d3">
+    <p>Every conversation about AI costs eventually reduces to the same question: <em>can you run it locally?</em></p>
+
+    <p>For the kind of work I'm doing with Strata — where the Match Agent needs to deep-score dozens of job listings per day, and the Scraper Agent needs to OCR career pages full of non-standard formatting — the cloud API costs are manageable but not negligible. More importantly, they scale linearly: more listings to evaluate means proportionally more spend. That's a bad cost curve for an autonomous system.</p>
+
+    <p>So I deployed two Mac Minis running local model inference via Apple Silicon. Here's what worked, what didn't, and what I learned about the real tradeoffs.</p>
+
+    <h3>The infrastructure</h3>
+
+    <table class="data-table">
+      <thead><tr><th>Machine</th><th>Spec</th><th>Primary Role</th></tr></thead>
+      <tbody>
+        <tr><td>mac-mini-1</td><td>M4 Pro, 48GB RAM, 512GB SSD</td><td>Strata services + OCR (GLM-OCR-2B via MLX)</td></tr>
+        <tr><td>mac-mini-2</td><td>M4 Pro, 48GB RAM, 1TB SSD</td><td>LLM inference (Gemma 4 27B, 4-bit quantized via MLX)</td></tr>
+      </tbody>
+    </table>
+
+    <p>Both machines are connected via direct Ethernet on the same LAN. Each machine also runs a Tailscale node, so when I'm at a coffee shop or library, my laptop can reach them through an encrypted WireGuard mesh. No port forwarding, no dynamic DNS, no exposed services.</p>
+
+    <p>Services run as <code>launchd</code> daemons — macOS's native service manager. They start on boot, restart on crash, and log to standard system locations. No Docker, no Kubernetes. These are two machines running three services. The infrastructure should be proportional to the complexity.</p>
+
+    <h3>Model selection: why Gemma, why quantized</h3>
+
+    <p>I evaluated several local model options. The criteria were specific: the model had to fit in ~20GB of unified memory (leaving headroom for the OS and services), achieve acceptable quality on job-description scoring, and support efficient batched inference on Apple Silicon via MLX.</p>
+
+    <p><strong>Gemma 4 27B (4-bit quantized)</strong> hit the sweet spot. At 4-bit quantization via MLX, the model loads in ~15GB of unified memory, leaving plenty of headroom. Inference speed on an M4 Pro is approximately 25-35 tokens/second — not blazing, but more than adequate for scoring tasks that don't need real-time response.</p>
+
+    <p>For OCR, <strong>GLM-OCR-2B via MLX</strong> runs on the first Mac Mini. It handles parsing career pages, extracting text from images, and processing PDF resumes. At 2B parameters, it's fast and accurate for structured text extraction.</p>
+
+    <h3>Shadow-mode calibration</h3>
+
+    <p>Here's the part most teams skip. You can't just deploy a local model and hope it's "good enough." You need <em>data</em> proving it.</p>
+
+    <div class="callout">
+      <strong>Shadow mode</strong> means running both the cloud model (GPT-4o-mini or Claude Haiku) and the local model (Gemma) on the same input simultaneously, then comparing results. You keep using the cloud model for production scoring while silently collecting local model outputs for evaluation.
+    </div>
+
+    <p>The metrics we track:</p>
+
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>What It Measures</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td>Pearson R correlation</td><td>Numerical score agreement between cloud and local</td><td>≥ 0.85</td></tr>
+        <tr><td>Routing-tier agreement</td><td>Same match tier (Strong/Medium/Weak/No) assigned</td><td>≥ 90%</td></tr>
+        <tr><td>Latency per evaluation</td><td>Time-to-score for a single listing</td><td>≤ 30s</td></tr>
+        <tr><td>Failure rate</td><td>Malformed or empty responses</td><td>≤ 2%</td></tr>
+      </tbody>
+    </table>
+
+    <p>When the local model consistently meets these thresholds on a large enough sample (100+ evaluations), you can start routing production traffic to it. The routing is gradual: start with "easy" matches (high-confidence Strong or No Match), then expand the routing as confidence grows.</p>
+
+    <h3>The economic argument</h3>
+
+    <p>The numbers are straightforward:</p>
+
+    <table class="data-table">
+      <thead><tr><th>Scenario</th><th>Monthly Cost</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>All cloud (current)</td><td>$7-10/mo in API costs</td><td>GPT-4o-mini + Haiku + Sonnet, with 80/15/5 routing</td></tr>
+        <tr><td>Hybrid (target)</td><td>$2-4/mo in API costs</td><td>Local handles 80%+ of scoring; cloud for hard cases</td></tr>
+        <tr><td>Electricity for two Mac Minis</td><td>~$8-10/mo</td><td>Idle ~5-7W each; inference ~25-35W each</td></tr>
+      </tbody>
+    </table>
+
+    <p>The Mac Minis were a one-time capital expense. At current API prices, the payback is measured in months if you're running any serious volume. But the real value isn't the dollar savings — <strong>it's the cost curve</strong>. Cloud costs scale linearly with volume. Local costs are fixed. When you're building an autonomous system that should run 24/7 without human attention, fixed costs are structurally better.</p>
+
+    <div class="callout orange">
+      <strong>The honest counter-argument:</strong> API costs are dropping fast. OpenAI, Anthropic, and Google are in a price war. Running local inference today might not make economic sense in 12 months. What local inference gives you that APIs can't: data stays on your network (privacy), zero rate limits, no vendor dependency, and the ability to fine-tune. Whether those matter depends on your use case.
+    </div>
+
+    <h3>Lessons learned</h3>
+
+    <p><strong>MLX is the secret weapon for Apple Silicon.</strong> Apple's MLX framework makes running quantized models on M-series chips genuinely practical. The unified memory architecture means no GPU memory management, no CUDA dependencies. <code>pip install mlx-lm</code>, download the quantized weights, and you're running inference.</p>
+
+    <p><strong>Tailscale makes home infrastructure viable.</strong> Before Tailscale, running services on home machines meant either opening ports (security risk) or setting up a VPN server (maintenance burden). Tailscale gives you a zero-config, encrypted mesh network. Every machine gets a stable hostname. It just works.</p>
+
+    <p><strong>launchd for services is underrated.</strong> The containerization instinct is strong, but macOS's native service management is excellent for this scale. <code>launchd</code> plists handle restarts, logging, environment variables, and startup dependencies. Two machines, three services. No orchestration layer needed.</p>
+
+    <p><strong>Calibration before cutover, always.</strong> The temptation is to deploy the local model and immediately start using it. Don't. Shadow mode exists because models have failure modes that aren't obvious in synthetic benchmarks. Real job descriptions have weird formatting, inconsistent structures, and domain-specific jargon. You need real-world evaluation data.</p>
+
+    <p><strong>Infrastructure complexity should be proportional.</strong> Two Mac Minis connected by Ethernet cable, running three Python services as launchd daemons, with Tailscale for remote access. That's the entire infrastructure. It would take an afternoon to set up from scratch. If your ML infrastructure requires a platform team to maintain, it's probably over-engineered for your actual needs.</p>
+  </div>
+
+  <div class="article-footer">
+    <a href="/#writing">&larr; All posts</a>
+    <span class="date">April 2026</span>
+  </div>
+</article>
+
+</body>
+</html>

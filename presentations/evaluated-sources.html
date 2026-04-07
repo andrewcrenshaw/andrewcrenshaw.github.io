@@ -293,8 +293,8 @@
   <div class="rule"></div>
   <div class="meta">
     <strong>Companion to:</strong> Living Memory &amp; Alexandria Technical Overview<br>
-    <strong>Evaluation period:</strong> February &ndash; March 2026 (6+ sessions)<br>
-    <strong>Date:</strong> March 2026
+    <strong>Evaluation period:</strong> February &ndash; April 2026 (10+ sessions, 30+ sources)<br>
+    <strong>Date:</strong> April 2026 &mdash; <em>updated to include harness engineering, Strata, and thought leadership sources</em>
   </div>
 </header>
 
@@ -666,6 +666,104 @@
       <div class="source-author">Christopher McGowan</div>
       <div class="source-summary">Practical demonstration of /nap, /wake, /take note commands for agent memory. Pre-compaction checkpoint pattern. Validated the federated memory principle: lightweight local memory bridged to a governed store.</div>
       <div class="source-contribution">Contributed: Slash command patterns, nap/wake lifecycle, federated memory principle</div>
+    </div>
+  </section>
+
+  <!-- HARNESS ENGINEERING & THOUGHT LEADERSHIP (NEW April 2026) -->
+  <section>
+    <div class="section-label">Harness engineering &amp; thought leadership (April 2026)</div>
+    <h2>Harness Engineering, Evals &amp; Thought Leadership</h2>
+    <div class="rule"></div>
+
+    <p>Sources added in April 2026, covering harness engineering (how to govern and evaluate agentic systems), context engineering, and the thought leaders whose work directly shaped our architecture.</p>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">NLAH: Natural-Language Agent Harnesses</span>
+        <span class="source-type type-paper">Paper</span>
+      </div>
+      <div class="source-author">Pan et al. &mdash; Tsinghua University, arXiv:2603.25723 (2026)</div>
+      <div class="source-summary">First controlled experimental evidence for agent harness design. Decomposes any harness into six components (Contracts, Roles, Stage Structure, Adapters, State Semantics, Failure Taxonomy). Critical finding: <strong>more structure can hurt</strong> &mdash; verification modules reduced performance when acceptance criteria diverged from evaluators. File-backed state was the #1 most valuable module. Validates our scratchpad/session-log architecture with experimental data.</div>
+      <div class="source-links">
+        <a href="https://arxiv.org/abs/2603.25723" target="_blank">arXiv:2603.25723</a>
+      </div>
+      <div class="source-contribution">Contributed: Six-component harness decomposition, verifier alignment requirement, evidence that file-backed state is the most valuable harness module</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Thoughtworks: Harness Engineering for AI-Assisted Delivery</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">Thoughtworks Technology Radar</div>
+      <div class="source-summary">Framed harness engineering into three pillars: context engineering, architectural constraints, and "garbage collection" against entropy. Identified that agents replicate whatever patterns already exist in the repository &mdash; including suboptimal ones. Without active entropy fighting, code quality compounds downward.</div>
+      <div class="source-contribution">Contributed: Three-pillar harness framework, entropy resistance as a first-class concern, garbage collection pattern</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">OpenAI: Harness Engineering with Codex</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">OpenAI Engineering</div>
+      <div class="source-summary">AGENTS.md as ~100-line table of contents, not a manual. Rigid dependency direction enforcement via custom linters. "Doc-gardening" agents that scan for stale documentation. 20% Friday cleanup time didn't scale; automated entropy processes did. Key insight: "Context is a scarce resource. A giant instruction file crowds out the task."</div>
+      <div class="source-contribution">Contributed: AGENTS.md architecture, mechanical validation, doc-gardening automation, entropy scan process</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Anthropic: Demystifying Evals for AI Agents</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">Anthropic</div>
+      <div class="source-summary">Complete eval stack: tasks, trials, graders (code/model/human), transcripts, suites. Distinction between capability evals (hill-climbing, start at low pass rate) and regression evals (guardrails, near 100%). Swiss Cheese Model from safety engineering: no single eval layer catches everything; multiple methods combined fill the gaps.</div>
+      <div class="source-links">
+        <a href="https://docs.anthropic.com/en/docs/test-and-evaluate/eval-design" target="_blank">Documentation</a>
+      </div>
+      <div class="source-contribution">Contributed: Capability vs regression eval distinction, pass@k/pass^k metrics, Swiss Cheese Model for agent quality</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">HumanLayer: Context-Efficient Agent Engineering</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">HumanLayer (N7 &amp; N8)</div>
+      <div class="source-summary">Two articles. N7: suppress passing test output (replace 200 lines of "PASS" with one checkmark), --bail in agent test runs, deterministic backpressure. N8: "Frequent Intentional Compaction" with 40-60% context utilization target. Research → Plan → Implement workflow. Subagents are about context control, not role-playing. "A bad line of plan leads to hundreds of bad lines of code."</div>
+      <div class="source-contribution">Contributed: run_silent pattern, context budget zones, Research→Plan→Implement workflow, subagent context isolation</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Andrej Karpathy: Software 2.0, LLM OS</span>
+        <span class="source-type type-industry">Thought Leadership</span>
+      </div>
+      <div class="source-author">Andrej Karpathy &mdash; Stanford, Tesla, OpenAI</div>
+      <div class="source-summary">"Software 2.0" framing: neural networks as the new programming paradigm, where the model IS the program and the training data IS the source code. The "LLM OS" vision: LLMs as the kernel of a new computing stack, with tools, memory, and file systems as peripherals. This directly shaped our architecture: the knowledge graph is the "file system" of the LLM OS, and agents are processes managed by the kernel.</div>
+      <div class="source-contribution">Contributed: Software 2.0 paradigm, LLM OS metaphor for architecture, kernel/peripheral framing for agent systems</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Boris Cherny: Context Engineering as a Discipline</span>
+        <span class="source-type type-industry">Thought Leadership</span>
+      </div>
+      <div class="source-author">Boris Cherny &mdash; Stripe, Shopify</div>
+      <div class="source-summary">Reframing "prompt engineering" as "context engineering" &mdash; the systems-level discipline of designing what information flows to a model and when. The key insight: the context window is the new bottleneck, not the model capability. Our architecture directly addresses this through token-budgeted getContext, berrypicking retrieval, and the living wiki as a pre-compiled context source.</div>
+      <div class="source-contribution">Contributed: Context engineering framing, token budget as architectural constraint, pre-compiled context concept</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Program-Aided Language Models (PAL)</span>
+        <span class="source-type type-paper">Paper</span>
+      </div>
+      <div class="source-author">Gao et al. &mdash; CMU, 2023</div>
+      <div class="source-summary">LLMs generate structured programs (code) as intermediate reasoning steps rather than free-form text. The code is then executed to produce the answer. This pattern directly influenced our approach: agents produce structured artifacts (scratchpads, session summaries, decision traces), not just chat responses. Code-as-reasoning, not prose-as-reasoning.</div>
+      <div class="source-links">
+        <a href="https://arxiv.org/abs/2211.10435" target="_blank">arXiv:2211.10435</a>
+      </div>
+      <div class="source-contribution">Contributed: Structured artifact generation, code-as-reasoning pattern, separation of reasoning from execution</div>
     </div>
   </section>
 
