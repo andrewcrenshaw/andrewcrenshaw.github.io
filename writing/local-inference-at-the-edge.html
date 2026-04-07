@@ -126,7 +126,7 @@
       <thead><tr><th>Machine</th><th>Spec</th><th>Primary Role</th></tr></thead>
       <tbody>
         <tr><td>mac-mini-1</td><td>M4 Pro, 48GB RAM, 512GB SSD</td><td>Strata services + OCR (GLM-OCR-2B via MLX)</td></tr>
-        <tr><td>mac-mini-2</td><td>M4 Pro, 48GB RAM, 1TB SSD</td><td>LLM inference (Gemma 4 27B, 4-bit quantized via MLX)</td></tr>
+        <tr><td>mac-mini-2</td><td>M4 Pro, 48GB RAM, 1TB SSD</td><td>LLM inference (Gemma 4 E4B, 4-bit quantized via MLX)</td></tr>
       </tbody>
     </table>
 
@@ -136,9 +136,22 @@
 
     <h3>Model selection: why Gemma, why quantized</h3>
 
-    <p>I evaluated several local model options. The criteria were specific: the model had to fit in ~20GB of unified memory (leaving headroom for the OS and services), achieve acceptable quality on job-description scoring, and support efficient batched inference on Apple Silicon via MLX.</p>
+    <p>I evaluated several local model options. The criteria were specific: the model had to fit comfortably in unified memory with headroom for the OS and services, achieve acceptable quality on job-description scoring, and support efficient inference on Apple Silicon via MLX.</p>
 
-    <p><strong>Gemma 4 27B (4-bit quantized)</strong> hit the sweet spot. At 4-bit quantization via MLX, the model loads in ~15GB of unified memory, leaving plenty of headroom. Inference speed on an M4 Pro is approximately 25-35 tokens/second — not blazing, but more than adequate for scoring tasks that don't need real-time response.</p>
+    <p><strong>Gemma 4 E4B (4-bit quantized)</strong> hit the sweet spot. At 4-bit quantization via <code>mlx-community/gemma-4-E4B-it-4bit</code>, the model runs with a peak memory footprint of just 5.25 GB — leaving the vast majority of 48GB unified memory free for other services. Performance is genuinely impressive on M4 Pro:</p>
+
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>Measured</th></tr></thead>
+      <tbody>
+        <tr><td>End-to-end latency (over LAN)</td><td><strong>0.93 seconds</strong></td></tr>
+        <tr><td>Prompt throughput</td><td>66.8 tokens/sec</td></tr>
+        <tr><td>Generation throughput</td><td>66.1 tokens/sec</td></tr>
+        <tr><td>Peak memory</td><td>5.25 GB</td></tr>
+        <tr><td>Model</td><td><code>mlx-community/gemma-4-E4B-it-4bit</code></td></tr>
+      </tbody>
+    </table>
+
+    <p>Sub-second latency over LAN and 66+ tokens/sec generation speed — more than adequate for scoring tasks, and fast enough for interactive use if needed.</p>
 
     <p>For OCR, <strong>GLM-OCR-2B via MLX</strong> runs on the first Mac Mini. It handles parsing career pages, extracting text from images, and processing PDF resumes. At 2B parameters, it's fast and accurate for structured text extraction.</p>
 
