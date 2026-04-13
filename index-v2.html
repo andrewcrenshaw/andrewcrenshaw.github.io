@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Andrew Crenshaw — Enterprise AI Architecture & Engineering</title>
+  <meta name="description" content="Enterprise technology leader building multi-agent systems with agentic memory and human-in-the-loop governance.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --bg-surface: #0f1319;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-hover: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-accent: rgba(78, 168, 201, 0.25);
+      --text: #e4e8ed;
+      --text-dim: #7e8a97;
+      --text-faint: #4a5568;
+      --accent: #4ea8c9;
+      --accent-dim: rgba(78, 168, 201, 0.15);
+      --accent-glow: rgba(78, 168, 201, 0.08);
+      --red: #c75b5b;
+      --green: #6bab73;
+      --orange: #c9954e;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Outfit', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --pad: clamp(1.5rem, 5vw, 5rem);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.25;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 500;
+      padding: 1rem var(--pad);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.4s var(--ease);
+    }
+
+    nav.scrolled {
+      background: rgba(10, 14, 20, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .name {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    nav .links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    nav .links a {
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    nav .links a:hover { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      nav .links { display: none; }
+    }
+
+    /* Sections */
+    section {
+      padding: clamp(4rem, 10vh, 8rem) var(--pad);
+      position: relative;
+    }
+
+    section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .section-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-inner.wide { max-width: 1200px; }
+    .section-inner.narrow { max-width: 760px; }
+
+    .rule {
+      width: 40px;
+      height: 2px;
+      background: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .rule.center { margin-left: auto; margin-right: auto; }
+
+    .section-label {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+
+    /* Typography */
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      font-weight: 400;
+      line-height: 1.0;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin-bottom: 1.2rem;
+    }
+
+    h3 {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+    }
+
+    p {
+      font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+      line-height: 1.7;
+      color: var(--text-dim);
+      max-width: 680px;
+    }
+
+    p + p { margin-top: 1rem; }
+
+    em {
+      font-style: italic;
+      color: var(--accent);
+      font-family: var(--serif);
+      font-size: 1.05em;
+    }
+
+    /* Hero */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 6rem;
+    }
+
+    #hero::before {
+      background:
+        radial-gradient(ellipse at 15% 50%, var(--accent-glow) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 20%, rgba(78, 168, 201, 0.04) 0%, transparent 50%);
+    }
+
+    .hero-subtitle {
+      font-family: var(--sans);
+      font-size: clamp(0.85rem, 1.3vw, 1.05rem);
+      font-weight: 400;
+      color: var(--text-dim);
+      margin-top: 1.5rem;
+      max-width: 640px;
+      line-height: 1.8;
+    }
+
+    .hero-cta {
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-cta a {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.8rem 2rem;
+      border-radius: 6px;
+      transition: all 0.3s var(--ease);
+    }
+
+    .cta-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .cta-primary:hover {
+      background: #5bbad5;
+      transform: translateY(-1px);
+    }
+
+    .cta-secondary {
+      border: 1px solid var(--border-accent);
+      color: var(--accent);
+    }
+
+    .cta-secondary:hover {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+    }
+
+    /* Card grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    @media (min-width: 960px) {
+      .card-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.4s var(--ease);
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      display: block;
+      color: var(--accent);
+    }
+
+    .card h3 {
+      font-family: var(--serif);
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .card .tech-tags {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .tech-tag {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      background: var(--accent-dim);
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* Layer stack */
+    .layer-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 2.5rem 0;
+      max-width: 600px;
+    }
+
+    .layer {
+      padding: 1.4rem 1.5rem;
+      border-left: 3px solid var(--accent);
+      background: var(--bg-card);
+      position: relative;
+      transition: all 0.3s var(--ease);
+    }
+
+    .layer:first-child { border-radius: 10px 10px 0 0; border-top: 1px solid var(--border); }
+    .layer:last-child { border-radius: 0 0 10px 10px; border-bottom: 1px solid var(--border); }
+    .layer:hover { background: var(--bg-card-hover); }
+
+    .layer-name {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .layer-desc {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+    }
+
+    .layer-tag {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      opacity: 0.7;
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .layer.highlight {
+      border-left-color: var(--orange);
+      background: rgba(201, 149, 78, 0.04);
+    }
+
+    .layer.highlight .layer-tag { color: var(--orange); }
+
+    /* Two column */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+      margin-top: 2.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .two-col { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    .two-col p { max-width: 100%; }
+
+    /* Timeline */
+    .timeline {
+      margin-top: 2.5rem;
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.5rem;
+      bottom: 0.5rem;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--accent), var(--border));
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 2.5rem;
+    }
+
+    .timeline-item:last-child { padding-bottom: 0; }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 0.5rem;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      transform: translateX(-3px);
+    }
+
+    .timeline-date {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+
+    .timeline-title {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .timeline-company {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      max-width: 560px;
+    }
+
+    /* Presentations grid */
+    .pres-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.2rem;
+      margin-top: 2.5rem;
+    }
+
+    .pres-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-decoration: none;
+      transition: all 0.4s var(--ease);
+      display: block;
+    }
+
+    .pres-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+
+    .pres-card .pres-type {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 0.8rem;
+    }
+
+    .type-arch { background: rgba(78, 168, 201, 0.15); color: var(--accent); }
+    .type-strategy { background: rgba(201, 149, 78, 0.15); color: var(--orange); }
+    .type-research { background: rgba(107, 206, 123, 0.15); color: #6bce7b; }
+
+    .pres-card h4 {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .pres-card .pres-desc {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* Writing section */
+    .writing-list {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .writing-item {
+      padding: 1.2rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s var(--ease);
+    }
+
+    .writing-item:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+    }
+
+    .writing-item h4 {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+
+    .writing-item .writing-desc {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+    }
+
+    /* Contact */
+    #contact {
+      text-align: center;
+      padding-bottom: clamp(6rem, 12vh, 10rem);
+    }
+
+    #contact h2 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin-bottom: 1rem;
+    }
+
+    #contact p {
+      margin: 0 auto 2rem;
+      text-align: center;
+      max-width: 520px;
+    }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-links a {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--accent);
+      padding: 0.7rem 1.8rem;
+      border: 1px solid var(--border-accent);
+      border-radius: 6px;
+      transition: all 0.3s var(--ease);
+    }
+
+    .contact-links a:hover {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+    }
+
+    /* Divider */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Reveal animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* Big quote */
+    .big-quote {
+      font-family: var(--serif);
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--text);
+      font-style: italic;
+      position: relative;
+      padding-left: 2rem;
+      max-width: 700px;
+      margin: 2rem 0;
+    }
+
+    .big-quote::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.2em;
+      bottom: 0.2em;
+      width: 3px;
+      background: var(--accent);
+    }
+
+    /* Footer */
+    footer {
+      padding: 2rem var(--pad);
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-faint);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--accent);
+      z-index: 600;
+      transition: width 0.15s linear;
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<nav id="nav">
+  <a href="#hero" class="name">Andrew Crenshaw</a>
+  <ul class="links">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#career">Career</a></li>
+    <li><a href="#presentations">Presentations</a></li>
+    <li><a href="#writing">Writing</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="https://gist.github.com/andrewcrenshaw/ef2f4e84b0a5d4fced230267e108889f" target="_blank" rel="noopener">Source</a></li>
+  </ul>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section id="hero">
+  <div class="section-inner">
+    <div class="rule reveal"></div>
+    <h1 class="reveal reveal-delay-1">Enterprise AI.<br>Built, Not Theorized.</h1>
+    <p class="hero-subtitle reveal reveal-delay-2">
+      I design and build multi-agent AI operating systems with living memory, local inference, and human-in-the-loop governance. 25+ years of enterprise architecture — now building the agentic infrastructure that compounds knowledge across sessions, agents, and machines. The rare combination of deep enterprise experience and hands-on AI systems building.
+    </p>
+    <div class="hero-cta reveal reveal-delay-3">
+      <a href="#work" class="cta-primary">See the work</a>
+      <a href="#contact" class="cta-secondary">Get in touch</a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==================== WHAT I BUILD ==================== -->
+<section id="work">
+  <div class="section-inner">
+    <div class="section-label reveal">What I Build</div>
+    <h2 class="reveal">Different domains. Same architecture spine.</h2>
+    <div class="rule reveal"></div>
+    <p class="reveal">Most organizations experimenting with AI agents are running single-agent demos against isolated problems. I design and build systems where multiple specialized agents collaborate under structured governance, building on each other's work through shared memory. I also ship practical AI-powered tools that real teams use every day.</p>
+
+    <div class="card-grid">
+      <div class="card reveal reveal-delay-1">
+        <span class="card-icon"><i class="ph ph-brain"></i></span>
+        <h3>Living Memory &amp; Knowledge System</h3>
+        <p>Designed a memory architecture where organizational knowledge manages itself: agents file knowledge chunks as they learn, auto-promoted lessons compile into a living wiki, and stale claims decay. Not passive retrieval — active knowledge metabolism that compounds across every session. Inspired by Karpathy's "Software 2.0" and Cherny's context engineering.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">knowledge graphs</span>
+          <span class="tech-tag">digestive pipeline</span>
+          <span class="tech-tag">living wiki</span>
+          <span class="tech-tag">agent reflections</span>
+          <span class="tech-tag">auto-promotion gates</span>
+          <span class="tech-tag">decay + consolidation</span>
+        </div>
+      </div>
+
+      <div class="card reveal reveal-delay-2">
+        <span class="card-icon"><i class="ph ph-git-branch"></i></span>
+        <h3>Multi-Agent Orchestration</h3>
+        <p>Built a framework coordinating a dozen specialized AI agents through a shared backlog with human-in-the-loop governance. Includes a Project Control Center with approval queues, session isolation, conflict detection, and automated review evaluation. Used daily as my primary development environment.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">TypeScript / Node.js</span>
+          <span class="tech-tag">SQLite</span>
+          <span class="tech-tag">REST API</span>
+          <span class="tech-tag">WebSocket</span>
+          <span class="tech-tag">review gates</span>
+          <span class="tech-tag">parallel agent management</span>
+        </div>
+      </div>
+
+      <div class="card reveal reveal-delay-3">
+        <span class="card-icon"><i class="ph ph-buildings"></i></span>
+        <h3>Enterprise Workflow Automation</h3>
+        <p>Applied the multi-agent framework to Salesforce development workflows with bidirectional Jira integration, Confluence documentation sync, and automated requirements traceability from business need to deployed code. Currently in UAT.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Salesforce (Apex / MCP)</span>
+          <span class="tech-tag">confidence evaluation</span>
+          <span class="tech-tag">brownfield discovery</span>
+          <span class="tech-tag">human-agent co-development</span>
+          <span class="tech-tag">Jira integration</span>
+          <span class="tech-tag">test coverage</span>
+        </div>
+      </div>
+
+      <div class="card reveal reveal-delay-1">
+        <span class="card-icon"><i class="ph ph-film-slate"></i></span>
+        <h3>HR Media Campaign Platform</h3>
+        <p>Designed and built an internal media campaign management system used by the HR People Team. Multi-format content creation (AI-generated audio, avatar video, text), Slack distribution, branded media player with engagement analytics. In active daily use.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Node.js / Express</span>
+          <span class="tech-tag">PostgreSQL</span>
+          <span class="tech-tag">Google TTS / HeyGen</span>
+          <span class="tech-tag">Slack integration</span>
+          <span class="tech-tag">SSO</span>
+        </div>
+      </div>
+
+      <div class="card reveal reveal-delay-2">
+        <span class="card-icon"><i class="ph ph-graduation-cap"></i></span>
+        <h3>niKi: Now I Know It</h3>
+        <p>A product bet exploring AI-powered compounding learning. Students upload course notes (images, PDFs, docs) and an LLM extracts atomic concepts with prerequisites and cross-course connections into a personal knowledge graph. Builds scoped study guides, with 8 built-in skills (concept extraction, confusion pair detection, exam postmortem, bridge detection). The same knowledge-graph-plus-learning-layer pattern from the enterprise work, applied to student learning.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Node.js</span>
+          <span class="tech-tag">LLM vision API</span>
+          <span class="tech-tag">knowledge graphs</span>
+          <span class="tech-tag">prompt templates</span>
+          <span class="tech-tag">portable / self-contained</span>
+        </div>
+      </div>
+
+      <div class="card reveal reveal-delay-3">
+        <span class="card-icon"><i class="ph ph-user-focus"></i></span>
+        <h3>Customer Contextualization Framework</h3>
+        <p>Designed a framework for synthesizing customer engagement signals across touchpoints into a unified context layer. Identity resolution, CRM architecture, behavioral data, and real-time orchestration powering personalization and support cost reduction.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">identity resolution</span>
+          <span class="tech-tag">rules engine</span>
+          <span class="tech-tag">relevance scoring</span>
+          <span class="tech-tag">Builder.io</span>
+          <span class="tech-tag">AWS Redshift</span>
+          <span class="tech-tag">Salesforce CRM</span>
+        </div>
+      </div>
+
+      <div class="card reveal reveal-delay-1">
+        <span class="card-icon"><i class="ph ph-crosshair"></i></span>
+        <h3>Strata: AI Job Search OS</h3>
+        <p>An autonomous AI operating system where eight specialized agents collaborate through governed PostgreSQL to discover, evaluate, match, and help apply to jobs. Three-layer dedup eliminates 95% of noise before LLM scoring. Two public PyPI libraries (strata-match, strata-harvest). Budget: $10–36/month for full operation.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">FastAPI / PostgreSQL</span>
+          <span class="tech-tag">pgvector</span>
+          <span class="tech-tag">8 governed agents</span>
+          <span class="tech-tag">ARQ + Redis</span>
+          <span class="tech-tag">3-layer dedup</span>
+          <span class="tech-tag">open source (PyPI)</span>
+        </div>
+      </div>
+
+      <div class="card reveal reveal-delay-2">
+        <span class="card-icon"><i class="ph ph-cpu"></i></span>
+        <h3>Local AI Infrastructure</h3>
+        <p>Deployed a two-machine Mac Mini cluster running local ML inference via LAN and Tailscale mesh. Gemma 4 (4-bit quantized) via MLX for cost-free LLM scoring, GLM-OCR for resume parsing. Shadow-mode calibration compares local vs. cloud models to optimize cost without sacrificing quality.</p>
+        <div class="tech-tags">
+          <span class="tech-tag">MLX / Apple Silicon</span>
+          <span class="tech-tag">Gemma 4 (quantized)</span>
+          <span class="tech-tag">GLM-OCR</span>
+          <span class="tech-tag">Tailscale VPN</span>
+          <span class="tech-tag">launchd services</span>
+          <span class="tech-tag">shadow-mode eval</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==================== ARCHITECTURE ==================== -->
+<section id="architecture">
+  <div class="section-inner">
+    <div class="section-label reveal">Architecture Thinking</div>
+    <h2 class="reveal">Memory is the multiplier. Agency is the force.</h2>
+    <div class="rule reveal"></div>
+
+    <div class="two-col">
+      <div class="reveal">
+        <p>Without memory, agency does the same work repeatedly. An agent fleet without shared memory is individually capable but collectively starts over every time. The architecture I designed solves this with three distinct layers, each with its own failure modes and quality signals.</p>
+        <p style="margin-top: 1rem;">The learning layer is the part most teams skip. It's where raw experience becomes structured understanding: what worked, what didn't, what should be applied next time. Without it, you have storage and retrieval but no compounding.</p>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <div class="layer-stack">
+          <div class="layer">
+            <div class="layer-name">Retrieval</div>
+            <div class="layer-desc">Right knowledge, right agent, right moment</div>
+            <div class="layer-tag">Personalization</div>
+          </div>
+          <div class="layer highlight">
+            <div class="layer-name">Learning</div>
+            <div class="layer-desc">Reduce, reflect, consolidate</div>
+            <div class="layer-tag">Most skip this</div>
+          </div>
+          <div class="layer">
+            <div class="layer-name">Storage</div>
+            <div class="layer-desc">Where knowledge lives</div>
+            <div class="layer-tag">Infrastructure</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="big-quote reveal" style="margin-top: 3rem;">
+      The difference between agents with a vector database and agents with a memory system that compounds is the difference between a tool and a team.
+    </div>
+
+    <div class="two-col" style="margin-top: 3rem;">
+      <div class="reveal">
+        <h3>Governance as Architecture</h3>
+        <p>Speed without governance means fast in the wrong direction. The framework enforces bounded authority (each agent has a narrow, architecturally enforced scope), continuous approval gates, automatic audit trails, and session isolation with conflict detection. Governance isn't a policy layer. It's a first-class architectural concern.</p>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <h3>Enterprise Reality</h3>
+        <p>The system is designed for real enterprise infrastructure: Salesforce with governor limits, Jira with all its workflow complexity, Confluence as a living documentation target. Most agent demonstrations run in isolation. This one operates where the constraints are real and the consequences matter.</p>
+      </div>
+    </div>
+
+    <div class="big-quote reveal" style="margin-top: 3rem;">
+      Standing on strong shoulders. Taking it further.
+    </div>
+
+    <div class="two-col" style="margin-top: 2rem;">
+      <div class="reveal">
+        <h3>Inspirations &amp; Synthesis</h3>
+        <p>This architecture didn't emerge in isolation. It synthesizes ideas from <em>Andrej Karpathy</em> (Software 2.0, LLM OS), <em>Boris Cherny</em> (context engineering as the core discipline), <em>Program-Aided Language Models (PAL)</em> (structured reasoning through code), and <em>Demis Hassabis</em> (systems that learn from experience, not just data). The key insight: most agentic systems bolt memory onto agents as an afterthought. We built memory as the foundation and agents as the consumers.</p>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <h3>Where We're Different</h3>
+        <p>Memory platforms like <em>Mem0</em>, <em>Zep</em>, and <em>LangMem</em> solve recall. Orchestration frameworks like <em>CrewAI</em> and <em>LangGraph</em> solve coordination. Neither solves compounding — the ability for a fleet of agents to get measurably better over time. Our system does: knowledge chunks auto-promote through confidence gates into a living wiki. Stale claims decay. Agents start sessions by reading what the fleet has learned, not by re-researching. The learning layer is the differentiator.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==================== CAREER ==================== -->
+<section id="career">
+  <div class="section-inner">
+    <div class="section-label reveal">Career Arc</div>
+    <h2 class="reveal">25 years of building systems<br>that make organizations smarter</h2>
+    <div class="rule reveal"></div>
+    <p class="reveal">The thread through my career: designing technology systems that help organizations understand their customers, make better decisions, and operate more intelligently. The actors have changed over 25 years. The architecture thinking hasn't.</p>
+
+    <div class="timeline reveal">
+      <div class="timeline-item">
+        <div class="timeline-date">2025 &ndash; 2026</div>
+        <div class="timeline-title">Agentic AI &amp; Multi-Agent Systems</div>
+        <div class="timeline-company">Head of GTM Engineering</div>
+        <div class="timeline-desc">Designed and built a multi-agent orchestration framework with living memory, human-in-the-loop governance, and enterprise workflow automation (3x Salesforce dev acceleration). Built Strata — an autonomous AI job search OS with 8 governed agents, 3-layer dedup, and local Gemma/OCR inference across a Mac Mini cluster. Shipped an AI media campaign platform for HR. Published two open-source PyPI libraries.</div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">2013 &ndash; 2025</div>
+        <div class="timeline-title">Customer Engagement & GTM Platform</div>
+        <div class="timeline-company">Executive Director, Customer Engagement Solutions</div>
+        <div class="timeline-desc">Architected customer data platforms, identity resolution, CRM strategy, and marketing technology for a major EdTech publisher. Converged 10 product companies onto a single Salesforce instance. Built a fully integrated customer engagement ecosystem with compounding flywheels and feedback loops, providing decision support to sales and execs, and accelerating a $250M pipeline.</div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">2002 &ndash; 2013</div>
+        <div class="timeline-title">Global CRM & Sales Technology</div>
+        <div class="timeline-company">Executive Director, Major Financial Institution</div>
+        <div class="timeline-desc">Nearly 9 years as global CRM product owner for 5,000 users, then Fixed Income IT portfolio lead managing a $20M technology budget. Built consolidated sales reporting, analysis, and coverage platforms replacing legacy systems.</div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-date">1996 &ndash; 2002</div>
+        <div class="timeline-title">Digital Product & Platform Engineering</div>
+        <div class="timeline-company">VP Product Management / Sr. Technical PM</div>
+        <div class="timeline-desc">Built digital platforms for performing arts organizations and Fortune 500 companies. Designed e-commerce and ticketing integrations that transformed how Broadway theaters sold tickets online.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==================== PRESENTATIONS ==================== -->
+<section id="presentations">
+  <div class="section-inner">
+    <div class="section-label reveal">Presentations</div>
+    <h2 class="reveal">Technical presentations and deep-dives</h2>
+    <div class="rule reveal"></div>
+    <p class="reveal">Self-contained, interactive HTML presentations covering the architecture, the research, and the strategic vision. Each one is a complete narrative, not a slide deck.</p>
+
+    <div class="pres-grid">
+      <a href="presentations/knowledge-framework-pitch.html" class="pres-card reveal reveal-delay-1">
+        <span class="pres-type type-strategy">Strategy</span>
+        <h4>Enterprise Knowledge Framework</h4>
+        <p class="pres-desc">Strategic pitch for an enterprise-wide knowledge architecture that connects organizational silos through a shared knowledge graph with curated claims.</p>
+      </a>
+
+      <a href="presentations/salesforce-ai-augmented-development.html" class="pres-card reveal reveal-delay-2">
+        <span class="pres-type type-strategy">Strategy</span>
+        <h4>Salesforce AI-Augmented Development</h4>
+        <p class="pres-desc">How multi-agent orchestration transforms the Salesforce delivery lifecycle: confidence evaluation, brownfield discovery, and human-agent co-development.</p>
+      </a>
+
+      <a href="presentations/agentic-memory-architecture.html" class="pres-card reveal reveal-delay-3">
+        <span class="pres-type type-arch">Architecture</span>
+        <h4>Agentic Memory: Technical Overview</h4>
+        <p class="pres-desc">Deep technical walk-through of the three-layer memory architecture, the digestive pipeline, and how knowledge compounds across agent sessions.</p>
+      </a>
+
+      <a href="presentations/customer-contextualization-framework.html" class="pres-card reveal reveal-delay-1">
+        <span class="pres-type type-strategy">Strategy</span>
+        <h4>Customer Contextualization Framework</h4>
+        <p class="pres-desc">Synthesizing engagement signals across customer touchpoints into a unified context layer. Identity resolution, behavioral data, and AI-powered orchestration.</p>
+      </a>
+
+      <a href="presentations/memory-landscape-2026.html" class="pres-card reveal reveal-delay-2">
+        <span class="pres-type type-research">Research</span>
+        <h4>Memory, Context & Graphs: The 2026 Landscape</h4>
+        <p class="pres-desc">Comparative analysis of the agentic memory landscape: academic papers, open-source projects, and commercial products evaluated against the architecture.</p>
+      </a>
+
+      <a href="presentations/evaluated-sources.html" class="pres-card reveal reveal-delay-3">
+        <span class="pres-type type-research">Research</span>
+        <h4>Further Research & Sources</h4>
+        <p class="pres-desc">20+ external sources pressure-tested against the architecture. Claim traceability, supporting evidence, and gaps identified. For the thorough reader.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==================== WRITING ==================== -->
+<section id="writing">
+  <div class="section-inner narrow">
+    <div class="section-label reveal">Writing</div>
+    <h2 class="reveal">Lessons from building</h2>
+    <div class="rule reveal"></div>
+    <p class="reveal">Observations from building multi-agent systems for real enterprise work. No theory. Just what I've learned.</p>
+
+    <div class="writing-list">
+      <a href="writing/the-memory-problem-in-multi-agent-systems.html" class="writing-item reveal">
+        <h4>The Memory Problem in Multi-Agent Systems</h4>
+        <p class="writing-desc">Why a dozen fast agents without shared memory is just expensive repetition.</p>
+      </a>
+      <a href="writing/agent-memory-vs-agentic-memory.html" class="writing-item reveal reveal-delay-1">
+        <h4>Agent Memory vs. Agentic Memory</h4>
+        <p class="writing-desc">The distinction most teams miss, and the three-layer architecture that solves it.</p>
+      </a>
+      <a href="writing/five-governance-patterns-for-enterprise-ai-agents.html" class="writing-item reveal reveal-delay-2">
+        <h4>Five Governance Patterns for Enterprise AI Agents</h4>
+        <p class="writing-desc">Approval gates, bounded authority, session isolation, and calibrating the human-in-the-loop.</p>
+      </a>
+      <a href="writing/rag-is-not-a-knowledge-strategy.html" class="writing-item reveal reveal-delay-3">
+        <h4>RAG Is Not a Knowledge Strategy</h4>
+        <p class="writing-desc">Why retrieval-augmented generation solves the search problem but not the knowledge problem.</p>
+      </a>
+      <a href="writing/enterprise-experience-is-the-missing-ingredient.html" class="writing-item reveal">
+        <h4>Enterprise Experience Is the Missing Ingredient</h4>
+        <p class="writing-desc">Decades of enterprise complexity aren't just relevant to the agentic stack — they're the part most teams are missing.</p>
+      </a>
+      <a href="writing/building-an-ai-job-search-os.html" class="writing-item reveal reveal-delay-1">
+        <h4>Building an AI Job Search OS from Scratch</h4>
+        <p class="writing-desc">Why I built Strata: eight governed agents, three-layer dedup, local Gemma inference, and the architecture decisions that make it run for $10/month.</p>
+      </a>
+      <a href="writing/local-inference-at-the-edge.html" class="writing-item reveal reveal-delay-2">
+        <h4>Local Inference at the Edge: Gemma on Mac Minis</h4>
+        <p class="writing-desc">Deploying quantized models across a LAN cluster with Tailscale mesh, shadow-mode calibration, and the economics of cloud vs. local.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==================== CONTACT ==================== -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="rule center reveal"></div>
+    <h2 class="reveal">Let's talk.</h2>
+    <p class="reveal">I'm looking for my next role leading AI-native engineering organizations — where the ability to actually build agentic systems, architect for enterprise reality, and ship production-grade AI infrastructure all matter. VP/Head of AI Engineering, AI Strategy, or Agentic Platform leadership.</p>
+    <div class="contact-links reveal reveal-delay-1">
+      <a href="https://www.linkedin.com/in/andrewcrenshaw/" target="_blank">LinkedIn</a>
+      <a href="#" onclick="this.href='mailto:'+'andrewcrenshaw123'+'@'+'gmail.com'" target="_blank">Email</a>
+      <a href="https://github.com/andrewcrenshaw" target="_blank">GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2026 Andrew Crenshaw</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav scroll effect
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Progress bar
+  const progress = document.getElementById('progress');
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = (scrollTop / docHeight) * 100;
+    progress.style.width = scrollPercent + '%';
+  });
+</script>
+
+</body>
+</html>
