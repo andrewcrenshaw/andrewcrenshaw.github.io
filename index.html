@@ -709,23 +709,25 @@
       </div>
 
       <div class="card reveal reveal-delay-2">
-        <span class="card-icon"><i class="ph ph-git-branch"></i></span>
-        <h3>Multi-Agent Orchestration</h3>
-        <p>Built a framework coordinating a dozen specialized AI agents through a shared backlog with human-in-the-loop governance. Includes a Project Control Center with approval queues, session isolation, conflict detection, and automated review evaluation. Used daily as my primary development environment.</p>
+        <span class="card-icon"><i class="ph ph-lightning"></i></span>
+        <h3>autogenous-synthesis Forge</h3>
+        <p>The development OS behind every project here. Forge is a harness engineering framework — it doesn't add AI to an existing process, it replaces the process entirely. Twelve-plus specialized agents (architect, builder, analyst, reviewer, tester, debugger, and more) operate under structured SOPs, a governed backlog, TDD enforcement, and persistent session memory. The system decomposes tasks, implements to spec, generates tests, evaluates quality, and submits for human review. When something fails, the fix is never "try harder" — it's "what capability is missing, and how do we make it legible to the agent?"</p>
         <div class="tech-tags">
+          <span class="tech-tag">harness engineering</span>
           <span class="tech-tag">TypeScript / Node.js</span>
           <span class="tech-tag">SQLite</span>
-          <span class="tech-tag">REST API</span>
-          <span class="tech-tag">WebSocket</span>
-          <span class="tech-tag">review gates</span>
-          <span class="tech-tag">parallel agent management</span>
+          <span class="tech-tag">12+ specialized agents</span>
+          <span class="tech-tag">approval gates</span>
+          <span class="tech-tag">TDD enforcement</span>
+          <span class="tech-tag">session memory</span>
+          <span class="tech-tag">agent SOPs</span>
         </div>
       </div>
 
       <div class="card reveal reveal-delay-3">
         <span class="card-icon"><i class="ph ph-buildings"></i></span>
         <h3>Enterprise Workflow Automation</h3>
-        <p>Applied the multi-agent framework to Salesforce development workflows with bidirectional Jira integration, Confluence documentation sync, and automated requirements traceability from business need to deployed code. Currently in UAT.</p>
+        <p>Applied the Forge framework to Salesforce development workflows with bidirectional Jira integration, Confluence documentation sync, and automated requirements traceability from business need to deployed code.</p>
         <div class="tech-tags">
           <span class="tech-tag">Salesforce (Apex / MCP)</span>
           <span class="tech-tag">confidence evaluation</span>
@@ -793,13 +795,15 @@
       <div class="card reveal reveal-delay-2">
         <span class="card-icon"><i class="ph ph-cpu"></i></span>
         <h3>Local AI Infrastructure</h3>
-        <p>Deployed a two-machine Mac Mini cluster running local ML inference via LAN and Tailscale mesh. Gemma 4 (4-bit quantized) via MLX for cost-free LLM scoring, GLM-OCR for resume parsing. Shadow-mode calibration compares local vs. cloud models to optimize cost without sacrificing quality.</p>
+        <p>A Mac Mini cluster running schedule-driven local inference across three machines. Gemma 4 31B (near-lossless q8 quantization) handles deep scoring overnight; Qwen3 30B MoE (60–70 tok/s) runs during dev hours — automatic launchd transitions between them. LiteLLM routes Strata's pipeline stages to the right model: fast and balanced stages to Qwen3, deep-score stages to Gemma 4. nomic-embed-text provides always-on 768-dim embeddings. GLM-OCR handles resume parsing. Shadow-mode calibration benchmarks local quality against cloud models continuously. Zero variable inference cost for production workloads.</p>
         <div class="tech-tags">
-          <span class="tech-tag">MLX / Apple Silicon</span>
-          <span class="tech-tag">Gemma 4 (quantized)</span>
+          <span class="tech-tag">Ollama / LiteLLM</span>
+          <span class="tech-tag">Gemma 4 31B (q8)</span>
+          <span class="tech-tag">Qwen3 30B MoE</span>
+          <span class="tech-tag">nomic-embed-text</span>
           <span class="tech-tag">GLM-OCR</span>
+          <span class="tech-tag">launchd scheduling</span>
           <span class="tech-tag">Tailscale VPN</span>
-          <span class="tech-tag">launchd services</span>
           <span class="tech-tag">shadow-mode eval</span>
         </div>
       </div>
@@ -954,13 +958,13 @@
       <a href="presentations/memory-landscape-2026.html" class="pres-card reveal reveal-delay-2">
         <span class="pres-type type-research">Research</span>
         <h4>Memory, Context & Graphs: The 2026 Landscape</h4>
-        <p class="pres-desc">Comparative analysis of the agentic memory landscape: academic papers, open-source projects, and commercial products evaluated against the architecture.</p>
+        <p class="pres-desc">Comparative analysis of the agentic memory landscape: academic papers, open-source projects, and commercial products evaluated against the architecture. 20+ sources with claim traceability and gap analysis.</p>
       </a>
 
-      <a href="presentations/evaluated-sources.html" class="pres-card reveal reveal-delay-3">
-        <span class="pres-type type-research">Research</span>
-        <h4>Further Research & Sources</h4>
-        <p class="pres-desc">20+ external sources pressure-tested against the architecture. Claim traceability, supporting evidence, and gaps identified. For the thorough reader.</p>
+      <a href="presentations/autogenous-synthesis-forge.html" class="pres-card reveal reveal-delay-3">
+        <span class="pres-type type-arch">Architecture</span>
+        <h4>autogenous-synthesis Forge: Technical Deep Dive</h4>
+        <p class="pres-desc">Inside the harness engineering framework: agent network design, SOP enforcement, approval gates, TDD pipeline, session memory, and the Oscar orchestration layer. The architecture that makes the rest of this possible.</p>
       </a>
     </div>
   </div>

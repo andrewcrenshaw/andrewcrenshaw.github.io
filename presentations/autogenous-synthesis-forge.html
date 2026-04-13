@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>autogenous-synthesis Forge — Harness Engineering for Agent-First Development</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#1a3a4a', primaryTextColor: '#ffffff',
+        primaryBorderColor: '#4ea8c9', lineColor: '#5bbad5',
+        secondaryColor: '#1a2633', tertiaryColor: '#1e2d3d',
+        background: '#0f1820', mainBkg: '#1a3a4a',
+        nodeBorder: '#4ea8c9', nodeTextColor: '#ffffff',
+        clusterBkg: '#111e28', clusterBorder: '#3a7a94',
+        titleColor: '#ffffff', edgeLabelBackground: '#0f1820',
+        fontSize: '14px', fontFamily: 'Outfit, sans-serif'
+      }
+    });
+  </script>
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --bg-surface: #0f1319;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-hover: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-accent: rgba(78, 168, 201, 0.25);
+      --text: #e4e8ed;
+      --text-dim: #7e8a97;
+      --text-faint: #4a5568;
+      --accent: #4ea8c9;
+      --accent-dim: rgba(78, 168, 201, 0.15);
+      --accent-glow: rgba(78, 168, 201, 0.08);
+      --red: #c75b5b;
+      --green: #6bab73;
+      --orange: #c9954e;
+      --purple: #9b8ec4;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Outfit', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --pad: clamp(1.5rem, 5vw, 5rem);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      padding: 1rem var(--pad);
+      display: flex; justify-content: space-between; align-items: center;
+      transition: background 0.4s var(--ease);
+    }
+    nav.scrolled {
+      background: rgba(10,14,20,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      display: flex; align-items: baseline; gap: 0.6rem;
+      font-family: var(--mono); font-size: 0.8rem; color: var(--text-dim);
+    }
+    .nav-brand strong { color: var(--accent); font-weight: 500; }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.75rem; font-weight: 400; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-dim); text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    @media (max-width: 768px) { .nav-links { display: none; } }
+
+    /* ── PROGRESS ── */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 2px;
+      background: var(--accent); z-index: 600;
+      transition: width 0.1s linear;
+    }
+
+    /* ── LAYOUT ── */
+    .section {
+      padding: clamp(5rem, 10vh, 8rem) var(--pad);
+      position: relative;
+    }
+    .section-inner { max-width: 960px; margin: 0 auto; }
+    .section-inner.wide { max-width: 1200px; }
+    .section-inner.narrow { max-width: 720px; }
+    .rule { width: 40px; height: 2px; background: var(--accent); margin-bottom: 1.5rem; }
+    .rule.center { margin-left: auto; margin-right: auto; }
+    .section-label {
+      font-family: var(--sans); font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+    .divider { height: 1px; background: var(--border); max-width: 960px; margin: 0 auto; }
+
+    /* ── TYPOGRAPHY ── */
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 9vw, 6.5rem);
+      font-weight: 400; line-height: 1.0;
+      color: var(--text); letter-spacing: -0.03em;
+    }
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      font-weight: 400; line-height: 1.15;
+      color: var(--text); letter-spacing: -0.01em;
+      margin-bottom: 1.2rem;
+    }
+    h3 {
+      font-family: var(--serif);
+      font-size: 1.4rem; font-weight: 600;
+      color: var(--text); margin-bottom: 0.7rem;
+    }
+    h4 {
+      font-family: var(--sans);
+      font-size: 0.85rem; font-weight: 600;
+      color: var(--text); letter-spacing: 0.04em;
+      text-transform: uppercase; margin-bottom: 0.5rem;
+    }
+    p {
+      font-size: clamp(0.92rem, 1.3vw, 1.05rem);
+      line-height: 1.75; color: var(--text-dim);
+      max-width: 680px;
+    }
+    p + p { margin-top: 1rem; }
+    p.wide { max-width: 100%; }
+    em { font-style: italic; color: var(--accent); font-family: var(--serif); font-size: 1.05em; }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding-top: 6rem;
+    }
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse at 10% 60%, rgba(78,168,201,0.09) 0%, transparent 55%),
+        radial-gradient(ellipse at 90% 20%, rgba(78,168,201,0.05) 0%, transparent 50%);
+    }
+    .hero-eyebrow {
+      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block;
+      width: 28px; height: 1px; background: var(--accent);
+    }
+    .hero-subtitle {
+      font-family: var(--sans);
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      font-weight: 300; color: var(--text-dim);
+      margin-top: 1.5rem; max-width: 680px; line-height: 1.8;
+    }
+    .hero-quote {
+      margin-top: 3rem; padding: 2rem 2.5rem;
+      border-left: 3px solid var(--accent);
+      background: var(--bg-card);
+      border-radius: 0 10px 10px 0;
+      max-width: 640px;
+    }
+    .hero-quote p {
+      font-family: var(--serif);
+      font-size: clamp(1.2rem, 2.5vw, 1.7rem);
+      font-weight: 400; font-style: italic;
+      color: var(--text); line-height: 1.5; max-width: 100%;
+    }
+    .hero-quote cite {
+      display: block; margin-top: 0.8rem;
+      font-family: var(--mono); font-size: 0.68rem;
+      color: var(--accent); letter-spacing: 0.08em;
+    }
+
+    /* ── STAT STRIP ── */
+    .stat-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); border-radius: 10px;
+      overflow: hidden; margin-top: 2.5rem;
+    }
+    @media (max-width: 700px) { .stat-strip { grid-template-columns: repeat(2, 1fr); } }
+    .stat {
+      background: var(--bg-card);
+      padding: 1.5rem; text-align: center;
+      transition: background 0.3s var(--ease);
+    }
+    .stat:hover { background: var(--bg-card-hover); }
+    .stat-num {
+      font-family: var(--serif); font-size: 2.4rem; font-weight: 600;
+      color: var(--accent); line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.75rem; color: var(--text-dim);
+      margin-top: 0.3rem; line-height: 1.4;
+    }
+
+    /* ── CARDS ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem; margin-top: 2.5rem;
+    }
+    .card-grid.two { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 700px) { .card-grid.two { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.75rem;
+      transition: all 0.4s var(--ease);
+    }
+    .card:hover { background: var(--bg-card-hover); border-color: var(--border-accent); transform: translateY(-2px); }
+    .card-icon {
+      font-size: 1.6rem; margin-bottom: 1rem;
+      display: block; color: var(--accent);
+    }
+    .card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .card p { font-size: 0.88rem; line-height: 1.65; }
+    .card .tags { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .tag {
+      font-family: var(--mono); font-size: 0.62rem;
+      padding: 0.18rem 0.45rem;
+      background: var(--accent-dim); border-radius: 4px; color: var(--accent);
+    }
+    .tag.green { background: rgba(107,171,115,0.15); color: var(--green); }
+    .tag.orange { background: rgba(201,149,78,0.15); color: var(--orange); }
+    .tag.purple { background: rgba(155,142,196,0.15); color: var(--purple); }
+
+    /* ── CALLOUT ── */
+    .callout {
+      background: var(--bg-card);
+      border: 1px solid var(--border-accent);
+      border-radius: 10px; padding: 1.5rem 2rem;
+      margin: 2rem 0;
+    }
+    .callout.warn { border-color: rgba(201,149,78,0.3); background: rgba(201,149,78,0.04); }
+    .callout.success { border-color: rgba(107,171,115,0.3); background: rgba(107,171,115,0.04); }
+    .callout p { max-width: 100%; font-size: 0.9rem; }
+    .callout-label {
+      font-family: var(--mono); font-size: 0.62rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--accent); margin-bottom: 0.5rem; display: block;
+    }
+    .callout.warn .callout-label { color: var(--orange); }
+    .callout.success .callout-label { color: var(--green); }
+
+    /* ── BIG QUOTE ── */
+    .big-quote {
+      font-family: var(--serif);
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      font-weight: 400; line-height: 1.4;
+      color: var(--text); font-style: italic;
+      position: relative; padding-left: 2rem;
+      max-width: 720px; margin: 2.5rem 0;
+    }
+    .big-quote::before {
+      content: ''; position: absolute; left: 0;
+      top: 0.2em; bottom: 0.2em; width: 3px; background: var(--accent);
+    }
+
+    /* ── CODE ── */
+    .code-block {
+      background: #080c11;
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.25rem 1.5rem;
+      overflow-x: auto; margin: 1rem 0;
+    }
+    pre {
+      font-family: var(--mono); font-size: 0.78rem;
+      line-height: 1.65; color: #8ab4c9; white-space: pre;
+    }
+    .code-label {
+      font-family: var(--mono); font-size: 0.6rem;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-faint); margin-bottom: 0.5rem; display: block;
+    }
+    .hl-comment { color: #4a5568; }
+    .hl-key { color: #4ea8c9; }
+    .hl-str { color: #6bab73; }
+    .hl-val { color: #c9954e; }
+    .hl-fn { color: #9b8ec4; }
+
+    /* ── PHASE LIST ── */
+    .phase-list { margin-top: 2rem; display: flex; flex-direction: column; gap: 0; }
+    .phase {
+      display: grid; grid-template-columns: 3rem 1fr;
+      gap: 1.5rem; align-items: start;
+      padding: 1.5rem 0; border-bottom: 1px solid var(--border);
+    }
+    .phase:last-child { border-bottom: none; }
+    .phase-num {
+      font-family: var(--mono); font-size: 0.65rem; font-weight: 500;
+      color: var(--accent); background: var(--accent-dim);
+      border-radius: 6px; width: 2.2rem; height: 2.2rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; letter-spacing: 0.05em;
+    }
+    .phase-content h4 { text-transform: none; letter-spacing: 0; font-size: 0.95rem; margin-bottom: 0.3rem; }
+    .phase-content p { font-size: 0.87rem; max-width: 100%; }
+
+    /* ── AGENT GRID ── */
+    .agent-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem; margin-top: 2rem;
+    }
+    .agent-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem;
+      transition: all 0.3s var(--ease);
+    }
+    .agent-card:hover { border-color: var(--border-accent); background: var(--bg-card-hover); }
+    .agent-name {
+      font-family: var(--serif); font-size: 1.05rem; font-weight: 600;
+      color: var(--text); margin-bottom: 0.15rem;
+    }
+    .agent-role {
+      font-family: var(--mono); font-size: 0.6rem; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem;
+    }
+    .agent-desc { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; }
+
+    /* ── LIFECYCLE FLOW ── */
+    .lifecycle {
+      display: flex; align-items: center; gap: 0;
+      margin: 2rem 0; overflow-x: auto; padding-bottom: 0.5rem;
+    }
+    .stage {
+      flex-shrink: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.9rem 1.2rem;
+      text-align: center; min-width: 130px;
+    }
+    .stage-name {
+      font-family: var(--mono); font-size: 0.65rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);
+    }
+    .stage-count {
+      font-family: var(--serif); font-size: 1.6rem; font-weight: 600;
+      color: var(--text); margin: 0.2rem 0;
+    }
+    .stage-desc { font-size: 0.7rem; color: var(--text-dim); line-height: 1.4; }
+    .stage-arrow {
+      font-size: 1.1rem; color: var(--border-accent);
+      padding: 0 0.3rem; flex-shrink: 0;
+    }
+
+    /* ── COMPARISON TABLE ── */
+    .compare-table {
+      width: 100%; border-collapse: collapse;
+      margin-top: 2rem; font-size: 0.85rem;
+    }
+    .compare-table th {
+      font-family: var(--sans); font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--text-dim); padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .compare-table th:first-child { width: 28%; }
+    .compare-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .dim { color: var(--red); font-size: 0.8rem; }
+    .compare-table .bright { color: var(--green); font-size: 0.8rem; }
+    .compare-table td:first-child {
+      font-family: var(--mono); font-size: 0.72rem;
+      color: var(--text); letter-spacing: 0.03em;
+    }
+    .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .compare-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .compare-header {
+      display: grid; grid-template-columns: 28% 1fr 1fr;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-header-cell {
+      padding: 1rem 1rem;
+      font-family: var(--sans); font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .compare-header-cell.forge { color: var(--accent); }
+    .compare-header-cell.traditional { color: var(--text-faint); }
+
+    /* ── SCREENSHOT ── */
+    .screenshot-wrap {
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      margin: 2rem 0; background: #050810;
+    }
+    .screenshot-wrap img {
+      width: 100%; display: block;
+    }
+    .screenshot-cap {
+      padding: 0.75rem 1.25rem;
+      font-family: var(--mono); font-size: 0.65rem;
+      color: var(--text-faint); letter-spacing: 0.05em;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── APPROVAL FLOW ── */
+    .approval-flow {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin-top: 2rem;
+    }
+    @media (max-width: 700px) { .approval-flow { grid-template-columns: 1fr; } }
+    .flow-step {
+      padding: 1.5rem;
+      border-right: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+    .flow-step:last-child { border-right: none; }
+    .flow-step-num {
+      font-family: var(--mono); font-size: 0.6rem;
+      color: var(--accent); margin-bottom: 0.75rem; display: block;
+    }
+    .flow-step h4 { font-size: 0.88rem; text-transform: none; letter-spacing: 0; margin-bottom: 0.4rem; }
+    .flow-step p { font-size: 0.78rem; max-width: 100%; }
+
+    /* ── TWO COL ── */
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 3rem; align-items: start; margin-top: 2.5rem;
+    }
+    @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; gap: 2rem; } }
+    .two-col p { max-width: 100%; }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .rd1 { transition-delay: 0.07s; }
+    .rd2 { transition-delay: 0.14s; }
+    .rd3 { transition-delay: 0.21s; }
+    .rd4 { transition-delay: 0.28s; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem var(--pad); text-align: center;
+      font-size: 0.75rem; color: var(--text-faint);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── BACK LINK ── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-dim);
+      text-decoration: none; transition: color 0.3s;
+    }
+    .back-link:hover { color: var(--accent); }
+    .back-link::before { content: '←'; }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<nav id="nav">
+  <div class="nav-brand">
+    <strong>autogenous-synthesis</strong>
+    <span>/ forge deep dive</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#what-it-is">What It Is</a></li>
+    <li><a href="#backlog">Backlog</a></li>
+    <li><a href="#oscar">Oscar</a></li>
+    <li><a href="#agents">Agents</a></li>
+    <li><a href="#governance">Governance</a></li>
+    <li><a href="#sessions">Sessions</a></li>
+    <li><a href="#differentiators">Differentiators</a></li>
+    <li><a href="../index.html#presentations" class="back-link" style="color: var(--text-faint);">Portfolio</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════ -->
+<section id="hero" class="section">
+  <div class="section-inner">
+
+    <div class="hero-eyebrow reveal">Technical Deep Dive · 2026</div>
+
+    <div class="rule reveal"></div>
+    <h1 class="reveal rd1">autogenous-<br>synthesis Forge</h1>
+
+    <p class="hero-subtitle reveal rd2">
+      A harness engineering framework for agent-first software development.
+      Not a wrapper around existing tools. A purpose-built development OS
+      where specialized agents decompose, implement, test, and validate
+      work end-to-end — under governance, with continuity, at the speed
+      a single engineer couldn't sustain alone.
+    </p>
+
+    <div class="hero-quote reveal rd3">
+      <p>"The primary job of an engineering team is no longer writing code. It is enabling agents to do useful work. When something fails, the fix is never 'try harder.' The fix is: what capability is missing, and how do we make it legible and enforceable for the agent?"</p>
+      <cite>— Harness Engineering, OpenAI · Feb 2026</cite>
+    </div>
+
+    <div class="stat-strip reveal rd4">
+      <div class="stat">
+        <div class="stat-num">12+</div>
+        <div class="stat-label">Specialized<br>agent skills</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">5</div>
+        <div class="stat-label">Lifecycle stages with<br>automated transitions</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">150+</div>
+        <div class="stat-label">Automated test suites<br>enforcing quality gates</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">80%</div>
+        <div class="stat-label">Review load reduced<br>by automated eval</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     THE QUESTION
+═══════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-inner narrow">
+    <div class="section-label reveal">The Obvious Question</div>
+    <h2 class="reveal">"Isn't this just a kanban board you copy-paste from?"</h2>
+    <div class="rule reveal"></div>
+
+    <p class="reveal">Fair question. Most "agent frameworks" are exactly that: a UI layer over a task list, where a human reads the ticket, constructs a prompt, pastes it into an AI tool, copies the result back, and manually updates a status field. The AI is accelerating individual steps. The process is still human-driven.</p>
+
+    <p class="reveal">Forge is architecturally different. The entry point — invoking Oscar with a ticket — is simple. What happens next is the distinction. The backlog is a <em>live state machine</em> with transactional guarantees. Agents register sessions, claim work, check for file conflicts, execute under structured SOPs, generate and validate their own test suites, and submit for review — without a human orchestrating each step. When a sub-agent's output doesn't meet the acceptance criteria, the system automatically revises the brief and re-runs it.</p>
+
+    <p class="reveal">The human's role is: set direction, define acceptance criteria, and review output. Everything between is Forge.</p>
+
+    <div class="callout reveal" style="margin-top: 2.5rem;">
+      <span class="callout-label">The core distinction</span>
+      <p><strong>AI-assisted:</strong> You use AI tools inside your existing process. Efficiency improves 10–20%. The loop is still human-driven.<br><br>
+      <strong>Forge / AI-first:</strong> You redesign the process around agents as the primary builders. Humans provide direction and judgment. Agents handle implementation, testing, and validation. The difference is multiplicative, not additive. Weeks of work become hours of work.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     WHAT IT IS
+═══════════════════════════════════════════════════════ -->
+<section id="what-it-is" class="section">
+  <div class="section-inner">
+    <div class="section-label reveal">What Forge Is</div>
+    <h2 class="reveal">Four properties that define agent-first development</h2>
+    <div class="rule reveal"></div>
+
+    <div class="card-grid reveal">
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-lightning"></i></span>
+        <h3>Agent-First</h3>
+        <p>Agents don't assist the developer — they are the primary builders. Forge is designed from the ground up to make agents' work legible, bounded, and enforceable. Every component — the session protocol, the backlog schema, the SOP library, the work packages — exists to maximize what agents can reliably do without human intervention.</p>
+        <div class="tags">
+          <span class="tag">harness engineering</span>
+          <span class="tag">agent SOPs</span>
+          <span class="tag">legible context</span>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-gear-six"></i></span>
+        <h3>High Throughput</h3>
+        <p>A single engineer can run multiple agents in parallel across unrelated concerns simultaneously. Oscar (the orchestration agent) decomposes tickets and dispatches specialist sub-agents in parallel where dependencies allow. File lock arbitration prevents collisions. Work that would serialize a solo engineer runs concurrently.</p>
+        <div class="tags">
+          <span class="tag">parallel execution</span>
+          <span class="tag">collision detection</span>
+          <span class="tag green">multi-agent coordination</span>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-flask"></i></span>
+        <h3>High Confidence</h3>
+        <p>All implementation work is test-driven: RED → GREEN → REFACTOR is a mechanical rule enforced by the verification gate, not a guideline. Machine-verifiable acceptance criteria (ISC format) make pass/fail binary. The evaluator auto-resolves routine reviews. No work reaches "done" without passing automated validation.</p>
+        <div class="tags">
+          <span class="tag">TDD enforced</span>
+          <span class="tag">ISC acceptance criteria</span>
+          <span class="tag orange">auto-eval</span>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-brain"></i></span>
+        <h3>Continuous Learning</h3>
+        <p>Agent sessions generate structured scratchpads that persist across context limits. The living memory system — agentic memory with digestive pipeline, auto-promotion gates, and decay — means agents start sessions knowing what the fleet has already learned. Knowledge compounds across every session, every agent, every project.</p>
+        <div class="tags">
+          <span class="tag">session continuity</span>
+          <span class="tag purple">living memory</span>
+          <span class="tag">compound knowledge</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     BACKLOG
+═══════════════════════════════════════════════════════ -->
+<section id="backlog" class="section">
+  <div class="section-inner wide">
+    <div class="section-label reveal">The Backlog</div>
+    <h2 class="reveal">A live state machine, not a task list</h2>
+    <div class="rule reveal"></div>
+
+    <p class="reveal">Every backlog item moves through five stages with automated transitions. Agents claim work, the system tracks conflicts, and the human sees a real-time view of what every agent is doing and why.</p>
+
+    <div class="lifecycle reveal" style="margin-top: 2rem;">
+      <div class="stage">
+        <div class="stage-name">Intake</div>
+        <div class="stage-count">15</div>
+        <div class="stage-desc">Needs acceptance criteria</div>
+      </div>
+      <div class="stage-arrow">→</div>
+      <div class="stage">
+        <div class="stage-name">Ready</div>
+        <div class="stage-count">8</div>
+        <div class="stage-desc">AC verified, work package generated</div>
+      </div>
+      <div class="stage-arrow">→</div>
+      <div class="stage">
+        <div class="stage-name">In Progress</div>
+        <div class="stage-count">1</div>
+        <div class="stage-desc">Agent claimed, executing</div>
+      </div>
+      <div class="stage-arrow">→</div>
+      <div class="stage">
+        <div class="stage-name">Review</div>
+        <div class="stage-count">2</div>
+        <div class="stage-desc">Eval runs first, human only if ambiguous</div>
+      </div>
+      <div class="stage-arrow">→</div>
+      <div class="stage" style="border-color: rgba(107,171,115,0.3);">
+        <div class="stage-name" style="color: var(--green);">Done</div>
+        <div class="stage-count" style="color: var(--green);">8</div>
+        <div class="stage-desc">Validated, merged, session archived</div>
+      </div>
+    </div>
+
+    <div class="screenshot-wrap reveal" style="margin-top: 2rem;">
+      <img src="../images/forge-dashboard.png" alt="autogenous-synthesis Forge — live backlog dashboard showing 35 items across 5 lifecycle stages">
+      <div class="screenshot-cap">FORGE DASHBOARD · LIVE BACKLOG · 35 ITEMS · http://localhost:5175</div>
+    </div>
+
+    <div class="two-col reveal" style="margin-top: 3rem;">
+      <div>
+        <h3>Acceptance Criteria are Machine-Verifiable</h3>
+        <p>Every backlog item in the <code>ready</code> state includes a table of Ideal State Criteria — binary, pass/fail conditions with explicit verification methods. No "it should work" or subjective sign-offs.</p>
+        <div class="code-block" style="margin-top: 1rem;">
+          <span class="code-label">Example ISC Table</span>
+<pre><span class="hl-comment">| # | Criterion                          | Verified how         |</span>
+<span class="hl-comment">|---|-----------------------------------|----------------------|</span>
+<span class="hl-key">AC1</span> <span class="hl-str">Migrations 029–038 applied cleanly</span>  <span class="hl-val">alembic current == head</span>
+<span class="hl-key">AC2</span> <span class="hl-str">All 6 new models importable</span>         <span class="hl-val">pytest -k test_models</span>
+<span class="hl-key">AC3</span> <span class="hl-str">Rollback to 028 succeeds</span>            <span class="hl-val">alembic downgrade -1</span></pre>
+        </div>
+      </div>
+      <div>
+        <h3>The HTTP API Is the Contract</h3>
+        <p>All state changes go through a single HTTP API server. No UI required. Agents make REST calls; the dashboard reflects state in real time via WebSocket. The API has atomic writes, 10-retry exponential backoff, and file-lock conflict detection.</p>
+        <div class="code-block" style="margin-top: 1rem;">
+          <span class="code-label">Agent claiming a ticket</span>
+<pre><span class="hl-fn">curl</span> <span class="hl-val">-X PATCH</span> http://localhost:5176/api/backlog/PCC-1846 \
+  <span class="hl-val">-H</span> <span class="hl-str">"Content-Type: application/json"</span> \
+  <span class="hl-val">-d</span> <span class="hl-str">'{
+    "status": "in_progress",
+    "assignedAgent": "bob"
+  }'</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     OSCAR
+═══════════════════════════════════════════════════════ -->
+<section id="oscar" class="section">
+  <div class="section-inner">
+    <div class="section-label reveal">Oscar — Autonomous Orchestration</div>
+    <h2 class="reveal">Paste the ticket. Review the output.</h2>
+    <div class="rule reveal"></div>
+
+    <p class="reveal">Oscar is Forge's autonomous ticket executor. He receives a backlog item, decomposes it into ordered sub-tasks, spawns the right specialist agent for each, evaluates their output against the acceptance criteria, and consolidates results into a unified deliverable. When a sub-agent's work doesn't meet the bar, Oscar automatically revises the brief and re-runs it. The user's only actions: paste the ticket ID, then review Oscar's final output.</p>
+
+    <div class="big-quote reveal">"You build the system. The prompts are disposable."</div>
+
+    <h3 class="reveal" style="margin-top: 2rem;">The Six-Phase Execution Protocol</h3>
+    <p class="reveal">Oscar doesn't ask what to do next at each step. He follows a deterministic protocol designed to produce consistent, verifiable results.</p>
+
+    <div class="phase-list reveal">
+      <div class="phase">
+        <div class="phase-num">P1</div>
+        <div class="phase-content">
+          <h4>Session Setup</h4>
+          <p>Oscar registers his own session via the API, loads any prior scratchpad for this ticket, and claims the backlog item. If a prior session exists (context overflow), Oscar reads the scratchpad to identify where he left off — no work is restarted from zero.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">P2</div>
+        <div class="phase-content">
+          <h4>Decompose</h4>
+          <p>Oscar reads the full ticket and breaks it into ordered sub-tasks. Each sub-task has exactly one concern, one agent type, and one clear output specification. Before dispatching any implementation sub-agents, Oscar calls <code>GET /api/locks</code> to detect file conflicts — preventing concurrent writes to the same files by parallel agents.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">P3</div>
+        <div class="phase-content">
+          <h4>Sub-Task Execution Loop</h4>
+          <p>For each sub-task in dependency order: Oscar writes a Task Brief containing only the context that sub-agent needs, spawns the specialist (Bob for implementation, Tessa for tests, Alex for architecture, etc.), receives the result, and evaluates it against that sub-task's acceptance criteria. If the result fails: Oscar revises the brief with specific corrections and re-spawns. Maximum two revision loops before escalating to human.</p>
+          <div class="code-block" style="margin-top: 0.75rem;">
+            <span class="code-label">Task Brief format (LB-001 — Latent Briefing Protocol)</span>
+<pre><span class="hl-key">Task:</span>     <span class="hl-str">Implement IntelSchema Alembic migration 029</span>
+<span class="hl-key">Context:</span>  <span class="hl-comment">[Only what affects this sub-task — not Oscar's full state]</span>
+<span class="hl-key">Inputs:</span>   <span class="hl-val">strata/migrations/028_previous.py, models/intel.py</span>
+<span class="hl-key">Output:</span>   <span class="hl-str">migrations/029_intel_schema.py, passing alembic upgrade</span>
+<span class="hl-key">Constraints:</span> <span class="hl-comment">Do not touch 028 or any earlier migration files</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">P4</div>
+        <div class="phase-content">
+          <h4>Consolidation</h4>
+          <p>Oscar synthesizes all sub-task results into a unified deliverable — not a status report. The Synthesis section of Oscar's scratchpad is the actual output artifact: working code, test results, documentation, or architectural decisions — whatever the ticket required. It accumulates across context restarts, so token limits don't reset progress.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">P5</div>
+        <div class="phase-content">
+          <h4>Quality Gate</h4>
+          <p>Before submission, Oscar verifies every row of the original ticket's acceptance criteria table against the consolidated output. Every AC row must show ✅. If any fail, Oscar initiates targeted correction — not a full restart. The quality gate is the last thing between Oscar and submission.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num">P6</div>
+        <div class="phase-content">
+          <h4>Submit and End Session</h4>
+          <p>Oscar patches the backlog item to <code>review</code> status, writes the session reflection to the scratchpad, archives it, and closes the session via <code>DELETE /api/sessions/oscar-[ticket]-[date]</code>. The Eval agent then independently verifies the submission. For routine completions, Eval auto-approves. Ambiguous cases escalate to human review.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout success reveal" style="margin-top: 2rem;">
+      <span class="callout-label">The Revision Loop — What makes this not copy-paste</span>
+      <p>When Oscar spawns Bob and Bob returns code that doesn't meet the acceptance criteria, Oscar doesn't ask the human to "try rephrasing the prompt." Oscar revises the Task Brief with specific, targeted corrections — explaining exactly what was wrong and what the next attempt needs to produce differently — and re-spawns automatically. This is automated error correction. It is the key difference between a tool that assists and a system that executes.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     AGENT NETWORK
+═══════════════════════════════════════════════════════ -->
+<section id="agents" class="section">
+  <div class="section-inner">
+    <div class="section-label reveal">The Agent Network</div>
+    <h2 class="reveal">12+ specialists. Auto-routed. Skill-aware.</h2>
+    <div class="rule reveal"></div>
+
+    <p class="reveal">Forge doesn't have a single "AI assistant." It has a network of specialized agents, each with their own SKILL.md that defines triggers, guardrails, sub-skills, and output formats. Routing is automatic — the right agent activates based on context keywords, not manual selection.</p>
+
+    <div class="agent-grid reveal">
+      <div class="agent-card">
+        <div class="agent-name">Oscar</div>
+        <div class="agent-role">Orchestrator</div>
+        <div class="agent-desc">Autonomous ticket executor. Decomposes, delegates, consolidates, quality-gates. The "paste ticket → review output" agent.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Stewart</div>
+        <div class="agent-role">Steward</div>
+        <div class="agent-desc">Backlog prioritization, sprint planning, collision detection, dependency tracking. Promotes intake to ready with verified AC.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Bea</div>
+        <div class="agent-role">Business Analyst</div>
+        <div class="agent-desc">Requirements framing, PRDs, stakeholder analysis, fit-gap. Routes to PRD-creator and R×S sub-skills automatically.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Alex</div>
+        <div class="agent-role">Architect</div>
+        <div class="agent-desc">Solution design, ADRs, integration architecture, trade-off analysis. Produces implementation-ready designs with risk assessment.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Bob</div>
+        <div class="agent-role">Builder</div>
+        <div class="agent-desc">TDD-driven implementation. RED→GREEN→REFACTOR enforced. Implements to spec. Works within Oscar's sub-task scope.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Tessa</div>
+        <div class="agent-role">Test Architect</div>
+        <div class="agent-desc">Test generation, coverage analysis, TDD coordination. Generates failing tests first. Verifies acceptance criteria are met.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Doug</div>
+        <div class="agent-role">Debugger</div>
+        <div class="agent-desc">Error analysis, root-cause identification, fix proposals. Escalates with evidence; doesn't make assumptions.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Remy</div>
+        <div class="agent-role">Refactorer</div>
+        <div class="agent-desc">Code quality analysis, improvement proposals. Read-only analysis; surfaces opportunities without making changes unilaterally.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Quinn</div>
+        <div class="agent-role">Code Reviewer</div>
+        <div class="agent-desc">Structured severity-ranked code review. Separates architectural risks from style concerns. Feeds Eval's resolution decision.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Eval</div>
+        <div class="agent-role">Evaluator</div>
+        <div class="agent-desc">Automated work completion evaluation. Checks AC rows against output. Auto-approves routine completions; escalates ambiguous decisions with evidence.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Sherry</div>
+        <div class="agent-role">Docs Writer</div>
+        <div class="agent-desc">Documentation generation, Confluence publishing, markdown structure. Ensures documentation is produced alongside code, not after.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Sentinel</div>
+        <div class="agent-role">Security</div>
+        <div class="agent-desc">Secrets scanning, vulnerability detection, authentication boundary analysis. Runs as a review gate, not a post-facto audit.</div>
+      </div>
+    </div>
+
+    <div class="callout reveal" style="margin-top: 2rem;">
+      <span class="callout-label">Auto-Routing — How skills activate</span>
+      <p>Skills don't require manual selection. Keywords in context trigger the right agent automatically: "requirements" → Bea · "architecture" / "ADR" → Alex · "debug" / "error" → Doug · "test" / "coverage" → Tessa · "security" / "audit" → Sentinel · "review" → Quinn. Each SKILL.md defines its trigger set, output format, and what it must not do — the three components that make routing reliable rather than hopeful.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     GOVERNANCE / APPROVAL
+═══════════════════════════════════════════════════════ -->
+<section id="governance" class="section">
+  <div class="section-inner">
+    <div class="section-label reveal">Governance & Human-in-the-Loop</div>
+    <h2 class="reveal">Speed with bounded authority.</h2>
+    <div class="rule reveal"></div>
+
+    <p class="reveal">Governance in Forge is automation-first, not approval-first. Requiring human sign-off on every agent action would create the exact bottleneck Forge is designed to eliminate. Instead, the system evaluates completed work automatically against objective criteria — and only escalates when it genuinely can't make the call.</p>
+
+    <div class="approval-flow reveal">
+      <div class="flow-step">
+        <span class="flow-step-num">STEP 01</span>
+        <h4>Automated Evaluation</h4>
+        <p>When an agent submits work, Eval runs immediately: acceptance criteria (ISC table), linting, regression tests. All checks are binary pass/fail — no subjective scoring. The full audit trail is persisted in SQLite and visible in the dashboard.</p>
+      </div>
+      <div class="flow-step">
+        <span class="flow-step-num">STEP 02</span>
+        <h4>Green → Auto-Done / Red → Back to Agent</h4>
+        <p>If all checks pass: the ticket is automatically marked done and the human is notified. If any check fails: the ticket is routed back to the responsible agent with the failure details. No human in the loop for either outcome.</p>
+      </div>
+      <div class="flow-step" style="border-right: none;">
+        <span class="flow-step-num">STEP 03</span>
+        <h4>Escalate Only When Uncertain</h4>
+        <p>When Eval can't determine pass/fail with confidence — genuinely ambiguous architectural decisions, novel failure patterns, out-of-bounds behavior — it escalates to the human with a structured evidence package. Human judgment is reserved for decisions that actually require it.</p>
+      </div>
+    </div>
+
+    <div class="two-col reveal" style="margin-top: 3rem;">
+      <div>
+        <h3>Guardrails Are Enforced, Not Suggested</h3>
+        <p>Global guardrails in <code>.agent-data/guardrails/global.md</code> define mechanical rules: never write to <code>.env*</code>, never run <code>rm -rf</code>, never push <code>--force</code> to main, never commit secrets. These aren't reminders. They're validated by automated test suites that run on every change. An agent that violates a guardrail rule fails the verification gate.</p>
+        <p style="margin-top: 1rem;">Three architectural constraints govern every component of Forge: cross-platform (Windows, Mac, Linux), IDE-agnostic (Cursor, VS Code, CLI, any tool), and model-agnostic (Claude, GPT, Gemini, future models). These are not design preferences — they are enforced by architecture boundary tests.</p>
+      </div>
+      <div>
+        <h3>The Eval Agent Closes the Loop</h3>
+        <p>When an agent submits work for review, the Eval agent runs independently against the objective acceptance criteria. For work that clearly meets every AC row with test evidence: Eval auto-approves. For ambiguous cases: Eval escalates to human with a structured evidence package — what passed, what's uncertain, why it's being escalated. This reduces review load by 80%+ without sacrificing oversight.</p>
+        <p style="margin-top: 1rem;">The goal is not to remove humans from decisions — it's to ensure humans only make decisions that genuinely require judgment. Routine completions don't need human attention. Architectural risks do.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SESSIONS & WORK PACKAGES
+═══════════════════════════════════════════════════════ -->
+<section id="sessions" class="section">
+  <div class="section-inner">
+    <div class="section-label reveal">Sessions, Work Packages & State</div>
+    <h2 class="reveal">No work is lost when context runs out.</h2>
+    <div class="rule reveal"></div>
+
+    <div class="two-col reveal">
+      <div>
+        <h3>Persistent Scratchpads</h3>
+        <p>Every agent session generates a structured scratchpad at <code>.agent-data/scratchpads/active/</code>. The scratchpad tracks: the decomposition plan, the status of each sub-task, the Task Brief sent to each sub-agent, what the sub-agent returned, whether it met the AC, and the accumulating Synthesis. When an agent hits a context limit, it writes its state and stops cleanly. The next invocation reads the scratchpad, identifies the last completed sub-task, and resumes from there. No restart from zero. No duplicate work.</p>
+        <div class="code-block" style="margin-top: 1rem;">
+          <span class="code-label">Scratchpad structure</span>
+<pre><span class="hl-key">## Decomposition Plan</span>
+<span class="hl-comment">| # | Sub-task        | Agent | Status  |</span>
+<span class="hl-val">| 1 | Implement model | Bob   | ✅ Done  |</span>
+<span class="hl-val">| 2 | Write tests     | Tessa | 🔨 WIP   |</span>
+<span class="hl-val">| 3 | Generate docs   | Sherry| ⏳ Wait  |</span>
+
+<span class="hl-key">## Sub-task 1: Result</span>
+<span class="hl-str">[What Bob returned]</span>
+<span class="hl-comment">[AC evaluation: met ✅ / failed ❌]</span>
+
+<span class="hl-key">## Synthesis</span>
+<span class="hl-comment">[Accumulating unified deliverable]</span></pre>
+        </div>
+      </div>
+      <div>
+        <h3>Auto-Generated Work Packages</h3>
+        <p>When Stewart promotes a backlog item to <code>ready</code>, Forge auto-generates a Work Package — a curated handoff document that contains everything an agent needs to start immediately. Not a pointer to the ticket. A self-contained brief with the problem statement, acceptance criteria, file references, and quick-start commands. No "can you explain this?" back-and-forth.</p>
+        <div class="code-block" style="margin-top: 1rem;">
+          <span class="code-label">Work Package contents</span>
+<pre><span class="hl-key">Problem Statement:</span>   <span class="hl-str">Clear description of what and why</span>
+<span class="hl-key">Acceptance Criteria:</span> <span class="hl-str">Binary ISC table — pass/fail only</span>
+<span class="hl-key">Files to Modify:</span>     <span class="hl-str">Exact paths, what to change</span>
+<span class="hl-key">Quick-Start:</span>         <span class="hl-str">Commands to verify env before writing</span>
+<span class="hl-key">Starter Context:</span>    <span class="hl-str">Relevant code excerpts, not full files</span>
+<span class="hl-key">Constraints:</span>         <span class="hl-str">What not to touch, hard limits</span></pre>
+        </div>
+        <p style="margin-top: 1rem;">Work packages are the link between "human writes a ticket" and "agent starts work." They are the automated prompt engineering layer — structured context that makes agent output reliable rather than hopeful.</p>
+      </div>
+    </div>
+
+    <h3 class="reveal" style="margin-top: 3rem;">The Session Lifecycle</h3>
+    <p class="reveal">Every agent follows a mandatory sequence. Not as a recommendation — as a protocol enforced by the framework and audited by the session API.</p>
+
+    <div class="code-block reveal" style="margin-top: 1rem;">
+      <span class="code-label">Session sequence — register → scratchpad → claim → work → submit → end</span>
+<pre><span class="hl-comment"># 1. Register — collision detection, session index</span>
+<span class="hl-fn">curl</span> <span class="hl-val">-X POST</span> localhost:5176/api/sessions
+  <span class="hl-val">-d</span> <span class="hl-str">'{"sessionId":"oscar-pcc-1846-2026-04-13","agentName":"oscar"}'</span>
+
+<span class="hl-comment"># 2. Load context — scratchpad auto-created from template if new</span>
+<span class="hl-fn">curl</span> localhost:5176/api/sessions/oscar-pcc-1846-2026-04-13/context<span class="hl-val">?backlogId=PCC-1846</span>
+
+<span class="hl-comment"># 3. Claim — prevents double-assignment, marks in_progress</span>
+<span class="hl-fn">curl</span> <span class="hl-val">-X PATCH</span> localhost:5176/api/backlog/PCC-1846
+  <span class="hl-val">-d</span> <span class="hl-str">'{"status":"in_progress","assignedAgent":"oscar"}'</span>
+
+<span class="hl-comment"># ... work happens ... scratchpad updated every 3-5 actions ...</span>
+
+<span class="hl-comment"># 4. Submit — triggers Eval; never ask the human first</span>
+<span class="hl-fn">curl</span> <span class="hl-val">-X PATCH</span> localhost:5176/api/backlog/PCC-1846
+  <span class="hl-val">-d</span> <span class="hl-str">'{"status":"review"}'</span>
+
+<span class="hl-comment"># 5. End — session archived, reflection written</span>
+<span class="hl-fn">curl</span> <span class="hl-val">-X DELETE</span> localhost:5176/api/sessions/oscar-pcc-1846-2026-04-13</pre>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TDD & QUALITY
+═══════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label reveal">Quality Pipeline</div>
+    <h2 class="reveal">TDD as infrastructure, not preference.</h2>
+    <div class="rule reveal"></div>
+
+    <div class="two-col reveal">
+      <div>
+        <p>All implementation work in Forge is test-driven. This is not a coding convention. It is a mechanical constraint enforced by the verification gate. Any PR or session submission that lacks a RED→GREEN→REFACTOR trace fails automatically before it reaches human review.</p>
+        <p style="margin-top: 1rem;">Tessa generates failing tests before Bob writes a line of implementation. Bob implements only enough to pass. Remy reviews the clean implementation for refactoring opportunities. The cycle is the process — not something bolted onto it afterwards.</p>
+      </div>
+      <div>
+        <div class="code-block">
+          <span class="code-label">Verification gate — runs before every submission</span>
+<pre><span class="hl-fn">npx jest</span> \
+  <span class="hl-val">--config</span> jest.config.verification.js \
+  <span class="hl-val">--runInBand</span> \
+  <span class="hl-val">--bail</span> \
+  <span class="hl-val">--passWithNoTests</span> \
+  <span class="hl-val">--forceExit</span>
+
+<span class="hl-comment"># Covers: core API unit tests, hook validation,
+# steward guardrails, approval queue, skill triggers,
+# architecture boundary checks — 150+ suites</span></pre>
+        </div>
+        <div class="callout" style="margin-top: 1rem;">
+          <span class="callout-label">No stubs in production code</span>
+          <p>Stub implementations (<code>throw new Error('Not implemented')</code>, empty returns, TODO placeholders) are rejected by the verification gate in production files. If full implementation isn't possible in scope, a new backlog item is created — not a placeholder left in code.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     OBSERVABILITY
+═══════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label reveal">Observability & Reporting</div>
+    <h2 class="reveal">The system knows what it's doing.</h2>
+    <div class="rule reveal"></div>
+
+    <p class="reveal">Forge generates structured observability artifacts automatically. Not after-the-fact documentation — live signals produced as work happens.</p>
+
+    <div class="card-grid reveal">
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-chart-bar"></i></span>
+        <h3>Daily Health Reports</h3>
+        <p>Automated daily check reports capture backlog state, session activity, agent throughput, and test coverage metrics. Structured JSON + Markdown. Available at <code>.agent-data/reports/daily-check-[date].json</code>.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-clipboard-text"></i></span>
+        <h3>Event Log</h3>
+        <p>Every agent action is logged to <code>.agent-data/events/event-log.yaml</code> — which agent, which ticket, what action, timestamp. Full audit trail of everything the agent network has done.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-magnifying-glass"></i></span>
+        <h3>Eval Results</h3>
+        <p>Every review decision generates a structured eval result: what was checked, which AC rows passed, what evidence was cited, whether the decision was auto-resolved or escalated and why.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-archive"></i></span>
+        <h3>Scratchpad Archive</h3>
+        <p>Completed scratchpads are archived to <code>.agent-data/scratchpads/archive/YYYY-MM/</code>. Every decision made during execution — what sub-tasks were decomposed, which sub-agents were spawned, what they returned — is preserved. Agent decisions are auditable, not ephemeral.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     DIFFERENTIATORS
+═══════════════════════════════════════════════════════ -->
+<section id="differentiators" class="section">
+  <div class="section-inner wide">
+    <div class="section-label reveal">Key Differentiators</div>
+    <h2 class="reveal">What makes this genuinely different.</h2>
+    <div class="rule reveal"></div>
+
+    <div class="compare-wrap reveal">
+      <div class="compare-header">
+        <div class="compare-header-cell" style="color: var(--text-faint);">Capability</div>
+        <div class="compare-header-cell traditional">AI Tools + Kanban</div>
+        <div class="compare-header-cell forge">autogenous-synthesis Forge</div>
+      </div>
+      <table class="compare-table">
+        <tbody>
+          <tr>
+            <td>Task Orchestration</td>
+            <td class="dim">Human reads ticket, constructs prompt, pastes into AI tool, copies output back. Human is the message bus.</td>
+            <td class="bright">Oscar decomposes tickets, spawns specialist agents in dependency order, evaluates results against AC, revises and re-runs on failure. Human reviews final output.</td>
+          </tr>
+          <tr>
+            <td>State Management</td>
+            <td class="dim">Drag-and-drop UI. No transactional guarantees. No conflict detection.</td>
+            <td class="bright">HTTP API with atomic writes, 10-retry exponential backoff, file-lock conflict detection before agent dispatch. All transitions are API calls with audit trail.</td>
+          </tr>
+          <tr>
+            <td>Work Handoff</td>
+            <td class="dim">Agent reads the raw ticket. Asks clarifying questions. Needs more context.</td>
+            <td class="bright">Stewart promotes item and auto-generates a Work Package: problem statement, binary AC table, file references, quick-start commands. Agent starts immediately.</td>
+          </tr>
+          <tr>
+            <td>Multi-Agent Coordination</td>
+            <td class="dim">No coordination. Two agents can edit the same file simultaneously. Manual management.</td>
+            <td class="bright"><code>GET /api/locks</code> detects which files are being modified before dispatching implementation agents. Serializes or escalates based on dependencies.</td>
+          </tr>
+          <tr>
+            <td>Quality Gates</td>
+            <td class="dim">Subjective review. "Does this look right?" Human checks everything.</td>
+            <td class="bright">ISC acceptance criteria (binary pass/fail). Verification gate runs 150+ test suites. Eval auto-approves routine completions. Human reviews only genuinely ambiguous decisions.</td>
+          </tr>
+          <tr>
+            <td>Context Continuity</td>
+            <td class="dim">Context limit hit → restart from zero. Repeat prior work. Lose progress.</td>
+            <td class="bright">Structured scratchpads persist full execution state. Resume reads scratchpad, identifies last completed sub-task, continues from next. Zero restart cost.</td>
+          </tr>
+          <tr>
+            <td>Error Correction</td>
+            <td class="dim">Sub-agent returns bad output → human re-prompts manually.</td>
+            <td class="bright">Oscar evaluates sub-agent output against AC. On failure: revises Task Brief with specific corrections and re-spawns automatically. Max 2 revision loops before human escalation.</td>
+          </tr>
+          <tr>
+            <td>Test-Driven Development</td>
+            <td class="dim">Optional. Depends on the individual prompt. Frequently skipped.</td>
+            <td class="bright">Mechanically enforced. Tessa generates failing tests first. Bob implements to pass. Verification gate rejects submissions without RED-GREEN evidence.</td>
+          </tr>
+          <tr>
+            <td>Approval Trail</td>
+            <td class="dim">No record. Agent writes wherever it wants. No oversight.</td>
+            <td class="bright">Every file write, delete, and command routes through approval queue. SQLite audit log with timestamps. Dashboard shows all pending requests. Agents cannot act without approval.</td>
+          </tr>
+          <tr>
+            <td>Skill Routing</td>
+            <td class="dim">Human decides which AI tool to use for each task. Manual selection every time.</td>
+            <td class="bright">12+ specialist agents auto-triggered by context keywords. Oscar routes sub-tasks to the right specialist automatically. Human never picks which agent.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     WHAT CHANGES
+═══════════════════════════════════════════════════════ -->
+<section class="section">
+  <div class="section-inner narrow">
+    <div class="section-label reveal">What Changes</div>
+    <h2 class="reveal">The developer's role, redefined.</h2>
+    <div class="rule reveal"></div>
+
+    <p class="reveal">Forge doesn't make you a faster developer. It makes you an <em>architect of systems that develop</em>. The shift is categorical, not incremental.</p>
+
+    <div class="big-quote reveal">The ability to write code fast is worth less every month. The ability to define what good looks like, evaluate what agents produce, and design the system that makes agents reliable — that compounds.</div>
+
+    <div class="card-grid two reveal" style="margin-top: 2.5rem;">
+      <div class="card" style="border-color: rgba(201,149,78,0.2); background: rgba(201,149,78,0.03);">
+        <h4 style="color: var(--orange); text-transform: none; letter-spacing: 0; font-size: 0.8rem; margin-bottom: 0.8rem;">Without Forge</h4>
+        <p>A solo engineer works sequentially. One task at a time. Context switches are expensive. Writing tests is deferred. Documentation follows (never). State lives in the engineer's head. When they're not working, nothing is.</p>
+      </div>
+      <div class="card" style="border-color: rgba(107,171,115,0.2); background: rgba(107,171,115,0.03);">
+        <h4 style="color: var(--green); text-transform: none; letter-spacing: 0; font-size: 0.8rem; margin-bottom: 0.8rem;">With Forge</h4>
+        <p>Multiple parallel agent sessions execute concurrently across unrelated concerns. Tests are generated before implementation. Documentation is produced alongside code. State is persistent and auditable. The system works whether or not the engineer is at the keyboard.</p>
+      </div>
+    </div>
+
+    <p class="reveal" style="margin-top: 2rem;">The key capability Forge creates isn't "AI writes my code." It's <em>institutional execution capacity</em> — the ability to run more work, in parallel, with higher confidence, than any individual developer could sustain. And to get measurably better at it over time, because the memory system compounds what the agent network learns.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     CLOSING
+═══════════════════════════════════════════════════════ -->
+<section class="section" style="text-align: center;">
+  <div class="section-inner narrow">
+    <div class="rule center reveal"></div>
+    <h2 class="reveal">The harness is the product.</h2>
+    <p class="reveal" style="margin: 0 auto 2rem; text-align: center;">
+      Forge is not a collection of prompts and a kanban board. It is a purpose-built engineering system designed to make agent-first development reliable, auditable, and continuously improving. Every component — the session protocol, the approval queue, the work packages, Oscar's revision loop, the TDD enforcement, the scratchpad continuity — exists to answer one question: <em>what capability is missing, and how do we make it legible to the agent?</em>
+    </p>
+    <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-top: 2rem;" class="reveal">
+      <a href="../index.html#work" style="font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.8rem 2rem;border-radius:6px;background:var(--accent);color:var(--bg);transition:all 0.3s var(--ease);">Back to Portfolio</a>
+      <a href="agentic-memory-architecture.html" style="font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.8rem 2rem;border-radius:6px;border:1px solid var(--border-accent);color:var(--accent);transition:all 0.3s var(--ease);">Memory Architecture →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>autogenous-synthesis Forge · <a href="../index.html">andrewcrenshaw.dev</a> · 2026</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
+
+  // Progress bar
+  const bar = document.getElementById('progress');
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
+    bar.style.width = pct + '%';
+  });
+</script>
+
+</body>
+</html>
