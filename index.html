@@ -316,6 +316,22 @@
       color: var(--accent);
     }
 
+    .card-doc-link {
+      display: inline-block;
+      margin-top: 1rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      opacity: 0.75;
+      transition: opacity 0.2s ease;
+    }
+
+    .card-doc-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
     /* Layer stack */
     .layer-stack {
       display: flex;
@@ -722,6 +738,7 @@
           <span class="tech-tag">session memory</span>
           <span class="tech-tag">agent SOPs</span>
         </div>
+        <a href="https://andrewcrenshaw.dev/autogenous-synthesis/" target="_blank" rel="noopener" class="card-doc-link">Documentation →</a>
       </div>
 
       <div class="card reveal reveal-delay-3">
@@ -790,6 +807,7 @@
           <span class="tech-tag">3-layer dedup</span>
           <span class="tech-tag">open source (PyPI)</span>
         </div>
+        <a href="https://andrewcrenshaw.dev/strata/" target="_blank" rel="noopener" class="card-doc-link">Documentation →</a>
       </div>
 
       <div class="card reveal reveal-delay-2">
