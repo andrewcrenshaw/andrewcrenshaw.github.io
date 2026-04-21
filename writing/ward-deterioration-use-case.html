@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Predictive Deterioration Detection on an Inpatient Ward — Andrew Crenshaw</title>
+  <meta name="description" content="A deployment-grounded companion to the synthesis notes on pairing Claude with a domain world model — what an on-premise Claude-plus-world-model early-warning system might actually look like on a hospital ward.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #faf7f0;
+      --bg-surface: #ffffff;
+      --bg-card: #f4efe5;
+      --border: #e5dfd0;
+      --border-accent: rgba(31, 90, 107, 0.3);
+      --text: #1a1f24;
+      --text-dim: #3d4754;
+      --text-faint: #8a939e;
+      --accent: #1f5a6b;
+      --accent-dim: rgba(31, 90, 107, 0.1);
+      --rule: #c8c0af;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Outfit', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --pad: clamp(1.5rem, 5vw, 5rem);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 1rem var(--pad);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(250, 247, 240, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .top-bar .name {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .top-bar .back-link {
+      font-size: 0.78rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .top-bar .back-link:hover { color: var(--accent); }
+
+    .article-wrapper {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 8rem var(--pad) 5rem;
+    }
+
+    .article-label {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 0.9rem;
+    }
+
+    .article-title {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4.5vw, 2.75rem);
+      font-weight: 500;
+      line-height: 1.15;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin-bottom: 0.75rem;
+    }
+
+    .article-subtitle {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+      color: var(--text-dim);
+      margin-bottom: 1.75rem;
+      max-width: 620px;
+      line-height: 1.4;
+      font-weight: 400;
+    }
+
+    .rule {
+      width: 48px;
+      height: 2px;
+      background: var(--accent);
+      margin-bottom: 2rem;
+    }
+
+    .meta-block {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 1.75rem;
+      line-height: 1.7;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .meta-block .meta-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .meta-block .meta-row:last-child { margin-bottom: 0; }
+
+    .meta-block .meta-label {
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding-top: 2px;
+    }
+
+    .meta-block a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-dim);
+    }
+
+    .meta-block a:hover { border-bottom-color: var(--accent); }
+
+    .context-note {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.02rem;
+      line-height: 1.65;
+      color: var(--text-dim);
+      margin-bottom: 3rem;
+      padding: 0.3rem 1.1rem;
+      border-left: 2px solid var(--accent);
+    }
+
+    .context-note a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-dim);
+    }
+
+    .context-note a:hover { border-bottom-color: var(--accent); }
+
+    .article-body {
+      font-size: clamp(0.98rem, 1.25vw, 1.08rem);
+      line-height: 1.8;
+      color: var(--text-dim);
+    }
+
+    .article-body p {
+      margin-bottom: 1.3rem;
+    }
+
+    .article-body p strong,
+    .article-body li strong,
+    .article-body td strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .article-body p em,
+    .article-body li em {
+      font-style: italic;
+      color: var(--text);
+      font-family: var(--serif);
+      font-size: 1.05em;
+    }
+
+    .article-body h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 3.25rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.25;
+      letter-spacing: -0.005em;
+    }
+
+    .article-body h3 {
+      font-family: var(--sans);
+      font-size: clamp(1.05rem, 1.5vw, 1.18rem);
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 2.25rem;
+      margin-bottom: 0.9rem;
+      letter-spacing: 0;
+    }
+
+    .article-body ul, .article-body ol {
+      margin: 0 0 1.5rem 1.4rem;
+      padding: 0;
+    }
+
+    .article-body li {
+      margin-bottom: 0.6rem;
+      line-height: 1.75;
+    }
+
+    .article-body li p {
+      margin-bottom: 0.5rem;
+    }
+
+    .article-body hr {
+      border: none;
+      height: 1px;
+      background: var(--border);
+      margin: 3rem 0;
+    }
+
+    .article-body .callout {
+      background: var(--bg-surface);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 1.4rem 1.7rem;
+      margin: 2rem 0 2.5rem;
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      line-height: 1.65;
+      color: var(--text);
+      font-style: italic;
+    }
+
+    .article-body .callout strong,
+    .article-body .callout em { color: var(--text); }
+
+    .article-body blockquote {
+      font-family: var(--serif);
+      font-size: 1.18rem;
+      font-style: italic;
+      line-height: 1.55;
+      color: var(--text);
+      margin: 2rem 0;
+      padding: 0.4rem 1.5rem;
+      border-left: 3px solid var(--accent);
+    }
+
+    .article-body a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-dim);
+      transition: border-color 0.2s;
+    }
+
+    .article-body a:hover {
+      border-bottom-color: var(--accent);
+    }
+
+    .article-body pre {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.5;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem 1.4rem;
+      margin: 1.75rem 0 2.25rem;
+      overflow-x: auto;
+      color: var(--text);
+      white-space: pre;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .article-body code {
+      font-family: var(--mono);
+      font-size: 0.88em;
+      background: var(--accent-dim);
+      color: var(--text);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0 2.25rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-surface);
+    }
+
+    .article-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.93rem;
+      line-height: 1.55;
+    }
+
+    .article-body th,
+    .article-body td {
+      text-align: left;
+      padding: 0.85rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-dim);
+      vertical-align: top;
+    }
+
+    .article-body th {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 0.76rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text);
+      background: var(--bg-card);
+    }
+
+    .article-body tr:last-child td {
+      border-bottom: none;
+    }
+
+    .article-footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.87rem;
+      color: var(--text-faint);
+      line-height: 1.7;
+    }
+
+    .article-footer .signature {
+      margin-bottom: 1.25rem;
+      color: var(--text-dim);
+    }
+
+    .article-footer .signature strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .article-footer .contact-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .article-footer .contact-row a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.86rem;
+      border-bottom: 1px solid var(--accent-dim);
+    }
+
+    .article-footer .contact-row a:hover {
+      border-bottom-color: var(--accent);
+    }
+
+    .article-footer .closer {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--text-faint);
+    }
+
+    .source-note {
+      margin-top: 2rem;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 0.92rem;
+      color: var(--text-faint);
+      line-height: 1.6;
+    }
+
+    .source-note a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-dim);
+    }
+
+    .source-note a:hover { border-bottom-color: var(--accent); }
+
+    .article-body .references-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.5rem 1.75rem;
+      margin: 3rem 0 1rem;
+    }
+
+    .article-body .references-card .rc-label {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .article-body .references-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+    }
+
+    .article-body .references-grid a.ref-link {
+      display: block;
+      padding: 1rem 1.15rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text-dim);
+      transition: transform 0.18s ease, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .article-body .references-grid a.ref-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(31, 90, 107, 0.1);
+      border-color: var(--border-accent);
+      border-bottom: 1px solid var(--border-accent);
+    }
+
+    .article-body .references-grid a.ref-link .ref-title {
+      display: block;
+      font-family: var(--serif);
+      font-size: 1.12rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+      line-height: 1.3;
+    }
+
+    .article-body .references-grid a.ref-link .ref-arrow {
+      display: inline-block;
+      color: var(--accent);
+      font-weight: 400;
+      margin-left: 0.2rem;
+      transition: transform 0.18s ease;
+    }
+
+    .article-body .references-grid a.ref-link:hover .ref-arrow {
+      transform: translateX(3px);
+    }
+
+    .article-body .references-grid a.ref-link .ref-sub {
+      display: block;
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 600px) {
+      .article-body .references-grid { grid-template-columns: 1fr; }
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fadeUp 0.6s var(--ease) forwards;
+    }
+
+    .fade-in-d1 { animation-delay: 0.08s; }
+    .fade-in-d2 { animation-delay: 0.16s; }
+    .fade-in-d3 { animation-delay: 0.24s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .meta-block .meta-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      .meta-block .meta-label { margin-bottom: 0.2rem; }
+      .article-body pre { font-size: 0.7rem; padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/" class="name">Andrew Crenshaw</a>
+  <a href="./pairing-claude-with-a-world-model.html" class="back-link">← Companion memo</a>
+</div>
+
+<article class="article-wrapper">
+  <div class="article-label fade-in">Use case · 2026-04-21</div>
+  <h1 class="article-title fade-in fade-in-d1">Predictive Deterioration Detection on an Inpatient Ward</h1>
+  <p class="article-subtitle fade-in fade-in-d2">A deployment-grounded companion to the synthesis notes on pairing Claude with a domain world model — where the model runs, what it ingests, what a nurse's day looks like, what it costs, and what would cause me to shut it down.</p>
+  <div class="rule fade-in fade-in-d2"></div>
+
+  <div class="meta-block fade-in fade-in-d2">
+    <div class="meta-row"><span class="meta-label">Author</span><span>Andrew Crenshaw</span></div>
+    <div class="meta-row"><span class="meta-label">Date</span><span>2026-04-21</span></div>
+    <div class="meta-row"><span class="meta-label">Companion to</span><span><a href="./pairing-claude-with-a-world-model.html">On Pairing Claude with a Domain World Model</a> — the synthesis notes this use case grounds in operational reality.</span></div>
+    <div class="meta-row"><span class="meta-label">Length</span><span>~2,400 words · 11-minute read</span></div>
+    <div class="meta-row"><span class="meta-label">Audience</span><span>Hospital CIOs, ministry-of-health leads, foundation program officers, and anyone asking "fine, but what does this actually <em>look</em> like on the floor."</span></div>
+  </div>
+
+  <p class="context-note fade-in fade-in-d3">
+    The <a href="./pairing-claude-with-a-world-model.html">companion notes</a> explore whether a compact, on-premise, domain-specific predictive model — paired with Claude as the reasoner and the nurse as the decider — could be a useful layer in mission-aligned AI deployment. That question is easy to ask at altitude. It is harder, and more useful, to work through on the ground. This document takes one of the notes' four domain examples — early-warning detection of deteriorating inpatients at a teaching hospital in a state-capacity-constrained setting — and makes the deployment concrete. If after reading this the deployment still sounds intangible, I have not done my job.
+  </p>
+
+  <div class="article-body fade-in fade-in-d3">
+
+    <h2>1. Where the model physically lives</h2>
+
+    <p>A single mid-range GPU workstation <strong>inside the hospital</strong>. Not in a cloud data center, not in a vendor's environment, not on any nurse's laptop. Concretely, one of:</p>
+
+    <ul>
+      <li>An NVIDIA RTX 4090 workstation (~$4,000 capex, one-time)</li>
+      <li>An NVIDIA Jetson Orin dev kit (~$2,000 capex, one-time, lower power draw — often the right choice in LMIC settings with unreliable grid)</li>
+    </ul>
+
+    <p>LeWorldModel-class architectures are ~15M parameters end-to-end. The predictor component is ~10M. Inference on a single patient's latent trajectory runs in well under a second; batched inference across a full ward of 30–40 patients updates the entire attention queue in roughly the interval between two vital-sign samples. This is not cloud-scale compute; it is closer to the hardware budget of a modern ultrasound cart.</p>
+
+    <p>The deployment topology looks like this:</p>
+
+    <pre>  Bedside monitors          EMR / Nursing Info System         Lab Info System
+  (GE / Philips / Mindray)  (medications, interventions)       (lactate, WBC…)
+         │                            │                              │
+         └─────────── HL7 / FHIR / direct monitor feed ───────────┐
+                                                                  │
+                              ┌───────────────────────────────────┴─┐
+                              │   Hospital LAN (on-prem, isolated)  │
+                              └───────────────────────────────────┬─┘
+                                                                  │
+                          ┌───────────────────────────────────────┴───┐
+                          │   JEPA + Claude-bridge server (on-prem)   │
+                          │   • Single GPU workstation                │
+                          │   • Runs model, stores latents locally    │
+                          │   • Optional Claude API call via a        │
+                          │     signed, audit-logged, rate-limited    │
+                          │     outbound gateway (NO patient data     │
+                          │     in the payload — only the latent      │
+                          │     summary + de-identified context)      │
+                          └───────────────────┬───────────────────────┘
+                                              │
+                              ┌───────────────┴───────────────┐
+                              │  Nursing-station display      │
+                              │  (attention-ranked ward view) │
+                              └───────────────────────────────┘</pre>
+
+    <p>Two architectural commitments in this topology are non-negotiable:</p>
+
+    <ol>
+      <li><strong>Raw patient data never leaves hospital walls.</strong> The JEPA trains and runs on-prem. Inference is local. Outbound network traffic carries <em>only</em> the compressed latent-derived signals (surprise scalar, contribution attribution, coarse context) needed for Claude to generate nurse-facing language — and even that outbound call is optional, rate-limited, audit-logged, and replaceable with an on-prem small-model alternative if the hospital's policy requires full air-gap.</li>
+      <li><strong>The system is not connected to the public internet for inference.</strong> The only external connection is a deliberate, batched, consented channel for (a) signed software updates and (b) federated weight-sharing with partner hospitals. Both can be turned off without degrading local operation.</li>
+    </ol>
+
+    <h2>2. What the model ingests (and what it does not)</h2>
+
+    <p>This is the question that determines whether the deployment is a capacity multiplier or a privacy catastrophe, so I want to be explicit.</p>
+
+    <p><strong>Not used, not needed, and would be vetoed on privacy grounds:</strong></p>
+
+    <ul>
+      <li>Video of patients</li>
+      <li>Video of nurses, doctors, or any hospital staff</li>
+      <li>Room audio or speech</li>
+      <li>Biometric images (facial recognition, gait, anything surveillance-adjacent)</li>
+      <li>Personally identifying information beyond what is operationally required to link a trajectory to a bed</li>
+    </ul>
+
+    <p><strong>Used, and already collected by the hospital today:</strong></p>
+
+    <ul>
+      <li><strong>Continuous numerical vitals</strong> from bedside monitors — heart rate, SpO2, respiratory rate, non-invasive blood pressure, temperature, ECG-derived features. These already stream over HL7 or direct monitor integration in any hospital with central monitoring; the JEPA server taps the same stream.</li>
+      <li><strong>Structured intervention events</strong> from the EMR / nursing information system — medication administration records, fluid boluses, oxygen titration, pressor titration, repositioning events, line placements. Time-stamped event logs, not narrative free text.</li>
+      <li><strong>Lab values</strong> from the laboratory information system — lactate, white cell count, creatinine, hemoglobin, blood gas. Time-stamped.</li>
+      <li><strong>Coarse admission context</strong> — age band, admission reason, surgical versus medical, length-of-stay category. Deliberately low-resolution, no free text, nothing that would individuate a patient beyond what is operationally necessary.</li>
+    </ul>
+
+    <p>The JEPA's latent is a compressed representation of <em>physiological trajectory and intervention response over time</em>. The reason this is meaningfully different from "surveillance" is that the signal it captures is already the signal the nurse is trying to read at the bedside — the shape of how this particular patient's physiology is responding to the care being given. The model is not watching the nurse, or the patient, or the room. It is reading the bedside chart, continuously, across the entire ward.</p>
+
+    <h2>3. The day on the floor</h2>
+
+    <p><strong>Before the shift.</strong> The JEPA server has been running overnight. It has ingested every monitor sample and every EMR event for every patient on the ward for as long as it has been deployed. For each occupied bed, it maintains a 192-dimensional latent representation of "where this patient's trajectory currently is," a scalar prediction-error signal (how surprised the model is by the last several hours of data), and a short attribution vector naming which input signals are driving the divergence. Nothing about this is visible to the nurse overnight. It just runs.</p>
+
+    <p><strong>07:00 — shift start.</strong> The outgoing charge nurse and the incoming charge nurse sit at the nursing station. On the display is not an alarm panel. It is a <strong>ranked ward view</strong> — every occupied bed, ordered by an "attention score" that smooths and calibrates the JEPA surprise signal. The top of the list is the one or two patients whose trajectories have drifted into the low-probability tail of the learned recovery manifold. The rest of the list is quiet. The handoff conversation walks top-to-bottom.</p>
+
+    <p>This is the single most important UX design property of the entire deployment: <strong>the system ranks attention, it does not generate alerts.</strong> Every intensive care unit on earth has alarm fatigue because existing early-warning scores (NEWS, MEWS, SIRS) throw too many false positives, and staff learn to tune them out within a week. A ranking view produces a different cognitive response — a nurse can absorb a ranked list of 30 patients in five seconds, and can always start from the top. There is no blaring noise, no red flash, no signal to dismiss. The system earns its place on the nursing station or it gets removed.</p>
+
+    <p><strong>09:07 — Bed 12 ascends the queue.</strong> Patient A, post-op day 2, has climbed to the top of the attention score. The charge nurse clicks through. She sees:</p>
+
+    <ul>
+      <li>A <strong>trajectory chart</strong> — prediction error has risen from baseline to 2.3 standard deviations over the last four hours. Stable before that.</li>
+      <li>A <strong>contribution attribution</strong> — the divergence is driven by rising respiratory rate, HR variability changes, and a pattern in which the last two fluid boluses produced less-than-expected MAP response.</li>
+      <li>A <strong>plain-language interpretation</strong> generated by Claude, grounded in the attribution and in this ward's own historical case base: <em>"This trajectory pattern matches what preceded septic decompensation in N similar post-operative cases on this ward over the past 18 months, with a median lead time of 12 hours. The attenuated MAP response to fluid is what separates this from a benign post-op course."</em></li>
+      <li>An <strong>ordered candidate-actions list</strong>, each flagged as a suggestion for nursing judgment, not an order: <em>"(1) Reassess at bedside. (2) Consider blood cultures + lactate. (3) If lactate elevated, escalate per ward's sepsis protocol."</em> Each suggestion is accompanied by the evidence that grounds it — "the sepsis pathway is supported by the combination of features, not by any single vital alone."</li>
+      <li>A <strong>hedge</strong>, always present, not boilerplate: <em>"This is an early-warning flag for human assessment, not a diagnosis. Physician evaluation is required before any protocol is initiated."</em></li>
+    </ul>
+
+    <p>The charge nurse goes to the bedside. She lays hands on the patient. She makes a human judgment. She may catch sepsis twelve hours early. She may mark the alert a false positive, which the system records and which feeds back into the ward's model recalibration. <strong>The decision is always the nurse's. The system focuses her attention; it does not replace her clinical reasoning.</strong></p>
+
+    <p><strong>Through the day.</strong> Most of the time — 70 to 80 percent, in pilot data from similar early-warning systems — the queue is quiet and the system is invisible. The remainder of the time, it surfaces the one or two patients on the ward who warrant a nurse's focused attention. End-of-shift, the outgoing charge nurse reviews the queue with the incoming one. The system supports the handoff. It does not replace it.</p>
+
+    <h2>4. The Claude / JEPA division of labor, stated plainly</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Layer</th><th>What it produces</th><th>What it is</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>JEPA (on-prem)</strong></td>
+            <td>192-dim patient latent, scalar surprise signal, contribution attribution, trajectory history</td>
+            <td>Pure numbers. No language, no interpretation, no decisions.</td>
+          </tr>
+          <tr>
+            <td><strong>Claude</strong> (called via signed outbound gateway)</td>
+            <td>Nurse-readable translation, historical grounding, ordered candidate actions, hedges</td>
+            <td>Language and reasoning over the numbers. No data access beyond the compressed latent summary.</td>
+          </tr>
+          <tr>
+            <td><strong>The nurse</strong></td>
+            <td>The decision to go to the bedside, to order labs, to escalate, or to mark the alert a false positive</td>
+            <td>Clinical judgment. Unreplaceable.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>This division is the whole point. A Claude-only deployment would either need the raw patient stream (privacy catastrophe) or would be reasoning without grounding (a charting assistant). A JEPA-only deployment would produce a scalar that a nurse cannot act on without interpretation. The composition is what makes this a nursing-capacity multiplier.</p>
+
+    <h2>5. Privacy architecture, specifically</h2>
+
+    <p>Two concerns and how the architecture handles them:</p>
+
+    <p><strong>Concern: patient vital-sign streams at population scale.</strong> Handled by on-prem deployment. The JEPA is trained and runs on hospital infrastructure. Raw patient data never leaves the hospital for inference. The only outbound traffic is (a) compressed latent summaries to Claude for language generation, which contain no PHI and can be audited on every call, and (b) optional federated weight updates to a partner consortium — see below.</p>
+
+    <p><strong>Concern: cross-site learning without data pooling.</strong> Handled by federated learning. If the program wants patterns learned at Hospital A to help Hospital B, three options, in order of privacy strength:</p>
+
+    <ol>
+      <li><strong>Federated weight averaging.</strong> Each hospital trains locally; only model gradient updates are exchanged with a coordinator, which averages and redistributes. Patient data never leaves any hospital. Mature protocols (FedAvg, DP-SGD with differential-privacy noise).</li>
+      <li><strong>Trained-model transfer.</strong> Hospital A shares its fully trained <em>weights</em> with Hospital B, which uses them as initialization and fine-tunes locally. Weights are compressed, anonymized-by-construction representations.</li>
+      <li><strong>De-identified synthetic trajectories.</strong> Hospital A generates synthetic patient trajectories that preserve population-level statistics but correspond to no real patient. Weaker privacy than (1) or (2), better transferability for new sites.</li>
+    </ol>
+
+    <p>The right choice for a Beneficial Deployments program is (1) and (2) in combination, with written consent frameworks at every partner hospital. (3) is used only when there is a specific, justified reason and the ethics review supports it.</p>
+
+    <p><strong>Regulatory framing.</strong> In jurisdiction-specific terms, the on-prem architecture dramatically reduces the regulatory surface because there is no cross-border transfer, no secondary use, and no aggregation beyond the institution. De-identified clinical data used for quality improvement within the institution that generated it is typically covered under existing operational consent frameworks. The harder conversation is about cross-site learning, which needs its own consent architecture, written into the partner agreement from day one.</p>
+
+    <h2>6. What this costs — estimated ranges</h2>
+
+    <p><em>All figures below are estimates intended to set expectations for an initial pilot, not a quoted budget. Costs assume skilled engineering labor paid at local rates in the partner country, not US rates. Actual costs will vary materially by country, by partner hospital's existing IT maturity, by ministry or IRB fee structure, and by the scope of clinical validation the program chooses to pursue. A detailed deployment estimate is a first-week exercise with each specific partner.</em></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Line item</th><th>Estimated range</th><th>Cadence</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>GPU workstation (per hospital)</td>
+            <td>$2,000–$5,000</td>
+            <td>One-time capex</td>
+            <td>RTX 4090 workstation or Jetson Orin dev kit. The single most predictable line.</td>
+          </tr>
+          <tr>
+            <td>Data integration engineer (200–400 hours, over 2–3 calendar months)</td>
+            <td>$3,000–$16,000</td>
+            <td>One-time per deployment</td>
+            <td>At $15–$40/hr local skilled-engineering rates (e.g. India ~$30–40/hr; lower in many SSA contexts). Often provided in-kind by a partner university or ministry IT group.</td>
+          </tr>
+          <tr>
+            <td>Hospital-side nursing informatics lead (0.1–0.25 FTE, ongoing)</td>
+            <td>in-kind, typically</td>
+            <td>Ongoing</td>
+            <td>Usually an existing staff role, not a new hire.</td>
+          </tr>
+          <tr>
+            <td>Claude API usage (latent summaries only, rate-limited)</td>
+            <td>under $500 / month</td>
+            <td>Ongoing</td>
+            <td>Outbound calls carry compressed latent summaries, not patient data. Replaceable with on-prem small-model alternative if policy requires full air-gap.</td>
+          </tr>
+          <tr>
+            <td>Software updates, federated coordination infrastructure</td>
+            <td>program-level, amortized</td>
+            <td>Ongoing</td>
+            <td>Carried by the Beneficial Deployments program, not the hospital.</td>
+          </tr>
+          <tr>
+            <td>Clinical validation — see staged breakdown below</td>
+            <td>$5,000–$80,000+</td>
+            <td>Scales with stage</td>
+            <td>Lowest stages can be entry-level; highest stage is typically grant-funded separately.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>First-year realistic entry cost for a single pilot hospital, at local rates:</strong> roughly <strong>$15,000–$40,000</strong>, of which the GPU and the engineering labor are the meaningful line items and the rest is either in-kind or program-amortized. The headline point the memo makes — the model is cheap; the integration and change management is what costs — still holds, but the total number is materially smaller than a US-rate estimate would suggest.</p>
+
+    <h3>What clinical validation actually entails, and why the cost range</h3>
+
+    <p>A predictive early-warning system cannot be deployed in a clinical setting without evidence that it performs as claimed in the environment it is being deployed into. The validation has three standard stages, each of which answers a different question and carries a different cost. A well-designed program runs them in sequence, with each stage gating the next.</p>
+
+    <p><strong>Stage A — Retrospective validation.</strong> Estimated <strong>$3,000–$10,000</strong> at local rates. The model is applied to the hospital's own historical data (with IRB approval for secondary use of de-identified clinical records). The question answered is: <em>would the system have flagged known deterioration events in this hospital's own population, with what lead time, and at what false-positive rate?</em> Work involved: de-identified historical dataset extraction; biostatistician time (~40–80 hours at local rates); IRB submission and fees. Output: AUROC, sensitivity/specificity curves, lead-time analysis. This is the cheapest stage and is non-negotiable — no live deployment without it.</p>
+
+    <p><strong>Stage B — Prospective silent validation.</strong> Estimated <strong>$10,000–$30,000</strong> at local rates, over 3–6 months. The system runs live but its output is not shown to nursing staff. Predictions are logged alongside actual outcomes. The question answered is: <em>does the retrospective performance hold up under real operational conditions — live data pipelines, missing values, sensor dropouts, the full messiness of the ward?</em> Work involved: live IT integration; clinical research coordinator at 0.1–0.25 FTE for 3–6 months; biostatistician analysis; interim safety review. Output: confirmation (or refutation) of Stage A claims in live conditions. This is typically the last stage before staff see any output from the system.</p>
+
+    <p><strong>Stage C — Prospective interventional study.</strong> Estimated <strong>$30,000–$80,000+</strong> at local rates, over 6–12 months, often more at multi-site scale. Nursing staff see the outputs; decisions are taken with the system's input; outcomes are measured against a control (often cluster-randomized by ward, or stepped-wedge). The question answered is the only one that actually matters in the end: <em>does the system improve clinical outcomes — time-to-intervention, adjusted mortality, length of stay — compared to standard of care?</em> Work involved: full clinical research infrastructure — IRB, clinical research coordinator (0.25–0.5 FTE), biostatistician, data safety monitoring board, pre-registered trial protocol, publication. Output: the clinical evidence base for continued use and for scale-out to additional sites.</p>
+
+    <p><strong>Why the range on each stage</strong> is wide: IRB and ethics committee fees vary by country and institution; biostatistician and CRC rates vary by market; trial duration and multi-site design multiply costs. In many LMIC settings, Stage A and Stage B can together be done for <strong>$13,000–$40,000 at local rates</strong>. Stage C is typically an order of magnitude more — not because it is technically harder, but because it is a real clinical trial and demands real trial infrastructure.</p>
+
+    <h3>On whether this cost is prohibitive</h3>
+
+    <p>Honestly, yes — if the pilot hospital is expected to carry it alone. A state-capacity-constrained teaching hospital is not the right payer for a $25,000 capex-plus-validation outlay in the first year. The deployment pattern assumes this cost is carried by the program, not the partner, structured in one of three ways:</p>
+
+    <ol>
+      <li><strong>Anthropic Beneficial Deployments funds the pilot directly</strong> as part of the reference-implementation program, amortized across the many partner sites the same pattern will deploy to.</li>
+      <li><strong>A foundation partner underwrites the pilot</strong> — the Gates Foundation, Wellcome, Grand Challenges, Rockefeller, PEPFAR-adjacent budgets, Gavi, national ministries of health with AI-readiness funding. For any specific partner hospital, one or more of these is usually the right source.</li>
+      <li><strong>An implementation research grant funds Stage C specifically</strong> — NIH Fogarty, USAID, Wellcome implementation science, Bill & Melinda Gates — if and only if Stages A and B have succeeded and there is a defensible case for a trial.</li>
+    </ol>
+
+    <p>The right unit of analysis for cost is not "what does a hospital pay" but "what does the program spend per hospital to establish a working, validated deployment that is ready for scale-out." On that framing, even the high end of the range is a defensible per-site investment against the eventual scale — a hundred hospitals carrying a validated early-warning system is, in public-health economics terms, a very cheap intervention per averted death.</p>
+
+    <p>The harder question for the program is <strong>which cost lines can be compressed without compromising the integrity of the deployment.</strong> The engineering cost can be compressed by embedding local-university graduate students or ministry IT staff, at zero incremental labor cost, paired with a Beneficial Deployments architect for structural supervision. The validation cost cannot be meaningfully compressed without giving up the evidence base — and the evidence base is what makes the reference implementation worth copying.</p>
+
+    <div class="callout">
+      <strong>The model is cheap. The data integration and the evidence are what the program pays for.</strong> That is the shape of every serious clinical AI deployment, and any pitch that hides it will not survive the first ministry-level review. In the companion memo's language: Year 1 is instrumentation and retrospective validation. Year 2 is live silent validation and the first interventional trial. The model itself is a line item; the evidence is the product.
+    </div>
+
+    <h2>7. What would cause me to shut the pilot down</h2>
+
+    <p>The test of this system is mortality and time-to-intervention on clinical endpoints, not technical elegance. Pre-registered shutdown criteria for a pilot:</p>
+
+    <ul>
+      <li><strong>Alarm fatigue:</strong> if nursing survey data shows staff are tuning out the attention queue within four weeks, the ranking model is wrong and we stop.</li>
+      <li><strong>No detectable improvement over the existing ward protocol:</strong> if the pilot does not show a statistically meaningful reduction in time-to-intervention or in adjusted mortality over a NEWS/MEWS control arm at six months, we do not continue to scale.</li>
+      <li><strong>Any adverse event where the system's ranking materially delayed care.</strong> Immediate shutdown, full review, transparent disclosure to the partner and the ministry. This is a clinical system; the ethical bar is the bar.</li>
+      <li><strong>Any privacy or data-governance failure,</strong> even a near-miss. Full audit, partner-driven investigation, no continuation without remediation.</li>
+    </ul>
+
+    <p>Without these shutdown criteria written into the partnership agreement, I would not run this pilot. They are not a CYA; they are how the deployment earns the trust it needs to scale beyond the pilot site.</p>
+
+    <h2>8. What makes this Anthropic-shaped</h2>
+
+    <p>Three properties of this deployment are specifically why I would want to run it inside Anthropic rather than inside a traditional health-tech vendor:</p>
+
+    <ol>
+      <li><strong>The privacy-forward, on-prem, federated architecture is not the default.</strong> The SaaS-ML default for a hospital early-warning system is to stream vitals to a vendor's cloud and return predictions. For a well-resourced US hospital with mature regulatory infrastructure, that is defensible. For a teaching hospital in a capacity-constrained setting, it is not. The architecture described here only exists because someone made the deliberate design choice to keep data on-prem, and that choice has to be institutionally backed. Anthropic's public commitments on safe deployment, RSP discipline, and interpretability are the institutional backing that makes this choice credible to a ministry-of-health partner in a first conversation.</li>
+      <li><strong>Interpretability is load-bearing, not decorative.</strong> A hospital early-warning system that cannot explain its surprise signal to a nurse in terms she can act on is not deployable, full stop. Anthropic's interpretability research — probing, feature attribution, causal analysis — is the research substrate that makes this system's "contribution attribution" honest rather than aesthetic.</li>
+      <li><strong>The same reference implementation travels across ten hospitals, two ministries, and four mission partners.</strong> The pattern-spotting work of adapting the logging standard, the training procedure, the nursing-station UX, and the federated protocol across partners is ecosystem-level infrastructure work, which is exactly what Beneficial Deployments is explicitly chartered to do. No other frontier lab has a team chartered this way.</li>
+    </ol>
+
+    <h2>9. The one-line version</h2>
+
+    <blockquote>
+      An on-prem GPU workstation ingests the bedside data the hospital already collects, continuously updates a compact physiological-trajectory model for every patient on the ward, ranks attention for the charge nurse, and calls Claude — not patient data, just latent summaries — for nurse-readable language and next-step suggestions. The nurse decides. The architecture is the point.
+    </blockquote>
+
+    <p>That is the use case. That is what converts the memo from vision to deployment.</p>
+
+    <div class="references-card">
+      <div class="rc-label">References</div>
+      <div class="references-grid">
+        <a class="ref-link" href="https://arxiv.org/abs/2603.19312" target="_blank" rel="noopener">
+          <span class="ref-title">LeWorldModel <span class="ref-arrow">↗</span></span>
+          <span class="ref-sub">Mila / NYU / Samsung / Brown · arXiv:2603.19312</span>
+        </a>
+        <a class="ref-link" href="https://www.darioamodei.com/essay/machines-of-loving-grace" target="_blank" rel="noopener">
+          <span class="ref-title">Machines of Loving Grace <span class="ref-arrow">↗</span></span>
+          <span class="ref-sub">Dario Amodei · darioamodei.com</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="article-footer">
+    <div class="signature">
+      <strong>Andrew Crenshaw</strong><br>
+      Written 2026-04-21. Companion to <a href="./pairing-claude-with-a-world-model.html" style="color: var(--accent); border-bottom: 1px solid var(--accent-dim); text-decoration: none;">On Pairing Claude with a Domain World Model</a>.
+    </div>
+    <div class="contact-row">
+      <a href="https://linkedin.com/in/andrewcrenshaw" rel="noopener">linkedin.com/in/andrewcrenshaw</a>
+      <a href="/">andrewcrenshaw.dev</a>
+    </div>
+    <p class="closer">If you are reading this because I shared the link with you, thank you for your time.</p>
+    <p class="source-note">Technical grounding from the <a href="./pairing-claude-with-a-world-model.html">LeWorldModel-based companion notes</a> and the broader JEPA literature. Privacy architecture draws on federated-learning practice at Owkin, MELLODDY, and the NHS Federated Data Platform; clinical-deployment discipline draws on the regulatory posture of the Epic Deterioration Index and the Kaiser Permanente AAM score, informed by the documented limitations of both.</p>
+  </div>
+
+</article>
+
+</body>
+</html>
