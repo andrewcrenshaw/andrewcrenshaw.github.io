@@ -496,7 +496,7 @@
   <ul class="nav-links">
     <li><a href="#what-it-is">What It Is</a></li>
     <li><a href="#backlog">Backlog</a></li>
-    <li><a href="#oscar">Oscar</a></li>
+    <li><a href="#oscar">Execution Loop</a></li>
     <li><a href="#agents">Agents</a></li>
     <li><a href="#governance">Governance</a></li>
     <li><a href="#sessions">Sessions</a></li>
@@ -532,7 +532,7 @@
 
     <div class="stat-strip reveal rd4">
       <div class="stat">
-        <div class="stat-num">13</div>
+        <div class="stat-num">12</div>
         <div class="stat-label">Specialized<br>agent skills</div>
       </div>
       <div class="stat">
@@ -717,75 +717,76 @@
 <!-- ═══════════════════════════════════════════════════════
      OSCAR
 ═══════════════════════════════════════════════════════ -->
-<section id="oscar" class="section">
+<section id="bob" class="section">
   <div class="section-inner">
-    <div class="section-label reveal">Oscar — Structured Ticket Execution Protocol</div>
-    <h2 class="reveal">One ticket. Multiple agents. One coherent deliverable.</h2>
+    <div class="section-label reveal">The Execution Loop</div>
+    <h2 class="reveal">From plan to done — without restarts.</h2>
     <div class="rule reveal"></div>
 
-    <p class="reveal">Oscar is the execution protocol Forge uses to drive multi-phase tickets to completion. He defines the playbook: how a ticket is broken into ordered phases, how a Task Brief is constructed for each specialist (Bob for build, Tessa for tests, Alex for ADRs, Remy for refactor, Sherry for docs), how phase boundaries are STOP-gated against ISC criteria, and how the next specialist picks up via a structured handoff signature in the scratchpad. Today, the operator runs the protocol — pasting agent-scoped prompts and ratifying STOP gates — while Stewart automates the upstream prep (work packages, AC tables, agent assignment). PCC-2327 (a 5-phase DB migration: Remy → Alex ADR → Remy → Stewart → Remy) shipped this way without restarts or context loss. <strong>Phase 2 of Forge wires this protocol into autonomous fan-out — calendar-gated ~6 weeks out, behind a measured-data review.</strong></p>
+    <p class="reveal">This is the loop every Forge ticket runs through. The orchestration is structured by the PDT (Project Definition Toolkit) and its dashboard, not by a single autonomous agent: tickets carry their own AC, prompt templates, and agent assignments; the dashboard auto-generates an agent-scoped prompt on status transitions; Launch and Relaunch buttons stage the prompt for one-click clipboard copy. PCC-2327 — a 5-phase DB migration that ran Remy → Alex (ADR) → Remy → Stewart → Remy — shipped through this loop without restarts or context loss. <strong>Autonomous fan-out — where a single orchestrator agent runs the whole loop unattended — is Phase 2, calendar-gated ~6 weeks out behind measured-data review of how often the operator actually wishes the system would take more action.</strong></p>
 
     <div class="big-quote reveal">"You build the system. The prompts are disposable."</div>
 
-    <h3 class="reveal" style="margin-top: 2rem;">The Six-Phase Execution Protocol</h3>
-    <p class="reveal">The protocol is deterministic. The same six phases run for every multi-agent ticket — producing consistent, verifiable results regardless of which specialists the ticket touches.</p>
+    <h3 class="reveal" style="margin-top: 2rem;">The Six Phases of the Loop</h3>
+    <p class="reveal">Every ticket runs the same six phases — from a planning agent's decomposition all the way to an automated review gate's auto-close. The dashboard owns dispatch and gating; specialists own execution; the operator clicks Launch or Relaunch.</p>
 
     <div class="phase-list reveal">
       <div class="phase">
         <div class="phase-num">P1</div>
         <div class="phase-content">
-          <h4>Session Setup</h4>
-          <p>Oscar registers his own session via the API, loads any prior scratchpad for this ticket, and claims the backlog item. If a prior session exists (context overflow), Oscar reads the scratchpad to identify where he left off — no work is restarted from zero.</p>
+          <h4>Plan & Decompose</h4>
+          <p>A planning agent (Alex for architecture, Bea for product requirements) reads the goal and produces a structured plan. The plan is filed as one or more PDT tickets via the API — each with a scoped AC table, an agent assignment (Bob, Tessa, Sherry, Remy, etc.), and the prompt template appropriate to that specialist's SOP.</p>
         </div>
       </div>
       <div class="phase">
         <div class="phase-num">P2</div>
         <div class="phase-content">
-          <h4>Decompose</h4>
-          <p>Oscar reads the full ticket and breaks it into ordered sub-tasks. Each sub-task has exactly one concern, one agent type, and one clear output specification. Before dispatching any implementation sub-agents, Oscar calls <code>GET /api/locks</code> to detect file conflicts — preventing concurrent writes to the same files by parallel agents.</p>
+          <h4>Stewart Grooms Intake → Ready</h4>
+          <p>Stewart verifies AC quality, checks for collisions with other in-flight work, confirms the agent assignment, attaches the right prompt template, and promotes the ticket from <code>intake</code> to <code>ready</code>. Tickets in <code>ready</code> are dispatchable; tickets in <code>intake</code> are not. This step is autonomous — no operator action required.</p>
         </div>
       </div>
       <div class="phase">
         <div class="phase-num">P3</div>
         <div class="phase-content">
-          <h4>Sub-Task Execution Loop</h4>
-          <p>For each phase in dependency order: a Task Brief is written containing only the context that specialist needs, the specialist (Bob for implementation, Tessa for tests, Alex for architecture, etc.) is spawned in a fresh session, and the result is evaluated against that phase's acceptance criteria. When a phase's output misses an ISC row, the protocol prescribes a targeted brief revision and re-run on a fresh session — maximum two revision loops before escalating to the human.</p>
+          <h4>Dispatch — the Launch button</h4>
+          <p>The operator moves a <code>ready</code> ticket to <code>in_progress</code> in the PDT dashboard. The status transition triggers prompt generation: the dashboard composes an agent-scoped prompt from the ticket's AC, file references, prompt template, and constraints — and stages it for the Launch button. <strong>One click on Launch copies the prompt to the clipboard.</strong> The operator pastes it into a fresh Claude session.</p>
           <div class="code-block" style="margin-top: 0.75rem;">
-            <span class="code-label">Task Brief format (LB-001 — Latent Briefing Protocol)</span>
-<pre><span class="hl-key">Task:</span>     <span class="hl-str">Implement IntelSchema Alembic migration 029</span>
-<span class="hl-key">Context:</span>  <span class="hl-comment">[Only what affects this sub-task — not Oscar's full state]</span>
-<span class="hl-key">Inputs:</span>   <span class="hl-val">strata/migrations/028_previous.py, models/intel.py</span>
-<span class="hl-key">Output:</span>   <span class="hl-str">migrations/029_intel_schema.py, passing alembic upgrade</span>
-<span class="hl-key">Constraints:</span> <span class="hl-comment">Do not touch 028 or any earlier migration files</span></pre>
+            <span class="code-label">Auto-staged prompt (excerpt — what Launch copies)</span>
+<pre><span class="hl-key">Agent:</span>    <span class="hl-str">bob</span>
+<span class="hl-key">Ticket:</span>   <span class="hl-val">PCC-2327 — Migrate PDT to better-sqlite3</span>
+<span class="hl-key">Context:</span>  <span class="hl-comment">[Files, prior scratchpad, related ADR]</span>
+<span class="hl-key">AC:</span>       <span class="hl-str">ISC table — binary pass/fail rows</span>
+<span class="hl-key">Constraints:</span> <span class="hl-comment">TDD required, do not touch migration 028</span>
+<span class="hl-key">Lifecycle:</span>   <span class="hl-val">/session bob PCC-2327</span></pre>
           </div>
         </div>
       </div>
       <div class="phase">
         <div class="phase-num">P4</div>
         <div class="phase-content">
-          <h4>Consolidation</h4>
-          <p>Oscar synthesizes all sub-task results into a unified deliverable — not a status report. The Synthesis section of Oscar's scratchpad is the actual output artifact: working code, test results, documentation, or architectural decisions — whatever the ticket required. It accumulates across context restarts, so token limits don't reset progress.</p>
+          <h4>Specialist Execution</h4>
+          <p>The agent registers its session via the <code>/session</code> lifecycle (<code>POST /api/sessions</code>), claims the ticket (<code>PATCH backlog → in_progress</code>), creates a scratchpad from template, executes under the relevant SOP and TDD protocol, runs verification, and submits for review (<code>PATCH → review</code>). Because the prompt staged by Launch already carries full context, the agent never has to ask "what's the goal" or "which files matter."</p>
         </div>
       </div>
       <div class="phase">
         <div class="phase-num">P5</div>
         <div class="phase-content">
-          <h4>Quality Gate</h4>
-          <p>Before submission, Oscar verifies every row of the original ticket's acceptance criteria table against the consolidated output. Every AC row must show ✅. If any fail, Oscar initiates targeted correction — not a full restart. The quality gate is the last thing between Oscar and submission.</p>
+          <h4>Automated Review Gates</h4>
+          <p>Submission to <code>review</code> triggers a multi-stage gate that runs without operator intervention: ESLint (TypeScript), Ruff (Python), 700+ Jest suites / 2,400+ test cases, Eval (machine-verifiable AC check), Quinn (code review SOP), Stewart's pre-commit gate, and Sentinel (security review where applicable). Every gate is binary and audit-logged.</p>
         </div>
       </div>
       <div class="phase">
         <div class="phase-num">P6</div>
         <div class="phase-content">
-          <h4>Submit and End Session</h4>
-          <p>Oscar patches the backlog item to <code>review</code> status, writes the session reflection to the scratchpad, archives it, and closes the session via <code>DELETE /api/sessions/oscar-[ticket]-[date]</code>. The Eval agent then independently verifies the submission. For routine completions, Eval auto-approves. Ambiguous cases escalate to human review.</p>
+          <h4>Done — or Relaunch</h4>
+          <p><strong>Pass:</strong> the ticket auto-closes to <code>done</code>. The operator is notified but does not click anything. <strong>Fail:</strong> the ticket flips back to <code>in_progress</code> and a Relaunch button appears, staging a "fix it" prompt that names the failed gate (which ISC row, which lint rule, which test) and the specific correction needed. <strong>One click on Relaunch copies it to the clipboard.</strong> The operator pastes it into the existing agent session — work continues, no restart.</p>
         </div>
       </div>
     </div>
 
     <div class="callout success reveal" style="margin-top: 2rem;">
-      <span class="callout-label">The Revision Loop — What makes this not copy-paste</span>
-      <p>When Bob returns code that doesn't meet the acceptance criteria, the answer is never "try rephrasing the prompt." The protocol prescribes a structured revision: cite the failed ISC row, list the specific correction needed, regenerate the Task Brief with that delta, and re-run on a fresh session. This is structured error correction — a rule-based revision loop with an ISC-anchored bar, not vibes. The framework is what makes the loop converge.</p>
+      <span class="callout-label">The Recovery Loop — What makes this not copy-paste</span>
+      <p>When a review gate fails, the answer is never "try rephrasing the prompt." The PDT dashboard composes a structured Relaunch prompt that names the failed gate (which ISC row, which lint rule, which test, which review note), states the specific correction needed, and re-attaches the original context. One click copies it to the clipboard; the operator pastes it into the same agent session to continue. This is structured error correction — a rule-based recovery loop with an ISC-anchored bar, not vibes — and it is what makes the framework converge instead of spin.</p>
     </div>
   </div>
 </section>
@@ -798,17 +799,12 @@
 <section id="agents" class="section">
   <div class="section-inner">
     <div class="section-label reveal">The Agent Network</div>
-    <h2 class="reveal">12+ specialists. Auto-routed. Skill-aware.</h2>
+    <h2 class="reveal">12 specialists. Auto-routed. Skill-aware.</h2>
     <div class="rule reveal"></div>
 
     <p class="reveal">Forge doesn't have a single "AI assistant." It has a network of specialized agents, each with their own SKILL.md that defines triggers, guardrails, sub-skills, and output formats. Routing is automatic — the right agent activates based on context keywords, not manual selection.</p>
 
     <div class="agent-grid reveal">
-      <div class="agent-card">
-        <div class="agent-name">Oscar</div>
-        <div class="agent-role">Orchestrator</div>
-        <div class="agent-desc">Structured execution protocol for multi-phase tickets. Defines decomposition, Task Brief format, STOP gates, handoff signatures, and the revision loop. Run by the operator today; targeted for autonomous fan-out in Phase 2.</div>
-      </div>
       <div class="agent-card">
         <div class="agent-name">Stewart</div>
         <div class="agent-role">Steward</div>
@@ -827,7 +823,7 @@
       <div class="agent-card">
         <div class="agent-name">Bob</div>
         <div class="agent-role">Builder</div>
-        <div class="agent-desc">TDD-driven implementation. RED→GREEN→REFACTOR enforced. Implements to spec. Works within Oscar's sub-task scope.</div>
+        <div class="agent-desc">TDD-driven implementation. RED→GREEN→REFACTOR enforced. Implements to spec within the ticket's AC table — no scope creep, no stubs.</div>
       </div>
       <div class="agent-card">
         <div class="agent-name">Tessa</div>
@@ -863,6 +859,11 @@
         <div class="agent-name">Sentinel</div>
         <div class="agent-role">Security</div>
         <div class="agent-desc">Secrets scanning, vulnerability detection, authentication boundary analysis. Runs as a review gate, not a post-facto audit.</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">Jerry</div>
+        <div class="agent-role">Jira Integration</div>
+        <div class="agent-desc">Bidirectional Jira sync — backlog tickets ↔ Jira issues, status round-trip, comment relay. Lets Forge participate in enterprise workflows without leaving the dashboard.</div>
       </div>
     </div>
 
@@ -973,14 +974,14 @@
       <span class="code-label">Session sequence — register → scratchpad → claim → work → submit → end</span>
 <pre><span class="hl-comment"># 1. Register — collision detection, session index</span>
 <span class="hl-fn">curl</span> <span class="hl-val">-X POST</span> localhost:5176/api/sessions
-  <span class="hl-val">-d</span> <span class="hl-str">'{"sessionId":"oscar-pcc-1846-2026-04-13","agentName":"oscar"}'</span>
+  <span class="hl-val">-d</span> <span class="hl-str">'{"sessionId":"bob-pcc-1846-2026-04-13","agentName":"bob"}'</span>
 
 <span class="hl-comment"># 2. Load context — scratchpad auto-created from template if new</span>
-<span class="hl-fn">curl</span> localhost:5176/api/sessions/oscar-pcc-1846-2026-04-13/context<span class="hl-val">?backlogId=PCC-1846</span>
+<span class="hl-fn">curl</span> localhost:5176/api/sessions/bob-pcc-1846-2026-04-13/context<span class="hl-val">?backlogId=PCC-1846</span>
 
 <span class="hl-comment"># 3. Claim — prevents double-assignment, marks in_progress</span>
 <span class="hl-fn">curl</span> <span class="hl-val">-X PATCH</span> localhost:5176/api/backlog/PCC-1846
-  <span class="hl-val">-d</span> <span class="hl-str">'{"status":"in_progress","assignedAgent":"oscar"}'</span>
+  <span class="hl-val">-d</span> <span class="hl-str">'{"status":"in_progress","assignedAgent":"bob"}'</span>
 
 <span class="hl-comment"># ... work happens ... scratchpad updated every 3-5 actions ...</span>
 
@@ -989,7 +990,7 @@
   <span class="hl-val">-d</span> <span class="hl-str">'{"status":"review"}'</span>
 
 <span class="hl-comment"># 5. End — session archived, reflection written</span>
-<span class="hl-fn">curl</span> <span class="hl-val">-X DELETE</span> localhost:5176/api/sessions/oscar-pcc-1846-2026-04-13</pre>
+<span class="hl-fn">curl</span> <span class="hl-val">-X DELETE</span> localhost:5176/api/sessions/bob-pcc-1846-2026-04-13</pre>
     </div>
   </div>
 </section>
@@ -1138,7 +1139,7 @@
           <tr>
             <td>Skill Routing</td>
             <td class="dim">Human decides which AI tool to use for each task. Manual prompt-engineering every time.</td>
-            <td class="bright">13 specialist agents with keyword-triggered SKILL.md activation. Stewart assigns the right specialist when promoting a ticket to ready; structured handoff signatures name the next agent at each phase boundary. The operator dispatches; no manual prompt engineering.</td>
+            <td class="bright">12 specialist agents with keyword-triggered SKILL.md activation. Stewart assigns the right specialist when promoting a ticket to ready; the dashboard auto-generates an agent-scoped prompt at the ready→in-progress transition; one click on Launch copies it to the clipboard. No manual prompt engineering.</td>
           </tr>
         </tbody>
       </table>
@@ -1186,7 +1187,7 @@
     <div class="rule center reveal"></div>
     <h2 class="reveal">The harness is the product.</h2>
     <p class="reveal" style="margin: 0 auto 2rem; text-align: center;">
-      Forge is not a collection of prompts and a kanban board. It is a purpose-built engineering system designed to make agent-first development reliable, auditable, and continuously improving. Every component — the session protocol, the approval queue, the work packages, Oscar's revision loop, the TDD enforcement, the scratchpad continuity — exists to answer one question: <em>what capability is missing, and how do we make it legible to the agent?</em>
+      Forge is not a collection of prompts and a kanban board. It is a purpose-built engineering system designed to make agent-first development reliable, auditable, and continuously improving. Every component — the session protocol, the approval queue, the work packages, the Launch / Relaunch dispatch loop, the TDD enforcement, the scratchpad continuity — exists to answer one question: <em>what capability is missing, and how do we make it legible to the agent?</em>
     </p>
     <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-top: 2rem;" class="reveal">
       <a href="../index.html#work" style="font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.8rem 2rem;border-radius:6px;background:var(--accent);color:var(--bg);transition:all 0.3s var(--ease);">Back to Portfolio</a>
