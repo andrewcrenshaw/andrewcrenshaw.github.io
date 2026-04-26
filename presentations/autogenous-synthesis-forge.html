@@ -519,9 +519,10 @@
     <p class="hero-subtitle reveal rd2">
       A harness engineering framework for agent-first software development.
       Not a wrapper around existing tools. A purpose-built development OS
-      where specialized agents decompose, implement, test, and validate
-      work end-to-end — under governance, with continuity, at the speed
-      a single engineer couldn't sustain alone.
+      where specialized agents implement, test, and document work under a
+      structured execution protocol — with shared context, machine-verifiable
+      acceptance criteria, and low-friction handoffs that let one engineer
+      drive multi-agent workflows without losing state.
     </p>
 
     <div class="hero-quote reveal rd3">
@@ -531,7 +532,7 @@
 
     <div class="stat-strip reveal rd4">
       <div class="stat">
-        <div class="stat-num">12+</div>
+        <div class="stat-num">13</div>
         <div class="stat-label">Specialized<br>agent skills</div>
       </div>
       <div class="stat">
@@ -539,12 +540,12 @@
         <div class="stat-label">Lifecycle stages with<br>automated transitions</div>
       </div>
       <div class="stat">
-        <div class="stat-num">150+</div>
-        <div class="stat-label">Automated test suites<br>enforcing quality gates</div>
+        <div class="stat-num">2,400+</div>
+        <div class="stat-label">Test cases (700+ suites)<br>enforced on every submission</div>
       </div>
       <div class="stat">
-        <div class="stat-num">80%</div>
-        <div class="stat-label">Review load reduced<br>by automated eval</div>
+        <div class="stat-num">5-stage</div>
+        <div class="stat-label">Review gate: Lint · Tests<br>· Eval · Quinn · Stewart</div>
       </div>
     </div>
   </div>
@@ -563,14 +564,14 @@
 
     <p class="reveal">Fair question. Most "agent frameworks" are exactly that: a UI layer over a task list, where a human reads the ticket, constructs a prompt, pastes it into an AI tool, copies the result back, and manually updates a status field. The AI is accelerating individual steps. The process is still human-driven.</p>
 
-    <p class="reveal">Forge is architecturally different. The entry point — invoking Oscar with a ticket — is simple. What happens next is the distinction. The backlog is a <em>live state machine</em> with transactional guarantees. Agents register sessions, claim work, check for file conflicts, execute under structured SOPs, generate and validate their own test suites, and submit for review — without a human orchestrating each step. When a sub-agent's output doesn't meet the acceptance criteria, the system automatically revises the brief and re-runs it.</p>
+    <p class="reveal">Forge is architecturally different. The backlog is a <em>live state machine</em> with transactional guarantees. Stewart promotes intake to ready and auto-generates agent-scoped prompts. Each agent registers its session, claims work, executes under a structured SOP, runs RED→GREEN→REFACTOR, and submits for review through a single HTTP API. The human stays at cross-ticket decision boundaries — picking what to dispatch, ratifying handoffs, owning architectural calls — while the framework removes the friction inside each ticket: shared scratchpads carry context across sessions, ISC tables make "done" binary, and structured reflection captures what the next agent needs.</p>
 
-    <p class="reveal">The human's role is: set direction, define acceptance criteria, and review output. Everything between is Forge.</p>
+    <p class="reveal">The human's role is: set direction, define acceptance criteria, and review output. Everything between is Forge — protocol, lifecycle, context, and gates.</p>
 
     <div class="callout reveal" style="margin-top: 2.5rem;">
       <span class="callout-label">The core distinction</span>
-      <p><strong>AI-assisted:</strong> You use AI tools inside your existing process. Efficiency improves 10–20%. The loop is still human-driven.<br><br>
-      <strong>Forge / AI-first:</strong> You redesign the process around agents as the primary builders. Humans provide direction and judgment. Agents handle implementation, testing, and validation. The difference is multiplicative, not additive. Weeks of work become hours of work.</p>
+      <p><strong>AI-assisted:</strong> You use AI tools inside your existing process. Efficiency improves 10–20%. The loop is still human-driven, the context is rebuilt every prompt, and "done" is subjective.<br><br>
+      <strong>Forge / AI-first:</strong> You redesign the process around agents as the primary builders. The framework handles dispatch prep, context continuity, structured handoffs between specialists, and machine-verifiable quality gates. Humans provide direction and architectural judgment. The difference is multiplicative, not additive — and it compounds because the system, scratchpads, and memory get better over time.</p>
     </div>
   </div>
 </section>
@@ -590,7 +591,7 @@
       <div class="card">
         <span class="card-icon"><i class="ph ph-lightning"></i></span>
         <h3>Agent-First</h3>
-        <p>Agents don't assist the developer — they are the primary builders. Forge is designed from the ground up to make agents' work legible, bounded, and enforceable. Every component — the session protocol, the backlog schema, the SOP library, the work packages — exists to maximize what agents can reliably do without human intervention.</p>
+        <p>Agents don't assist the developer — they are the primary builders. Forge is designed from the ground up to make agents' work legible, bounded, and enforceable. Every component — the session protocol, the backlog schema, the SOP library, the work packages — exists to maximize what agents can reliably do, with the human reserved for direction-setting and cross-ticket judgment.</p>
         <div class="tags">
           <span class="tag">harness engineering</span>
           <span class="tag">agent SOPs</span>
@@ -600,7 +601,7 @@
       <div class="card">
         <span class="card-icon"><i class="ph ph-gear-six"></i></span>
         <h3>High Throughput</h3>
-        <p>A single engineer can run multiple agents in parallel across unrelated concerns simultaneously. Oscar (the orchestration agent) decomposes tickets and dispatches specialist sub-agents in parallel where dependencies allow. File lock arbitration prevents collisions. Work that would serialize a solo engineer runs concurrently.</p>
+        <p>A single engineer can run multiple agents in parallel across unrelated concerns simultaneously. Stewart auto-generates agent-scoped prompts at promotion time; the operator dispatches them across parallel sessions. Within a single ticket, structured phase boundaries let one specialist hand off to the next without context loss — proven on PCC-2327, a five-phase DB migration that ran Remy → Alex → Remy → Stewart → Remy without a restart. Work that would serialize a solo engineer runs concurrently.</p>
         <div class="tags">
           <span class="tag">parallel execution</span>
           <span class="tag">collision detection</span>
@@ -718,16 +719,16 @@
 ═══════════════════════════════════════════════════════ -->
 <section id="oscar" class="section">
   <div class="section-inner">
-    <div class="section-label reveal">Oscar — Autonomous Orchestration</div>
-    <h2 class="reveal">Paste the ticket. Review the output.</h2>
+    <div class="section-label reveal">Oscar — Structured Ticket Execution Protocol</div>
+    <h2 class="reveal">One ticket. Multiple agents. One coherent deliverable.</h2>
     <div class="rule reveal"></div>
 
-    <p class="reveal">Oscar is Forge's autonomous ticket executor. He receives a backlog item, decomposes it into ordered sub-tasks, spawns the right specialist agent for each, evaluates their output against the acceptance criteria, and consolidates results into a unified deliverable. When a sub-agent's work doesn't meet the bar, Oscar automatically revises the brief and re-runs it. The user's only actions: paste the ticket ID, then review Oscar's final output.</p>
+    <p class="reveal">Oscar is the execution protocol Forge uses to drive multi-phase tickets to completion. He defines the playbook: how a ticket is broken into ordered phases, how a Task Brief is constructed for each specialist (Bob for build, Tessa for tests, Alex for ADRs, Remy for refactor, Sherry for docs), how phase boundaries are STOP-gated against ISC criteria, and how the next specialist picks up via a structured handoff signature in the scratchpad. Today, the operator runs the protocol — pasting agent-scoped prompts and ratifying STOP gates — while Stewart automates the upstream prep (work packages, AC tables, agent assignment). PCC-2327 (a 5-phase DB migration: Remy → Alex ADR → Remy → Stewart → Remy) shipped this way without restarts or context loss. <strong>Phase 2 of Forge wires this protocol into autonomous fan-out — calendar-gated ~6 weeks out, behind a measured-data review.</strong></p>
 
     <div class="big-quote reveal">"You build the system. The prompts are disposable."</div>
 
     <h3 class="reveal" style="margin-top: 2rem;">The Six-Phase Execution Protocol</h3>
-    <p class="reveal">Oscar doesn't ask what to do next at each step. He follows a deterministic protocol designed to produce consistent, verifiable results.</p>
+    <p class="reveal">The protocol is deterministic. The same six phases run for every multi-agent ticket — producing consistent, verifiable results regardless of which specialists the ticket touches.</p>
 
     <div class="phase-list reveal">
       <div class="phase">
@@ -748,7 +749,7 @@
         <div class="phase-num">P3</div>
         <div class="phase-content">
           <h4>Sub-Task Execution Loop</h4>
-          <p>For each sub-task in dependency order: Oscar writes a Task Brief containing only the context that sub-agent needs, spawns the specialist (Bob for implementation, Tessa for tests, Alex for architecture, etc.), receives the result, and evaluates it against that sub-task's acceptance criteria. If the result fails: Oscar revises the brief with specific corrections and re-spawns. Maximum two revision loops before escalating to human.</p>
+          <p>For each phase in dependency order: a Task Brief is written containing only the context that specialist needs, the specialist (Bob for implementation, Tessa for tests, Alex for architecture, etc.) is spawned in a fresh session, and the result is evaluated against that phase's acceptance criteria. When a phase's output misses an ISC row, the protocol prescribes a targeted brief revision and re-run on a fresh session — maximum two revision loops before escalating to the human.</p>
           <div class="code-block" style="margin-top: 0.75rem;">
             <span class="code-label">Task Brief format (LB-001 — Latent Briefing Protocol)</span>
 <pre><span class="hl-key">Task:</span>     <span class="hl-str">Implement IntelSchema Alembic migration 029</span>
@@ -784,7 +785,7 @@
 
     <div class="callout success reveal" style="margin-top: 2rem;">
       <span class="callout-label">The Revision Loop — What makes this not copy-paste</span>
-      <p>When Oscar spawns Bob and Bob returns code that doesn't meet the acceptance criteria, Oscar doesn't ask the human to "try rephrasing the prompt." Oscar revises the Task Brief with specific, targeted corrections — explaining exactly what was wrong and what the next attempt needs to produce differently — and re-spawns automatically. This is automated error correction. It is the key difference between a tool that assists and a system that executes.</p>
+      <p>When Bob returns code that doesn't meet the acceptance criteria, the answer is never "try rephrasing the prompt." The protocol prescribes a structured revision: cite the failed ISC row, list the specific correction needed, regenerate the Task Brief with that delta, and re-run on a fresh session. This is structured error correction — a rule-based revision loop with an ISC-anchored bar, not vibes. The framework is what makes the loop converge.</p>
     </div>
   </div>
 </section>
@@ -806,7 +807,7 @@
       <div class="agent-card">
         <div class="agent-name">Oscar</div>
         <div class="agent-role">Orchestrator</div>
-        <div class="agent-desc">Autonomous ticket executor. Decomposes, delegates, consolidates, quality-gates. The "paste ticket → review output" agent.</div>
+        <div class="agent-desc">Structured execution protocol for multi-phase tickets. Defines decomposition, Task Brief format, STOP gates, handoff signatures, and the revision loop. Run by the operator today; targeted for autonomous fan-out in Phase 2.</div>
       </div>
       <div class="agent-card">
         <div class="agent-name">Stewart</div>
@@ -1092,7 +1093,7 @@
           <tr>
             <td>Task Orchestration</td>
             <td class="dim">Human reads ticket, constructs prompt, pastes into AI tool, copies output back. Human is the message bus.</td>
-            <td class="bright">Oscar decomposes tickets, spawns specialist agents in dependency order, evaluates results against AC, revises and re-runs on failure. Human reviews final output.</td>
+            <td class="bright">Stewart auto-generates agent-scoped prompts with binary AC. The operator dispatches across parallel sessions; structured handoff signatures let specialists pick up mid-ticket without restart. Eval runs at submission against the ISC table.</td>
           </tr>
           <tr>
             <td>State Management</td>
@@ -1121,8 +1122,8 @@
           </tr>
           <tr>
             <td>Error Correction</td>
-            <td class="dim">Sub-agent returns bad output → human re-prompts manually.</td>
-            <td class="bright">Oscar evaluates sub-agent output against AC. On failure: revises Task Brief with specific corrections and re-spawns automatically. Max 2 revision loops before human escalation.</td>
+            <td class="dim">Sub-agent returns bad output → human re-prompts manually with ad-hoc context.</td>
+            <td class="bright">The protocol defines a structured revision loop on AC failure: cite the failed ISC row, regenerate the Task Brief with the targeted correction, re-run on a fresh session. Max 2 loops before escalation.</td>
           </tr>
           <tr>
             <td>Test-Driven Development</td>
@@ -1136,8 +1137,8 @@
           </tr>
           <tr>
             <td>Skill Routing</td>
-            <td class="dim">Human decides which AI tool to use for each task. Manual selection every time.</td>
-            <td class="bright">12+ specialist agents auto-triggered by context keywords. Oscar routes sub-tasks to the right specialist automatically. Human never picks which agent.</td>
+            <td class="dim">Human decides which AI tool to use for each task. Manual prompt-engineering every time.</td>
+            <td class="bright">13 specialist agents with keyword-triggered SKILL.md activation. Stewart assigns the right specialist when promoting a ticket to ready; structured handoff signatures name the next agent at each phase boundary. The operator dispatches; no manual prompt engineering.</td>
           </tr>
         </tbody>
       </table>
