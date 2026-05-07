@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Andrew Crenshaw — Enterprise AI Architecture & Engineering</title>
-  <meta name="description" content="Enterprise technology leader building multi-agent systems with agentic memory and human-in-the-loop governance.">
+  <meta name="description" content="Enterprise technology leader building multi-agent systems on a substrate / lens / frame memory architecture with human-in-the-loop governance.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -713,21 +713,23 @@
       <div class="card reveal reveal-delay-1">
         <span class="card-icon"><i class="ph ph-brain"></i></span>
         <h3>Living Memory &amp; Knowledge System</h3>
-        <p>Designed a memory architecture where organizational knowledge manages itself: agents file knowledge chunks as they learn, auto-promoted lessons compile into a living wiki, and stale claims decay. Not passive retrieval — active knowledge metabolism that compounds across every session. Inspired by Karpathy's "Software 2.0" and Cherny's context engineering.</p>
+        <p>A memory architecture where AI agents, humans, and subsystems share one substrate. Three orthogonal axes: <em>storage</em> (Living Memory, Alexandria, Episodic Continuity), <em>interpretation</em> (substrate &mdash; universal state; lens &mdash; persistent role-shaped filter; frame &mdash; transient task-binding), and <em>action</em> (typed state-changes, outcome &rarr; procedure feedback, intentional non-action). The render equation: <em>view = render(substrate, lens, frame)</em>. Sentra named substrate and lens; we add frame as the missing transient layer. The same pattern shipped years earlier at Macmillan as UXF / ASO26 / EDR &mdash; this is its solo-scale continuation.</p>
         <div class="tech-tags">
-          <span class="tech-tag">knowledge graphs</span>
-          <span class="tech-tag">digestive pipeline</span>
-          <span class="tech-tag">living wiki</span>
-          <span class="tech-tag">agent reflections</span>
-          <span class="tech-tag">auto-promotion gates</span>
+          <span class="tech-tag">substrate / lens / frame</span>
+          <span class="tech-tag">typed state-changes</span>
+          <span class="tech-tag">bi-temporal validity</span>
+          <span class="tech-tag">decision traces</span>
+          <span class="tech-tag">RBAC lens contracts</span>
+          <span class="tech-tag">intentional non-action</span>
           <span class="tech-tag">decay + consolidation</span>
+          <span class="tech-tag">approval-gated mutation</span>
         </div>
       </div>
 
       <div class="card reveal reveal-delay-2">
         <span class="card-icon"><i class="ph ph-lightning"></i></span>
         <h3>autogenous-synthesis Forge</h3>
-        <p>The development OS behind every project here. Forge is a harness engineering framework — it doesn't add AI to an existing process, it replaces the process entirely. Twelve specialized agents (architect, builder, analyst, reviewer, tester, debugger, and more) operate under structured SOPs, a governed backlog, TDD enforcement, and persistent session memory. The loop: a planning agent decomposes work into tickets via the PDT API; Stewart grooms intake to ready with verified AC and an agent assignment; the dashboard auto-generates an agent-scoped prompt at the ready→in-progress transition; one click on Launch copies it to the clipboard, the agent runs in a fresh session, and submission triggers an automated multi-stage review gate (lint, 700+ test suites, Eval, code review, pre-commit) that auto-closes the ticket on pass or stages a "fix it" prompt via a Relaunch button on fail. When something fails, the fix is never "try harder" — it's "what capability is missing, and how do we make it legible to the agent?"</p>
+        <p>The development OS behind every project here. Forge is a harness engineering framework — it doesn't add AI to an existing process, it replaces the process entirely. Twelve specialized agents (architect, builder, analyst, reviewer, tester, debugger, and more) operate under structured SOPs, a governed backlog, TDD enforcement, and persistent session memory. The loop: a planning agent decomposes work into tickets via the Forge backlog API; Stewart grooms intake to ready with verified AC and an agent assignment; the dashboard auto-generates an agent-scoped prompt at the ready→in-progress transition; one click on Launch copies it to the clipboard, the agent runs in a fresh session, and submission triggers an automated multi-stage review gate (lint, 700+ test suites, Eval, code review, pre-commit) that auto-closes the ticket on pass or stages a "fix it" prompt via a Relaunch button on fail. When something fails, the fix is never "try harder" — it's "what capability is missing, and how do we make it legible to the agent?"</p>
         <div class="tech-tags">
           <span class="tech-tag">harness engineering</span>
           <span class="tech-tag">TypeScript / Node.js</span>
@@ -798,7 +800,7 @@
       <div class="card reveal reveal-delay-1">
         <span class="card-icon"><i class="ph ph-crosshair"></i></span>
         <h3>Strata: AI Job Search OS</h3>
-        <p>An autonomous AI operating system where eight specialized agents collaborate through governed PostgreSQL to discover, evaluate, match, and help apply to jobs. Three-layer dedup eliminates 95% of noise before LLM scoring. Two public PyPI libraries (strata-match, strata-harvest). Budget: $10–36/month for full operation.</p>
+        <p>An autonomous AI operating system where eight specialized agents collaborate through governed PostgreSQL to discover, evaluate, match, and help apply to jobs. Three-layer dedup eliminates 95% of noise before LLM scoring. Local inference handles the majority of scoring via a four-machine Apple Silicon fleet — Qwen3.6-35B MoE for fast evaluation, Qwen3.6-27B Dense for synthesis — with cloud API as fallback only. Two public PyPI libraries (strata-match, strata-harvest). Variable API cost: $2–5/month.</p>
         <div class="tech-tags">
           <span class="tech-tag">FastAPI / PostgreSQL</span>
           <span class="tech-tag">pgvector</span>
@@ -813,14 +815,14 @@
       <div class="card reveal reveal-delay-2">
         <span class="card-icon"><i class="ph ph-cpu"></i></span>
         <h3>Local AI Infrastructure</h3>
-        <p>A Mac Mini cluster running schedule-driven local inference across three machines. Gemma 4 31B (near-lossless q8 quantization) handles deep scoring overnight; Qwen3 30B MoE (60–70 tok/s) runs during dev hours — automatic launchd transitions between them. LiteLLM routes Strata's pipeline stages to the right model: fast and balanced stages to Qwen3, deep-score stages to Gemma 4. nomic-embed-text provides always-on 768-dim embeddings. GLM-OCR handles resume parsing. Shadow-mode calibration benchmarks local quality against cloud models continuously. Zero variable inference cost for production workloads.</p>
+        <p>A four-machine Apple Silicon cluster running oMLX 0.3.8 across all nodes. mac-studio1 (M3 Ultra, 96GB) is the primary inference host: Qwen3.6-35B MoE (8bit, DFlash) for interactive and scoring workloads at 245–326 tok/s; Qwen3.6-27B Dense (8bit, thinking ON) for synthesis and coaching at 91.9% TruthfulQA. mac-mini3 (M4 Pro, 64GB, 4TB) is the dedicated Alexandria worker — nightly librarian schedule (synthesis-detector, wiki-lint, link-builder, dedup) without competing with studio1's live traffic. mac-mini1 + mac-mini2 (M4, 16GB each) are the always-on edge tier: Qwen3.6-2B-MLX-4bit + snowflake-arctic-embed for sub-3s extract-fast and embed-fast regardless of studio1 load. Application code calls named slots (score-fast, score-deep, synth-deep, extract-fast, embed-fast); the role-resolver maps each to the right host, model, and oMLX profile. Alexandria session priming, daily digests, and agent knowledge retrieval all run on-device. Shadow-mode calibration benchmarks local quality against cloud continuously.</p>
         <div class="tech-tags">
-          <span class="tech-tag">Ollama / LiteLLM</span>
-          <span class="tech-tag">Gemma 4 31B (q8)</span>
-          <span class="tech-tag">Qwen3 30B MoE</span>
-          <span class="tech-tag">nomic-embed-text</span>
-          <span class="tech-tag">GLM-OCR</span>
-          <span class="tech-tag">launchd scheduling</span>
+          <span class="tech-tag">oMLX 0.3.8</span>
+          <span class="tech-tag">Qwen3.6-35B MoE (8bit)</span>
+          <span class="tech-tag">Qwen3.6-27B Dense (thinking)</span>
+          <span class="tech-tag">snowflake-arctic-embed</span>
+          <span class="tech-tag">role-slot resolver</span>
+          <span class="tech-tag">launchd daemons</span>
           <span class="tech-tag">Tailscale VPN</span>
           <span class="tech-tag">shadow-mode eval</span>
         </div>
@@ -886,11 +888,11 @@
     <div class="two-col" style="margin-top: 2rem;">
       <div class="reveal">
         <h3>Inspirations &amp; Synthesis</h3>
-        <p>This architecture didn't emerge in isolation. It synthesizes ideas from <em>Andrej Karpathy</em> (Software 2.0, LLM OS), <em>Boris Cherny</em> (context engineering as the core discipline), <em>Program-Aided Language Models (PAL)</em> (structured reasoning through code), and <em>Demis Hassabis</em> (systems that learn from experience, not just data). The key insight: most agentic systems bolt memory onto agents as an afterthought. We built memory as the foundation and agents as the consumers.</p>
+        <p>This architecture didn't emerge in isolation. It synthesizes ideas from <em>Ashwin Gopinath / Sentra</em> (Company Brain &mdash; substrate &amp; lens vocabulary), <em>Andrej Karpathy</em> (Software 2.0, LLM OS &mdash; memory is the file system), <em>Boris Cherny</em> (context engineering as the core discipline), and <em>Program-Aided Language Models (PAL)</em> (structured reasoning through code). The deeper lineage runs through <em>UXF / ASO26 / EDR</em> at Macmillan Learning, where the substrate-vs-lens pattern shipped in production years before Sentra named it. The key insight: most agentic systems bolt memory onto agents as an afterthought. We built the substrate as the foundation, declared lenses as the role-shaped filter, and added frames as the transient layer Sentra and others don't ship.</p>
       </div>
       <div class="reveal reveal-delay-1">
         <h3>Where We're Different</h3>
-        <p>Memory platforms like <em>Mem0</em>, <em>Zep</em>, and <em>LangMem</em> solve recall. Orchestration frameworks like <em>CrewAI</em> and <em>LangGraph</em> solve coordination. Neither solves compounding — the ability for a fleet of agents to get measurably better over time. Our system does: knowledge chunks auto-promote through confidence gates into a living wiki. Stale claims decay. Agents start sessions by reading what the fleet has learned, not by re-researching. The learning layer is the differentiator.</p>
+        <p>Memory platforms like <em>Mem0</em>, <em>Zep</em>, and <em>LangMem</em> solve recall. Orchestration frameworks like <em>CrewAI</em> and <em>LangGraph</em> solve coordination. Per-tool memory in <em>Notion</em>, <em>Linear</em>, and <em>Cursor</em> remembers each tool's own stuff. <em>Glean</em> searches across them but doesn't preserve state-change. None of them ship the layer that matters: one substrate that remembers across systems, with role-shaped lenses on top and transient task frames inside. The substrate generalizes; lenses don't. Memory fragmentation in everyone else's stack is the moat &mdash; the substrate that remembers state-changes across systems and renders them through a Sales lens, On-call lens, or Exec lens is the durable position.</p>
       </div>
     </div>
   </div>
@@ -911,7 +913,7 @@
         <div class="timeline-date">2025 &ndash; 2026</div>
         <div class="timeline-title">Agentic AI &amp; Multi-Agent Systems</div>
         <div class="timeline-company">Head of GTM Engineering</div>
-        <div class="timeline-desc">Designed and built a multi-agent orchestration framework with living memory, human-in-the-loop governance, and enterprise workflow automation (3x Salesforce dev acceleration). Built Strata — an autonomous AI job search OS with 8 governed agents, 3-layer dedup, and local Gemma/OCR inference across a Mac Mini cluster. Shipped an AI media campaign platform for HR. Published two open-source PyPI libraries.</div>
+        <div class="timeline-desc">Designed and built a multi-agent orchestration framework on a substrate / lens / frame memory architecture: one shared substrate (entities, facts, typed state-changes, decision traces, interactions, bi-temporal validity), role-shaped lenses with RBAC, and transient task frames. Human-in-the-loop governance and enterprise workflow automation (3x Salesforce dev acceleration). Built Strata — an autonomous AI job search OS with 8 governed agents, 3-layer dedup, and local LLM inference (Qwen3.6-35B MoE + Qwen3.6-27B Dense via oMLX) across a four-machine Apple Silicon cluster. Shipped an AI media campaign platform for HR. Published two open-source PyPI libraries.</div>
       </div>
 
       <div class="timeline-item">
@@ -952,7 +954,7 @@
       <a href="presentations/knowledge-framework-pitch.html" class="pres-card reveal reveal-delay-1">
         <span class="pres-type type-strategy">Strategy</span>
         <h4>Enterprise Knowledge Framework</h4>
-        <p class="pres-desc">Strategic pitch for an enterprise-wide knowledge architecture that connects organizational silos through a shared knowledge graph with curated claims.</p>
+        <p class="pres-desc">Strategic pitch for institutional memory as a moat: one substrate, many role-shaped lenses, transient task frames. UXF / ASO26 / EDR lineage as production prior-art; memory fragmentation across per-tool memory as the durable position.</p>
       </a>
 
       <a href="presentations/salesforce-ai-augmented-development.html" class="pres-card reveal reveal-delay-2">
@@ -964,7 +966,7 @@
       <a href="presentations/agentic-memory-architecture.html" class="pres-card reveal reveal-delay-3">
         <span class="pres-type type-arch">Architecture</span>
         <h4>Agentic Memory: Technical Overview</h4>
-        <p class="pres-desc">Deep technical walk-through of the three-layer memory architecture, the digestive pipeline, and how knowledge compounds across agent sessions.</p>
+        <p class="pres-desc">Deep technical walk-through of the three-axis memory architecture (storage &times; interpretation &times; action), the substrate / lens / frame primitives, the render equation <em>view = render(substrate, lens, frame)</em>, and the lens roster of consumers across agents and humans.</p>
       </a>
 
       <a href="presentations/customer-contextualization-framework.html" class="pres-card reveal reveal-delay-1">
@@ -976,7 +978,7 @@
       <a href="presentations/memory-landscape-2026.html" class="pres-card reveal reveal-delay-2">
         <span class="pres-type type-research">Research</span>
         <h4>Memory, Context & Graphs: The 2026 Landscape</h4>
-        <p class="pres-desc">Comparative analysis of the agentic memory landscape: academic papers, open-source projects, and commercial products evaluated against the architecture. 20+ sources with claim traceability and gap analysis.</p>
+        <p class="pres-desc">Comparative analysis of the 2026 memory landscape: substrate-vs-lens vocabulary from Sentra, three-axis classification, the moat thesis (memory fragmentation in per-tool memory). 35+ sources with claim traceability and gap analysis.</p>
       </a>
 
       <a href="presentations/autogenous-synthesis-forge.html" class="pres-card reveal reveal-delay-3">
@@ -1021,11 +1023,11 @@
       </a>
       <a href="writing/building-an-ai-job-search-os.html" class="writing-item reveal reveal-delay-1">
         <h4>Building an AI Job Search OS from Scratch</h4>
-        <p class="writing-desc">Why I built Strata: eight governed agents, three-layer dedup, local Gemma inference, and the architecture decisions that make it run for $10/month.</p>
+        <p class="writing-desc">Why I built Strata: eight governed agents, three-layer dedup, local LLM inference across a four-machine Apple Silicon fleet, and the architecture decisions that make it run for under $5/month in API costs.</p>
       </a>
       <a href="writing/local-inference-at-the-edge.html" class="writing-item reveal reveal-delay-2">
-        <h4>Local Inference at the Edge: Gemma on Mac Minis</h4>
-        <p class="writing-desc">Deploying quantized models across a LAN cluster with Tailscale mesh, shadow-mode calibration, and the economics of cloud vs. local.</p>
+        <h4>Local Inference at the Edge: A Four-Machine Fleet</h4>
+        <p class="writing-desc">Building a four-machine Apple Silicon inference cluster with oMLX — slot-based routing, tiered hardware, and why control and privacy matter more than API cost savings.</p>
       </a>
     </div>
   </div>

@@ -717,6 +717,42 @@
   </section>
 
   <!-- ============================
+       SLIDE 4.5: Lineage
+       ============================ -->
+  <section class="slide" data-slide="3.5">
+    <div class="slide-content">
+      <h3 class="reveal">Lineage</h3>
+      <h2 class="reveal reveal-delay-1">This pattern has shipped before.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <div class="two-col reveal reveal-delay-3">
+        <div>
+          <p style="margin-bottom: 1.5rem;">
+            Substrate-vs-lens isn't a new bet. The same architectural shape has run in production at Macmillan Learning under three different names. Alexandria is its solo-scale continuation.
+          </p>
+          <p>
+            <em>UXF</em> (Customer Experience Contextualization Framework): one customer-experience substrate, multiple role-shaped lenses. <em>ASO26 / IA-EA</em>: per-course persistent record (course + institution + time) was the substrate; SFDC decision-trace objects with <em>as-is</em> vs <em>as-was</em> fields were state-change as first-class; sales / support / leadership dashboards were the lenses. <em>EDR &gt; Decision Support</em>: role-conditioned surfaces (CEO vs sales vs support) over the same memory. The pattern compiled, shipped, and ran.
+          </p>
+        </div>
+        <div>
+          <table class="compare-table">
+            <thead><tr><th>Macmillan artifact</th><th>Substrate / Lens role</th></tr></thead>
+            <tbody>
+              <tr><td class="highlight">UXF customer-experience contextualization</td><td>Customer-facing lens over substrate</td></tr>
+              <tr><td class="highlight">ASO26 per-course persistent record</td><td>Bounded entity timeline (substrate)</td></tr>
+              <tr><td class="highlight">ASO26 decision-trace SFDC objects (as-is vs as-was)</td><td>State-change primitive in microcosm</td></tr>
+              <tr><td class="highlight">ASO26 Profile vs Context (two-tier identity)</td><td>Lens (Profile) vs Frame (Context)</td></tr>
+              <tr><td class="highlight">EDR &gt; Decision Support role-conditioned surfaces</td><td>Role-conditioned lenses over same memory</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="reveal reveal-delay-4" style="margin-top: 2rem;">
+        Decision-trace and as-is/as-was state-change machinery shipped at Macmillan years before Sentra named the substrate-vs-lens pattern. Alexandria carries that lineage forward at solo scale, with the architectural shape that admits enterprise lens packs as additive &mdash; not as a rewrite.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================
        SLIDE 5: What Alexandria Is
        ============================ -->
   <section class="slide" data-slide="4">
@@ -730,18 +766,18 @@
       <div class="card-grid reveal reveal-delay-3">
         <div class="card">
           <span class="card-icon">&#9670;</span>
-          <h4>Knowledge Graph</h4>
-          <p>Entities, claims, and typed connections,  not folders and files. Decisions link to assumptions. Assumptions link to evidence. Strategy links to execution.</p>
+          <h4>Substrate</h4>
+          <p>The universal state of the organization &mdash; entities, facts, state-changes, decision traces, interactions, bi-temporal validity. Provenance, permissions, history. One substrate per organization; everyone shares it.</p>
         </div>
         <div class="card">
           <span class="card-icon">&#9670;</span>
-          <h4>Metabolic Layer</h4>
-          <p>Knowledge that maintains itself. Agents extract, connect, challenge, condense, and forget,  so the graph improves without human curation burden.</p>
+          <h4>Lens</h4>
+          <p>The role-shaped filter. Sales sees opportunity health. Engineering sees code precedent. The CEO sees strategy drift. Same substrate, different surface, governed by RBAC and preferences. Lenses are how the substrate becomes useful per consumer.</p>
         </div>
         <div class="card">
           <span class="card-icon">&#9670;</span>
-          <h4>Progressive Disclosure</h4>
-          <p>Not a data dump. The right knowledge reaches the right person at the right moment,  from retrieval filters to full claims to traversable links.</p>
+          <h4>Frame</h4>
+          <p>The transient task binding. What is this person, agent, or team currently working on, what's the plan, what's been tried, what's next? Frames hold the work in front of you; lenses hold who you are.</p>
         </div>
       </div>
     </div>
@@ -832,43 +868,25 @@
   <section class="slide" data-slide="7">
     <div class="slide-content">
       <h3 class="reveal">For Any Role</h3>
-      <h2 class="reveal reveal-delay-1">Compounding scales across<br>every function.</h2>
+      <h2 class="reveal reveal-delay-1">One substrate. Many lenses.<br>Any role.</h2>
       <div class="rule reveal reveal-delay-2"></div>
-      <p class="reveal reveal-delay-2" style="margin-bottom: 1.5rem;">What veterans learn over time, Alexandria makes available to the whole org,  and to every agent.</p>
+      <p class="reveal reveal-delay-2" style="margin-bottom: 1.5rem;">Each lens is a contract &mdash; entity types loaded by default, relationships in scope, state-changes watched, RBAC capabilities, expiration policy. The substrate generalizes; lenses don't. Sales, Success, On-call, Exec, and Customer-facing lenses are <em>future lens packs</em> on the same substrate. Lens packs are the productizable surface; substrate is the platform.</p>
       <table class="compare-table reveal reveal-delay-3">
         <thead>
           <tr>
-            <th>Role</th>
-            <th>What the veteran knows (today, in one head)</th>
-            <th>What Alexandria provides (shared, queryable)</th>
+            <th>Lens</th>
+            <th>Default scope</th>
+            <th>Watched state-changes</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="highlight">VP of Sales</td>
-            <td>Which objections signal real risk vs. negotiation theater</td>
-            <td>Cross-deal pattern recognition, assumption tracking per account, stated-vs-revealed preference analysis</td>
-          </tr>
-          <tr>
-            <td class="highlight">Product Owner</td>
-            <td>Which features were tried before and why they failed</td>
-            <td>Decision traces with outcomes, assumption registers with kill criteria, strategy-execution drift detection</td>
-          </tr>
-          <tr>
-            <td class="highlight">Architect</td>
-            <td>Which patterns work under what constraints</td>
-            <td>Precedent retrieval filtered by decision quality, cross-system connection mapping, technology assumption validation</td>
-          </tr>
-          <tr>
-            <td class="highlight">Developer</td>
-            <td>Where the bodies are buried in the codebase</td>
-            <td>Accumulated lessons, guardrails from past failures, existing patterns to extend before creating new ones</td>
-          </tr>
-          <tr>
-            <td class="highlight">Executive</td>
-            <td>Which strategic bets are working and which are drift</td>
-            <td>Cross-entity reconciliation: calendar vs. stated priorities, assumptions validated or invalidated, narrative consistency</td>
-          </tr>
+          <tr><td class="highlight">Architect</td><td>ADRs, planning docs, system design, integration points</td><td>Architectural drift, ADR contradictions, cross-system coupling</td></tr>
+          <tr><td class="highlight">Developer</td><td>Code, tests, gates, eval results, golden principles</td><td>Test failures, regression signals, gate breaks</td></tr>
+          <tr><td class="highlight">Analyst</td><td>Requirements, decision matrices, stakeholder context</td><td>Stated-vs-revealed preference drift, assumption invalidation</td></tr>
+          <tr><td class="highlight">Steward</td><td>Backlog, sprint state, dependencies, claim leases</td><td>Stale claims, ghost tickets, blocked dependencies</td></tr>
+          <tr><td class="highlight">Writer</td><td>Docs, Confluence, public-facing surfaces</td><td>Stale docs, undocumented features, drift from code</td></tr>
+          <tr><td class="highlight">Principal</td><td>Workspace-wide; can wear any lens</td><td>Strategy-execution drift, longitudinal patterns, cross-entity reconciliation</td></tr>
+          <tr><td class="highlight">Subsystem</td><td>Trigger-shaped, event-conditioned</td><td>Threshold crossings; emit act/wait/escalate/no-op decisions</td></tr>
         </tbody>
       </table>
     </div>
@@ -880,7 +898,7 @@
   <section class="slide" data-slide="8">
     <div class="slide-content">
       <h3 class="reveal">What's Different</h3>
-      <h2 class="reveal reveal-delay-1">Not storage. Metabolism.</h2>
+      <h2 class="reveal reveal-delay-1">One substrate.<br>Not per-tool memory.</h2>
       <div class="rule reveal reveal-delay-2"></div>
       <div class="two-col reveal reveal-delay-3">
         <div>
@@ -888,35 +906,22 @@
             <thead>
               <tr>
                 <th></th>
-                <th>Traditional</th>
-                <th>Alexandria</th>
+                <th>Per-tool memory<br/>(Notion / Linear / Cursor)</th>
+                <th>Substrate (Alexandria)</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td class="highlight">Wiki</td>
-                <td>Write once, decay forever</td>
-                <td>Self-maintaining, contradiction-detecting</td>
-              </tr>
-              <tr>
-                <td class="highlight">Search</td>
-                <td>You query; results returned</td>
-                <td>Knowledge encountered during reading,  links do cognitive work inline</td>
-              </tr>
-              <tr>
-                <td class="highlight">Chatbot</td>
-                <td>Stateless Q&A, no compounding</td>
-                <td>Sessions compound: every interaction strengthens the graph</td>
-              </tr>
-              <tr>
-                <td class="highlight">RAG</td>
-                <td>Chunks retrieved by embedding similarity</td>
-                <td>Claims installed as capabilities,  propositional, connected, quality-gated</td>
-              </tr>
+              <tr><td class="highlight">State of the world</td><td>Fragmented per tool</td><td>Unified &mdash; one substrate</td></tr>
+              <tr><td class="highlight">State change</td><td>Audit log per tool</td><td>Typed state-change with before/after, consumer, frame, evidence</td></tr>
+              <tr><td class="highlight">Time</td><td>created_at only</td><td>Bi-temporal (valid_at + invalid_at)</td></tr>
+              <tr><td class="highlight">Personalization</td><td>Tool is the lens</td><td>Persistent lens contract with RBAC capabilities</td></tr>
+              <tr><td class="highlight">Task context</td><td>Open tabs and chat history</td><td>Frame: intent + next-steps + footprint + suppression</td></tr>
+              <tr><td class="highlight">Cross-tool reasoning</td><td>Glean searches; nothing preserves change</td><td>Substrate is queryable across every system that writes to it</td></tr>
             </tbody>
           </table>
         </div>
         <div>
+          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">The decomposition inside substrate</h4>
           <div class="layer-stack">
             <div class="layer">
               <div class="layer-name">Personalization</div>
@@ -925,20 +930,40 @@
             </div>
             <div class="layer">
               <div class="layer-name">Learning</div>
-              <div class="layer-desc">Extract → Connect → Challenge → Condense → Forget</div>
+              <div class="layer-desc">Extract &rarr; Connect &rarr; Challenge &rarr; Condense &rarr; Forget</div>
               <div class="layer-tag">Process</div>
             </div>
             <div class="layer">
               <div class="layer-name">Memory</div>
-              <div class="layer-desc">Knowledge graph, lessons, decision traces, entities</div>
+              <div class="layer-desc">Entities, facts, state-changes, decision traces, interactions, bi-temporal validity</div>
               <div class="layer-tag">Store</div>
             </div>
           </div>
           <p style="font-size: 0.85rem; margin-top: 1rem;">
-            The M/L/P architecture: Memory stores, Learning processes, Personalization serves. Most systems have Memory. Few have Learning. Almost none have all three.
+            Memory / Learning / Personalization is the decomposition inside the substrate side of the architecture. Memory stores, Learning processes, Personalization serves. The lens layer sits above; the frame layer sits above the lens. <em>view = render(substrate, lens, frame)</em>.
           </p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       SLIDE 8.5: The Moat
+       ============================ -->
+  <section class="slide" data-slide="8.5">
+    <div class="slide-content narrow">
+      <h3 class="reveal">The Moat</h3>
+      <h2 class="reveal reveal-delay-1">Memory fragmentation is the durable position.</h2>
+      <div class="rule reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2" style="margin-bottom: 2rem;">
+        Notion remembers Notion-stuff. Linear remembers Linear-stuff. Cursor remembers Cursor-stuff. Glean searches across them but doesn't preserve state-change. Sentra is building substrate + lens for enterprise. <em>Per-tool memory is the failure mode the industry is collectively producing.</em>
+      </p>
+      <div class="big-quote reveal reveal-delay-3">
+        The substrate that remembers state-changes across systems &mdash; and lets a Sales lens or On-call lens read those changes through a role-shaped filter &mdash; is the durable position.
+      </div>
+      <p class="reveal reveal-delay-4" style="margin-top: 2rem;">
+        The credibility artifact is years of solo dogfood under load &mdash; not enterprise vapor. ASO26 proved the pattern shipped. Alexandria is proving it compounds longitudinally. <em>Lens-pack productization, if it ever happens, follows from those two proofs.</em>
+      </p>
     </div>
   </section>
 
@@ -991,35 +1016,35 @@
   <section class="slide" data-slide="10">
     <div class="slide-content wide">
       <h3 class="reveal">Architecture</h3>
-      <h2 class="reveal reveal-delay-1">Infrastructure for compounding intelligence.</h2>
+      <h2 class="reveal reveal-delay-1">Substrate. Lens. Frame.</h2>
       <div class="rule reveal reveal-delay-2"></div>
       <div class="two-col reveal reveal-delay-3">
         <div>
-          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">The Knowledge Graph</h4>
-          <p style="margin-bottom: 1.5rem;">Entities (people, products, strategies, assumptions, decisions) connected by typed, weighted relationships. Claims are propositional,  specific enough to be wrong, useful enough to install as capabilities.</p>
-          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">The Metabolic Layer</h4>
-          <p style="margin-bottom: 1.5rem;">Five operations that maintain the graph: <em>Reduce</em> (extract), <em>Reflect</em> (connect), <em>Reweave</em> (restructure), <em>Verify</em> (challenge), <em>Archive</em> (forget). This is what makes it agentic memory, not just storage.</p>
-          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">The Rendering Layer</h4>
-          <p>Knowledge presented as markdown with [[wiki-links]] so agents encounter reasoning, not query results. "Since [[assumption X]], therefore Y" carries the argument inline.</p>
+          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Substrate</h4>
+          <p style="margin-bottom: 1.5rem;">Universal storage of state &mdash; entities, facts, typed state-changes, decision traces, interactions, bi-temporal validity. Semantic-filesystem-shaped, not graph-DB-shaped. One substrate per organization; everyone shares it.</p>
+          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Lens</h4>
+          <p style="margin-bottom: 1.5rem;">Persistent, consumer-keyed, DB-resident filter. Declares entity types loaded, relationships in scope, watched state-changes, RBAC capabilities, expiration policy. Lens mutations flow through the same approval-gated pipeline as substrate mutations.</p>
+          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Frame</h4>
+          <p>Transient, task-keyed, DB-resident binding. Holds canonical intent (one of ten), next-steps with assigned consumers, footprint of decisions made, surfaced substrate references, suppression state. Scratchpads carry frame_id at creation.</p>
         </div>
         <div>
           <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Design Principles</h4>
           <div style="display: flex; flex-direction: column; gap: 1.2rem;">
             <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
-              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Claims are installed capabilities</div>
-              <div style="font-size: 0.85rem; color: var(--text-dim);">Loading a claim doesn't retrieve a record,  it gives the agent reasoning it didn't have before.</div>
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Substrate generalizes; lenses don't</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">One substrate, many lenses. Adding a lens never forks the substrate. This is the architectural posture for enterprise re-entry as lens-pack vendor.</div>
             </div>
             <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
-              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Forgetting is architecture</div>
-              <div style="font-size: 0.85rem; color: var(--text-dim);">Stale claims are worse than missing claims. Decay, condensation, and archival are first-class operations.</div>
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">State-change is first-class</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">Every substrate write emits a typed state-change with before/after, consumer, frame, evidence. Bi-temporal validity answers &ldquo;what did the system believe on date X.&rdquo;</div>
             </div>
             <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
-              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Methodology over tooling</div>
-              <div style="font-size: 0.85rem; color: var(--text-dim);">Teams don't change their tools. They publish claims in a standard format. The framework is the coordination surface.</div>
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Lens is declared, not emergent</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">DB-resident lens contracts with RBAC, defaults, watched state-changes. Skill metadata references the lens; the dispatcher trusts the DB.</div>
             </div>
             <div style="padding: 1rem 1.2rem; background: var(--bg-card); border-radius: 8px; border-left: 2px solid var(--accent);">
-              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Encountered, not just sought</div>
-              <div style="font-size: 0.85rem; color: var(--text-dim);">High-value knowledge is encountered during reading via [[wiki-links]]. Query results are metadata; inline links are reasoning.</div>
+              <div style="font-weight: 500; color: var(--text); margin-bottom: 0.2rem;">Non-action is a decision</div>
+              <div style="font-size: 0.85rem; color: var(--text-dim);">Triggers emit explicit act/wait/escalate/no-op with rationale. Silent drift becomes structurally distinguishable from intentional restraint.</div>
             </div>
           </div>
         </div>

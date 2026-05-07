@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Local Inference at the Edge: Gemma on Mac Minis — Andrew Crenshaw</title>
-  <meta name="description" content="Deploying quantized models across a LAN cluster with Tailscale mesh, shadow-mode calibration, and the economics of cloud vs. local.">
+  <title>Local Inference at the Edge: A Four-Machine Fleet — Andrew Crenshaw</title>
+  <meta name="description" content="Building a home inference cluster across four Apple Silicon machines — schedule-driven model switching, oMLX routing, and the economics of zero variable inference cost.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -109,58 +109,104 @@
 
 <article class="article-wrapper">
   <div class="article-label fade-in">Lessons from Building</div>
-  <h1 class="article-title fade-in fade-in-d1">Local Inference at the Edge: Gemma on Mac Minis</h1>
-  <p class="article-subtitle fade-in fade-in-d2">Deploying quantized models across a LAN cluster with Tailscale mesh, shadow-mode calibration, and the economics of cloud vs. local.</p>
+  <h1 class="article-title fade-in fade-in-d1">Local Inference at the Edge: A Four-Machine Fleet</h1>
+  <p class="article-subtitle fade-in fade-in-d2">From two Mac Minis to a four-machine Apple Silicon cluster — schedule-driven model switching, oMLX routing, and what it looks like to wire local inference into every layer of the stack.</p>
   <div class="rule fade-in fade-in-d2"></div>
 
   <div class="article-body fade-in fade-in-d3">
-    <p>Every conversation about AI costs eventually reduces to the same question: <em>can you run it locally?</em></p>
+    <p>Every conversation about running local AI eventually hits the same question: <em>why bother?</em></p>
 
-    <p>For the kind of work I'm doing with Strata — where the Match Agent needs to deep-score dozens of job listings per day, and the Scraper Agent needs to OCR career pages full of non-standard formatting — the cloud API costs are manageable but not negligible. More importantly, they scale linearly: more listings to evaluate means proportionally more spend. That's a bad cost curve for an autonomous system.</p>
+    <p>The honest answer isn't "API costs." I've spent more on hardware than I'd spend on API costs in years of current-volume operation. That's not the story.</p>
 
-    <p>So I deployed two Mac Minis running local model inference via Apple Silicon. Here's what worked, what didn't, and what I learned about the real tradeoffs.</p>
+    <p>The story is control, privacy, and what you learn by actually running the models. For the kind of work I'm doing with Strata — where the job-scoring pipeline handles salary data, career targets, and interview coaching content — everything staying local isn't optional. Beyond that: when you manage your own inference fleet, you configure temperature, quantization, context windows, and thinking-on/thinking-off per workload. You can't do any of that through an API. And frontier lab pricing is demonstrably subsidized; tightening usage tiers are already the story. Converting that uncertainty to a fixed electricity bill is structurally sound.</p>
+
+    <p>So I built a four-machine cluster — three Mac Minis and a Mac Studio — running local model inference on Apple Silicon via oMLX. Here's what the setup looks like today and what I've learned from running it.</p>
 
     <h3>The infrastructure</h3>
 
     <table class="data-table">
       <thead><tr><th>Machine</th><th>Spec</th><th>Primary Role</th></tr></thead>
       <tbody>
-        <tr><td>mac-mini-1</td><td>M4, 16GB RAM, 512GB SSD</td><td>Strata services + OCR (GLM-OCR-2B via MLX)</td></tr>
-        <tr><td>mac-mini-2</td><td>M4, 16GB RAM, 1TB SSD</td><td>LLM inference (Gemma 4 E4B, 4-bit quantized via MLX)</td></tr>
+        <tr><td>mac-studio1</td><td>M3 Ultra, 96GB RAM, 28 cores</td><td>Primary oMLX host — all production inference (Strata + Alexandria); OWC storage hub (22TB SMB exports)</td></tr>
+        <tr><td>mac-mini3</td><td>M4 Pro, 64GB RAM, 4TB internal</td><td>Secondary oMLX host — Alexandria librarian + overnight synthesis; Strata failover</td></tr>
+        <tr><td>mac-mini1</td><td>M4, 16GB RAM, 228GB internal</td><td>Edge oMLX — <code>extract-fast</code> + <code>embed-fast</code>, always-on</td></tr>
+        <tr><td>mac-mini2</td><td>M4, 16GB RAM, 228GB internal</td><td>Edge oMLX mirror — round-robin load balance + failover for mini1</td></tr>
       </tbody>
     </table>
 
-    <p>Both machines are connected via direct Ethernet on the same LAN. Each machine also runs a Tailscale node, so when I'm at a coffee shop or library, my laptop can reach them through an encrypted WireGuard mesh. No port forwarding, no dynamic DNS, no exposed services.</p>
+    <p>All four machines are connected via Ethernet on the same LAN. Each also runs a Tailscale node, giving my laptop encrypted WireGuard access from anywhere. No port forwarding, no dynamic DNS, no exposed services.</p>
 
-    <p>Services run as <code>launchd</code> daemons — macOS's native service manager. They start on boot, restart on crash, and log to standard system locations. No Docker, no Kubernetes. These are two machines running three services. The infrastructure should be proportional to the complexity.</p>
+    <p>Inference runs as <code>launchd</code> daemons — macOS's native service manager. They start on boot, restart on crash, and log to standard locations. No Docker, no Kubernetes, no orchestration layer. The infrastructure should be proportional to the actual complexity.</p>
 
-    <h3>Model selection: why Gemma, why quantized</h3>
+    <h3>The inference engine: oMLX, not Ollama or vanilla MLX</h3>
 
-    <p>I evaluated several local model options. The constraints were real: with only 16GB of unified memory, the model had to be lean enough to leave headroom for the OS and services, while still achieving acceptable quality on job-description scoring. It had to support efficient inference on Apple Silicon via MLX.</p>
+    <p>The serving runtime matters more than I expected. The fleet runs <strong>oMLX 0.3.8</strong> — a purpose-built Mac inference server that's distinct from both Apple's MLX framework and Ollama. The difference: oMLX adds DFlash (token-budget-aware attention caching for single-request throughput), TurboQuant (dynamic quantization at high context lengths), and continuous-batching profiles for multi-agent fan-out. It exposes an OpenAI-compatible API on port 8000, which means any client that speaks that protocol can route to it.</p>
 
-    <p><strong>Gemma 4 E4B (4-bit quantized)</strong> hit the sweet spot. At 4-bit quantization via <code>mlx-community/gemma-4-E4B-it-4bit</code>, the model runs with a peak memory footprint of just 5.25 GB &mdash; roughly a third of available unified memory, leaving enough for the OS, services, and comfortable operation. Performance is genuinely impressive on M4:</p>
+    <p>The fleet is organized into three tiers by hardware capability:</p>
+
+    <p><strong>Heavy tier — mac-studio1</strong> (M3 Ultra, 96GB, ~820 GB/s memory bandwidth) carries all production online inference. Two Qwen3.6 models resident simultaneously:</p>
 
     <table class="data-table">
-      <thead><tr><th>Metric</th><th>Measured</th></tr></thead>
+      <thead><tr><th>Model</th><th>Size</th><th>Slots</th></tr></thead>
       <tbody>
-        <tr><td>End-to-end latency (over LAN)</td><td><strong>0.93 seconds</strong></td></tr>
-        <tr><td>Prompt throughput</td><td>66.8 tokens/sec</td></tr>
-        <tr><td>Generation throughput</td><td>66.1 tokens/sec</td></tr>
-        <tr><td>Peak memory</td><td>5.25 GB</td></tr>
-        <tr><td>Model</td><td><code>mlx-community/gemma-4-E4B-it-4bit</code></td></tr>
+        <tr><td><code>Qwen3.6-35B-A3B-Abliterated-MLX-8bit</code> (MoE)</td><td>~36 GB</td><td><code>chat-interactive</code>, <code>score-fast</code>, <code>score-deep</code>, <code>extract-fast</code></td></tr>
+        <tr><td><code>Qwen3.6-27B-MLX-8bit</code> (Dense)</td><td>~27 GB</td><td><code>synth-deep</code>, <code>librarian-curate</code></td></tr>
+        <tr><td>DFlash draft weight (~0.93 GB)</td><td>&lt;1 GB</td><td>Required for DFlash-ON profile on the 35B MoE</td></tr>
       </tbody>
     </table>
 
-    <p>Sub-second latency over LAN and 66+ tokens/sec generation speed &mdash; more than adequate for scoring tasks, and fast enough for interactive use if needed. With bigger models (27B+), you'd want more memory. Like many people building on Apple Silicon right now, I'm eagerly watching the M5 Studio announcements &mdash; 192GB of unified memory would open up entirely different model classes. But the point of this exercise is getting creative and being productive with what's already on the desk, not waiting for ideal hardware.</p>
+    <p>With DFlash enabled on the 35B MoE, interactive throughput reaches 245–326 tok/s for single requests. The 27B Dense model runs with thinking enabled for synthesis work — it hits 91.9% TruthfulQA, which matters when generating interview coaching content or Alexandria knowledge bootstraps where accuracy is the constraint, not speed.</p>
 
-    <p>For OCR, <strong>GLM-OCR-2B via MLX</strong> runs on the first Mac Mini. It handles parsing career pages, extracting text from images, and processing PDF resumes. At 2B parameters, it's fast and accurate for structured text extraction.</p>
+    <p><strong>Medium tier — mac-mini3</strong> (M4 Pro, 64GB, 4TB internal) is the dedicated Alexandria worker. One model loaded permanently:</p>
+
+    <table class="data-table">
+      <thead><tr><th>Model</th><th>Size</th><th>Profile</th></tr></thead>
+      <tbody>
+        <tr><td><code>Qwen3.6-27B-MLX-8bit</code> (Dense)</td><td>~27 GB</td><td>Thinking ON, TurboQuant ON at ≥65K context, 65K context window</td></tr>
+      </tbody>
+    </table>
+
+    <p>mini3 runs the nightly Alexandria schedule — synthesis-detector, wiki-lint, link-builder, dedup — on its own hardware so it never competes with studio1's live traffic. With 64GB and a 4TB local drive for model storage, it handles librarian-curate passes that take an hour without impacting anything else on the fleet.</p>
+
+    <p><strong>Edge tier — mac-mini1 + mac-mini2</strong> (M4, 16GB each, mirrored config) serve Living Memory's near-real-time slots. Two models co-loaded per machine (~2.5 GB total):</p>
+
+    <table class="data-table">
+      <thead><tr><th>Model</th><th>Size</th><th>Slot</th></tr></thead>
+      <tbody>
+        <tr><td><code>Qwen3.6-2B-MLX-4bit</code></td><td>~1.6 GB</td><td><code>extract-fast</code> — dup-check, chunk summarize, quick classification</td></tr>
+        <tr><td><code>snowflake-arctic-embed-l-v2.0-8bit</code></td><td>~600 MB</td><td><code>embed-fast</code> — 1024-dim embeddings</td></tr>
+      </tbody>
+    </table>
+
+    <p>The edge machines exist for one reason: isolation. When an agent is actively coding and a duplicate-check fires, I want a sub-3s response regardless of what studio1 is doing (which might be a long synthesis job or a Strata batch run). mini1 is primary, mini2 is immediate failover. Resolver routes <code>extract-fast</code> and <code>embed-fast</code> to the edge tier first; falls back to studio1 only if both edge machines are unreachable.</p>
+
+    <h3>The slot layer: how applications talk to the fleet</h3>
+
+    <p>Application code doesn't call specific models or machines — it calls <em>slots</em>. The role-resolver maps each slot to a <code>(model_name, profile, host)</code> tuple at runtime. Change the binding, not the code.</p>
+
+    <table class="data-table">
+      <thead><tr><th>Slot</th><th>Host</th><th>Model</th><th>Used For</th></tr></thead>
+      <tbody>
+        <tr><td><code>embed-fast</code></td><td>mini1/2</td><td>snowflake-arctic-embed-l</td><td>Embeddings for Living Memory retrieval</td></tr>
+        <tr><td><code>extract-fast</code></td><td>mini1/2 → studio1</td><td>2B MLX-4bit → 35B MoE</td><td>Dup-check, chunk summarize, quick extraction</td></tr>
+        <tr><td><code>score-fast</code></td><td>studio1</td><td>35B MoE + DFlash + continuous batching</td><td>Strata Stage 2A: fast scoring, ~290 tok/s aggregate</td></tr>
+        <tr><td><code>score-deep</code></td><td>studio1</td><td>35B MoE, no DFlash</td><td>Strata Stage 2B: deep evaluation</td></tr>
+        <tr><td><code>chat-interactive</code></td><td>studio1</td><td>35B MoE + DFlash</td><td>Interactive agent turns, 245–326 tok/s</td></tr>
+        <tr><td><code>synth-deep</code></td><td>studio1 / mini3</td><td>27B Dense, thinking ON</td><td>Coach synthesis, Alexandria knowledge bootstrap</td></tr>
+        <tr><td><code>librarian-curate</code></td><td>mini3 (nightly)</td><td>27B Dense, thinking ON, 65K ctx</td><td>Wiki lint, link-builder, dedup, staleness detection</td></tr>
+      </tbody>
+    </table>
+
+    <p>One oMLX quirk worth knowing: 0.3.8 supports one profile per loaded model name. To run the same base model under two different profiles (e.g., 27B Dense with thinking ON for synthesis vs. thinking OFF for fast scoring), you load it under two distinct names using symlinks. Same weights on disk, two registered model IDs, two independent profile configs. It doesn't double memory usage as long as only one is active at a time.</p>
+
+    <p>Alexandria's knowledge operations — session priming, daily digests, knowledge queries — route to mini3 and studio1 via the same slot abstraction. When mini3 is running a long librarian pass, studio1's live-traffic capacity is untouched. Retrieval happens locally against SQLite/LanceDB on the calling machine; the LLM only runs for synthesis steps that actually need it.</p>
 
     <h3>Shadow-mode calibration</h3>
 
     <p>Here's the part most teams skip. You can't just deploy a local model and hope it's "good enough." You need <em>data</em> proving it.</p>
 
     <div class="callout">
-      <strong>Shadow mode</strong> means running both the cloud model (GPT-4o-mini or Claude Haiku) and the local model (Gemma) on the same input simultaneously, then comparing results. You keep using the cloud model for production scoring while silently collecting local model outputs for evaluation.
+      <strong>Shadow mode</strong> means running both the cloud model and the local model on the same input simultaneously, then comparing results. You keep using the cloud model for production scoring while silently collecting local model outputs for evaluation. The local model earns production traffic by demonstrating agreement on real data, not synthetic benchmarks.
     </div>
 
     <p>The metrics we track:</p>
@@ -177,41 +223,11 @@
 
     <p>When the local model consistently meets these thresholds on a large enough sample (100+ evaluations), you can start routing production traffic to it. The routing is gradual: start with "easy" matches (high-confidence Strong or No Match), then expand the routing as confidence grows.</p>
 
-    <h3>The economic argument</h3>
-
-    <p>The numbers are straightforward:</p>
-
-    <table class="data-table">
-      <thead><tr><th>Scenario</th><th>Monthly Cost</th><th>Notes</th></tr></thead>
-      <tbody>
-        <tr><td>All cloud (current)</td><td>$7-10/mo in API costs</td><td>GPT-4o-mini + Haiku + Sonnet, with 80/15/5 routing</td></tr>
-        <tr><td>Hybrid (target)</td><td>$2-4/mo in API costs</td><td>Local handles 80%+ of scoring; cloud for hard cases</td></tr>
-        <tr><td>Electricity for two Mac Minis</td><td>~$8-10/mo</td><td>Idle ~5-7W each; inference ~25-35W each</td></tr>
-      </tbody>
-    </table>
-
-    <p>The Mac Minis were a one-time capital expense. At current API prices, the payback is measured in months if you're running any serious volume. But the real value isn't the dollar savings — <strong>it's the cost curve</strong>. Cloud costs scale linearly with volume. Local costs are fixed. When you're building an autonomous system that should run 24/7 without human attention, fixed costs are structurally better.</p>
-
-    <div class="callout orange">
-      <strong>The honest counter-argument:</strong> API costs are dropping fast. OpenAI, Anthropic, and Google are in a price war. Running local inference today might not make economic sense in 12 months. What local inference gives you that APIs can't: data stays on your network (privacy), zero rate limits, no vendor dependency, and the ability to fine-tune. Whether those matter depends on your use case.
-    </div>
-
-    <h3>Lessons learned</h3>
-
-    <p><strong>MLX is the secret weapon for Apple Silicon.</strong> Apple's MLX framework makes running quantized models on M-series chips genuinely practical. The unified memory architecture means no GPU memory management, no CUDA dependencies. <code>pip install mlx-lm</code>, download the quantized weights, and you're running inference.</p>
-
-    <p><strong>Tailscale makes home infrastructure viable.</strong> Before Tailscale, running services on home machines meant either opening ports (security risk) or setting up a VPN server (maintenance burden). Tailscale gives you a zero-config, encrypted mesh network. Every machine gets a stable hostname. It just works.</p>
-
-    <p><strong>launchd for services is underrated.</strong> The containerization instinct is strong, but macOS's native service management is excellent for this scale. <code>launchd</code> plists handle restarts, logging, environment variables, and startup dependencies. Two machines, three services. No orchestration layer needed.</p>
-
-    <p><strong>Calibration before cutover, always.</strong> The temptation is to deploy the local model and immediately start using it. Don't. Shadow mode exists because models have failure modes that aren't obvious in synthetic benchmarks. Real job descriptions have weird formatting, inconsistent structures, and domain-specific jargon. You need real-world evaluation data.</p>
-
-    <p><strong>Infrastructure complexity should be proportional.</strong> Two Mac Minis connected by Ethernet cable, running three Python services as launchd daemons, with Tailscale for remote access. That's the entire infrastructure. It would take an afternoon to set up from scratch. If your ML infrastructure requires a platform team to maintain, it's probably over-engineered for your actual needs.</p>
   </div>
 
   <div class="article-footer">
     <a href="/#writing">&larr; All posts</a>
-    <span class="date">April 2026</span>
+    <span class="date">Updated May 2026</span>
   </div>
 </article>
 

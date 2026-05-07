@@ -504,8 +504,8 @@
   <h1>Living Memory &amp; Alexandria</h1>
   <div class="rule"></div>
   <div class="meta">
-    <strong>Status:</strong> Level 4 (Agentic Memory) operational on the Project Development Tool (PDT). Level 5 (Alexandria) in progress for personal and intra-team use. Living Wiki compiler rendering auto-promoted knowledge. Pattern validated across a second platform (Strata &mdash; 8-agent job search OS with governed PostgreSQL).<br>
-    <strong>Date:</strong> April 2026 &mdash; <em>updated from March 2026</em>
+    <strong>Status:</strong> Substrate, lens contracts, and frame primitive operational across Forge (an agentic project-orchestration platform) and Strata (an autonomous job-search OS). State-change projection, outcome &rarr; procedure feedback, and the dispatcher contract running in production.<br>
+    <strong>Date:</strong> 2026-05-07 &mdash; <em>substrate / lens / frame architecture &mdash; updated from April 2026</em>
   </div>
 </header>
 
@@ -515,13 +515,13 @@
   <nav class="toc">
     <ol>
       <li><a href="#exec">Executive Summary</a></li>
+      <li><a href="#axes">The Three Axes</a></li>
       <li><a href="#built">What's Built and Running</a></li>
-      <li><a href="#arch">Architecture: M/L/P</a></li>
-      <li><a href="#loop">The Learning Loop (Step-by-Step)</a></li>
+      <li><a href="#loop">The Session Lifecycle</a></li>
       <li><a href="#digest">The Digestive Pipeline</a></li>
       <li><a href="#retrieval">How Retrieval Works</a></li>
       <li><a href="#graph">The Knowledge Graph</a></li>
-      <li><a href="#taxonomy">Agent Taxonomy</a></li>
+      <li><a href="#consumers">Consumers (Lenses in Use)</a></li>
       <li><a href="#challenges">Honest Challenges</a></li>
       <li><a href="#vision">Architecture Vision</a></li>
     </ol>
@@ -533,11 +533,11 @@
     <h2>Executive Summary</h2>
     <div class="rule"></div>
 
-    <p>We've built a shared memory system for AI agents that lets them learn from each other's sessions, share precedent across workflows, and maintain that knowledge automatically. The system is in active use on two workflows (core platform development and Salesforce development), where we're dogfooding it to prove out the architecture and fine-tune the real-world experience. The overall design has been pressure-tested against 30+ external sources from academia, industry, and thought leadership, though the current implementation doesn't yet address all of the findings.</p>
+    <p>This document describes a memory architecture for AI agents, humans, and subsystems sharing one substrate. The substrate stores entities, facts, state-changes, decision traces, and interaction records. <strong>Lenses</strong> &mdash; persistent, role-keyed, DB-resident filters &mdash; render the substrate for each consumer. <strong>Frames</strong> &mdash; transient task-keyed bindings &mdash; hold the intent, plan, footprint, and suppression state for the work currently in front of a consumer. The architectural identity is one equation: <em>view = render(substrate, lens, frame)</em>.</p>
 
-    <p>The architecture decomposes into three layers: <strong>Memory</strong> (storage), <strong>Learning</strong> (extraction and maintenance), and <strong>Personalization</strong> (serving the right knowledge to the right agent). We operate at Level 4 (agentic learning and memory) today. Level 5 (Alexandria: the full knowledge library with propositional claims and graph traversal) is currently being built for personal and intra-team use, architected to scale.</p>
+    <p>The architecture is orthogonal across three axes. The <strong>storage axis</strong> (Living Memory, Alexandria, Episodic Continuity) tells you where a fact lives. The <strong>interpretation axis</strong> (substrate vs lens vs frame) tells you whose view of the substrate it belongs to. The <strong>action axis</strong> (state-change events, outcome &rarr; procedure feedback, intentional non-action) tells you how the substrate evolves under work. Every memory feature gets classified on all three.</p>
 
-    <p>This document focuses on the architecture: how it works, step-by-step processes, honest challenges, and the vision for what it could become. For the business case and landscape context, see the companion decks (Alexandria pitch book and Memory, Context &amp; Graphs landscape primer).</p>
+    <p>The substrate is operational on Forge (an agentic project-orchestration platform on TypeScript / Node / SQLite) and validated on Strata (Python / FastAPI / PostgreSQL + pgvector). Lens contracts, the frame primitive, the typed state-change stream, the outcome &rarr; procedure feedback loop, and the intentional non-action dispatcher all run in production. The companion landscape and pitch decks cover positioning; this document is the architectural truth.</p>
   </section>
 
   <!-- 2. WHAT'S BUILT -->
@@ -546,7 +546,7 @@
     <h2>What's Built and Running</h2>
     <div class="rule"></div>
 
-    <p>Everything below is built and running, used daily on the PDT and SFDC dev workflows. The goal is to employ it as a real use case, iterate, and prove out the architecture before any broader rollout.</p>
+    <p>Everything below is built and running, used daily on the Forge platform and SFDC dev workflows. The goal is to employ it as a real use case, iterate, and prove out the architecture before any broader rollout.</p>
 
     <h3 class="sub">Memory &amp; Learning Core</h3>
     <table>
@@ -596,7 +596,7 @@
         <tr>
           <td>Multi-workflow support</td>
           <td><span class="badge built">Built</span></td>
-          <td>Core PDT (PCC) and SFDC dev share one framework, data partitioned by workflow. Workflow engine with pluggable adapters.</td>
+          <td>Core Forge platform and SFDC dev share one framework, data partitioned by workflow. Workflow engine with pluggable adapters.</td>
         </tr>
         <tr>
           <td>Scratchpad + session summary</td>
@@ -721,58 +721,60 @@
     </table>
 
     <div class="callout success">
-      <p><strong>Cross-platform validation:</strong> The M/L/P architecture has now been validated on two entirely different platforms. On the PDT (TypeScript / Node.js / SQLite), agents coordinate through a shared backlog with living memory. On Strata (Python / FastAPI / PostgreSQL + pgvector), eight governed agents collaborate through scoped repositories with decision traces. The same architectural principles &mdash; governed writes, learning loops, cost-conscious inference &mdash; apply naturally to both. This gives us confidence the patterns are transferable, not framework-specific.</p>
+      <p><strong>Cross-platform validation:</strong> The M/L/P architecture has now been validated on two entirely different platforms. On Forge (an agentic project-orchestration platform on TypeScript / Node / SQLite), agents coordinate through a shared backlog with living memory. On Strata (Python / FastAPI / PostgreSQL + pgvector), eight governed agents collaborate through scoped repositories with decision traces. The same architectural principles &mdash; governed writes, learning loops, cost-conscious inference &mdash; apply naturally to both. This gives us confidence the patterns are transferable, not framework-specific.</p>
     </div>
   </section>
 
   <!-- 3. ARCHITECTURE -->
-  <section id="arch">
-    <div class="section-label">03</div>
-    <h2>Architecture: Memory / Learning / Personalization</h2>
+  <section id="axes">
+    <div class="section-label">02</div>
+    <h2>The Three Axes</h2>
     <div class="rule"></div>
 
-    <p>The architecture spans three layers with explicit boundaries between them. Failures concentrate at those boundaries: conflating a retrieval problem (Personalization) with a storage problem (Memory) or an extraction problem (Learning) is the most common design mistake in agent memory systems.</p>
+    <p>The architecture spans three orthogonal axes. Confusion between axes is the most common architectural mistake &mdash; conflating storage with interpretation, or interpretation with action, produces designs that fight themselves.</p>
+
+    <h3 class="sub">Axis 1 &mdash; Storage (where it lives)</h3>
+    <p><strong>Living Memory</strong> holds user/workspace context (preferences, behavioral feedback, project facts). <strong>Alexandria</strong> holds cross-session, cross-project learnings as bi-temporal claims with decision traces. <strong>Episodic Continuity</strong> holds session-scoped state: scratchpads (narrative) and per-ticket context (now generalized to frames). Storage is operational; documented in <code>MEMORY-TIERS.md</code>.</p>
+
+    <h3 class="sub">Axis 2 &mdash; Interpretation (whose view of it)</h3>
+    <p><strong>Substrate</strong> is the universal storage of state &mdash; entities, facts, typed state-changes, relationships, provenance, permissions, history. Bi-temporal validity columns (<code>valid_at</code> / <code>invalid_at</code>), decision traces, lesson chains, and interaction-typed records all live here. <strong>Lens</strong> is a persistent consumer-keyed filter declaring entity types loaded by default, relationships in scope, watched state-changes, RBAC capabilities, cross-lens read scope, and expiration policy. Lenses are DB-resident (<code>lens_contracts</code> + <code>lens_preferences</code> + <code>consumer_lens_assignments</code> + <code>permission_groups</code> + <code>permissions</code>). <strong>Frame</strong> is a transient task-keyed binding holding intents (canonical 10), <code>next_steps</code> with assigned consumers, footprint, surfaced substrate refs, and suppression state. Frames are also DB-resident; scratchpads carry <code>frame_id</code> at creation.</p>
+
+    <h3 class="sub">Axis 3 &mdash; Action (how it evolves)</h3>
+    <p>Substrate writes emit typed <strong>state-change</strong> events with before/after diffs, <code>lens_id</code> and <code>frame_id</code> annotation, and evidence references. Outcomes (eval results, gate failures, learning-proposal status) flow back to procedure (<code>SKILL.md</code> mutations) through an approval-gated mutator that records the mutation as a state-change. Triggers (hooks, watchdog, scheduler, evaluator) emit explicit <em>act / wait / escalate / no-op</em> decisions with rationale &mdash; non-action is a first-class action when it is intentional and persisted, and silent failure is structurally distinguishable from intentional restraint.</p>
+
+    <p><strong>Dreams &mdash; retrospective synthesis.</strong> The action axis includes scheduled retrospections inspired by Anthropic's <em>Managed Agents Dreams</em> primitive (research preview, 2026-04). Dreams run asynchronously over a rolling window of state-changes, scratchpad archives, decision traces, and the docs corpus, surfacing duplicate facts to merge, contradicted facts to retire, stale entries to age out, and skill-improvement proposals based on outcome patterns. Anthropic's version is developer-triggered and adoption-gated by hand. The local implementation extends Anthropic's framing with scheduled cadence on the local-LLM fleet (mini1/2/3, studio1) and an automated adoption gate &mdash; per-proposal-type confidence and risk thresholds with mandatory approval-queue routing for exceptions. Output flows through the same approval-gated mutator as every other substrate change, with provenance tagging so subsequent dreams skip their own prior outputs.</p>
 
     <div class="diagram">
-      <div class="diagram-label">M/L/P Architecture with layer boundaries and intellectual provenance</div>
+      <div class="diagram-label">Three orthogonal axes</div>
       <pre class="mermaid">
 flowchart TB
-  subgraph P["<b>Personalization</b> — Real-time serving<br/><i>Context engineering (Cherny)</i>"]
-    direction LR
-    gc["getContext"]
-    rf["Retrieval filters"]
-    tb["Token budgets"]
-    pd["Progressive disclosure"]
-    gc --- rf --- tb --- pd
+  subgraph storage["Storage Axis"]
+    LM["Living Memory<br/>user/workspace"]
+    AL["Alexandria<br/>cross-session learnings"]
+    EC["Episodic Continuity<br/>scratchpads + frames"]
   end
-
-  subgraph L["<b>Learning</b> — Async extraction<br/><i>Structured artifacts (PAL, Karpathy)</i>"]
-    direction LR
-    refl["Session-end reflection"]
-    dp["Digestive pipeline"]
-    cond["Condensation"]
-    forg["Forgetting"]
-    refl --- dp --- cond --- forg
+  subgraph interp["Interpretation Axis"]
+    S["Substrate<br/>entities, facts, state-changes,<br/>decision traces, interactions"]
+    L["Lens<br/>DB-resident, RBAC,<br/>consumer-keyed"]
+    F["Frame<br/>DB-resident, transient,<br/>task-keyed"]
   end
-
-  subgraph M["<b>Memory</b> — Storage infrastructure<br/><i>Vault as identity (Cornelius), File-backed state (NLAH)</i>"]
-    direction LR
-    les["Lessons DB"]
-    conn["Connections"]
-    ent["Entities"]
-    sp["Scratchpads"]
-    dt["Decision traces"]
-    les --- conn --- ent --- sp --- dt
+  subgraph action["Action Axis"]
+    SC["Typed state-changes<br/>before/after + lens_id + frame_id"]
+    OP["Outcome &rarr; Procedure<br/>approval-gated SKILL.md mutator"]
+    NA["Intentional non-action<br/>act / wait / escalate / no-op"]
   end
-
-  P -->|"Usage signals + outcomes"| M
-  M -->|"Raw material"| L
-  L -->|"Structured knowledge"| P
+  storage -.->|"writes through"| interp
+  interp -.->|"evolves via"| action
+  action -.->|"persisted in"| storage
       </pre>
     </div>
 
     <div class="callout">
-      <p><strong>Standing on strong shoulders.</strong> This architecture didn't emerge in isolation. It synthesizes ideas from <strong>Karpathy</strong> (Software 2.0, LLM OS &mdash; the model is the program, memory is the file system), <strong>Cherny</strong> (context engineering as a systems-level discipline, not prompt crafting), <strong>PAL</strong> (structured code-as-reasoning artifacts, not free-form prose), <strong>Cornelius</strong> (the vault constitutes identity &mdash; "the vault is the riverbed, the sessions are the water"), and <strong>NLAH/Pan et al.</strong> (six-component harness decomposition, file-backed state as the #1 most valuable module). The M/L/P naming draws from MAPLE. Each layer has different failure modes and maintenance rhythms. The memory layer is an active participant in its own maintenance (agentic memory), not a passive store.</p>
+      <p><strong>The render equation:</strong> <em>view = render(substrate, lens, frame)</em>. The same substrate read through the Architect lens with a frame for &ldquo;evaluate vendor for new identity broker&rdquo; produces a different view than the same substrate through the Steward lens with a frame for &ldquo;sprint plan.&rdquo; The Memory / Learning / Personalization decomposition (MAPLE) sits inside the substrate side of the interpretation axis: Memory = substrate storage; Learning = digestive pipeline that mutates substrate; Personalization = render(substrate, lens, frame). M/L/P remains accurate; substrate / lens / frame is the load-bearing vocabulary.</p>
+    </div>
+
+    <div class="callout">
+      <p><strong>Standing on strong shoulders.</strong> The substrate-vs-lens vocabulary was crystallized by <strong>Sentra's Company Brain series</strong> (Ashwin Gopinath, 2026-04). The frame primitive is a local extension Andrew added to disambiguate transient task-binding from persistent role-shape. Earlier influences remain load-bearing: <strong>Karpathy</strong> (Software 2.0, LLM OS &mdash; memory is the file system), <strong>Cherny</strong> (context engineering as systems discipline), <strong>PAL</strong> (structured artifacts over free-form prose), <strong>Cornelius</strong> ("the vault is the riverbed, the sessions are the water"), and <strong>NLAH/Pan et al.</strong> (file-backed state as the highest-value harness module). The M/L/P naming draws from MAPLE. The deeper lineage &mdash; UXF, ASO26 / IA-EA, EDR &gt; Decision Support &mdash; proved the substrate-vs-lens pattern in production at Macmillan years before Sentra named it.</p>
     </div>
   </section>
 
@@ -987,45 +989,27 @@ flowchart LR
   <!-- 8. AGENT TAXONOMY -->
   <section id="taxonomy">
     <div class="section-label">08</div>
-    <h2>Agent Taxonomy</h2>
+    <h2 id="consumers">Consumers (Lenses in Use)</h2>
     <div class="rule"></div>
 
-    <p>Not every agent should learn. The architecture serves four types of agents, distinguished by their relationship to knowledge. Moving along this spectrum is incremental.</p>
-
-    <div class="diagram">
-      <div class="diagram-label">Agent complexity spectrum</div>
-      <pre class="mermaid">
-flowchart LR
-    subgraph S["Stateless Tools"]
-        s1["Code formatter<br/>Data validator"]
-    end
-    subgraph C["Knowledge Consumers"]
-        c1["Pipeline reporter<br/>Meeting prep agent"]
-    end
-    subgraph L["Scoped Learners"]
-        l1["Coding assistant<br/>Sales assistant"]
-    end
-    subgraph F["Full-Metabolism Agents"]
-        f1["Strategic architect<br/>Business analyst"]
-    end
-
-    S -->|"Add graph reads"| C
-    C -->|"Add feedback loop"| L
-    L -->|"Add metabolic machinery"| F
-      </pre>
-    </div>
+    <p>Agents are one consumer class. Humans are another. Subsystems (watchdog, scheduler, dispatcher) are a third. All read the same substrate through different lenses. A consumer can wear more than one lens; multi-lens permissions UNION (wearing more lenses can only widen scope, never restrict it). Andrew, as Principal, can wear any lens to view the work through that role's filter.</p>
 
     <table>
-      <thead><tr><th>Type</th><th>% of fleet</th><th>Reads graph</th><th>Learns</th><th>Full metabolism</th></tr></thead>
+      <thead><tr><th>Lens</th><th>Consumers</th><th>Default scope</th></tr></thead>
       <tbody>
-        <tr><td>Stateless tools</td><td>65-70%</td><td>No</td><td>No</td><td>No</td></tr>
-        <tr><td>Knowledge consumers</td><td>20-25%</td><td>Yes</td><td>No</td><td>No</td></tr>
-        <tr><td>Scoped learners</td><td>5-10%</td><td>Domain slice</td><td>Bounded</td><td>No</td></tr>
-        <tr><td>Full-metabolism agents</td><td>1-3%</td><td>Full graph</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Architect</td><td>alex</td><td>Wide; ADR + planning + cross-system entities; high decision-trace density</td></tr>
+        <tr><td>Developer</td><td>bob, doug, remy, quinn, evelyn, sentinel, jerry</td><td>Code, tests, gates, eval results; narrow per-task</td></tr>
+        <tr><td>Analyst</td><td>bea</td><td>Requirements, decision matrices, stakeholder context</td></tr>
+        <tr><td>Steward</td><td>stewart, oscar</td><td>Backlog, sprint state, dependencies, collisions</td></tr>
+        <tr><td>Writer</td><td>sherry</td><td>Docs, Confluence, documentation drift</td></tr>
+        <tr><td>Principal</td><td>andrew (default; can wear any lens)</td><td>Workspace-wide; longitudinal; decision-trace heavy</td></tr>
+        <tr><td>Subsystem</td><td>watchdog, scheduler-daemon, dispatcher</td><td>Event-conditioned; trigger-shaped; non-action capable</td></tr>
       </tbody>
     </table>
 
-    <p>The key design choice: the graph must serve stateless tools and knowledge consumers (the majority) with minimal friction. A single API call returns what they need. No session registration, no scratchpad. The metabolic machinery exists for the 1-3% that justify it.</p>
+    <p>Skills are workspace-wide capabilities. A loose-coupling join records which lens each skill is primary for, which skills bridge between lenses (Bea's <em>R&times;S to Backlog</em> hands work from Analyst to Steward), and which are lens-agnostic (the <em>career-coach</em> skill operates outside any analyst/developer lens). The lens prioritizes and surfaces skills; permissions gate invocation. Skills don't gate against the active lens &mdash; carrying a skill while wearing the &ldquo;wrong&rdquo; lens is permitted, just not surfaced by default.</p>
+
+    <p>Not every agent should learn. The substrate still serves four levels of agent complexity, distinguished by their relationship to knowledge: <strong>stateless tools</strong> (run, return, forget), <strong>knowledge consumers</strong> (read substrate, no writes), <strong>scoped learners</strong> (write within a single lens), and <strong>full-metabolism agents</strong> (write across substrate with reflection and decision-trace contribution). The 65/20/10/3 distribution still holds. The lens layer cuts orthogonally to autonomy: a stateless tool can be Developer-lensed (formatter); a full-metabolism agent can be Architect-lensed (alex). Lens determines scope; autonomy determines write capacity.</p>
   </section>
 
   <!-- 9. HONEST CHALLENGES -->
@@ -1078,9 +1062,9 @@ flowchart LR
           <td>Design in progress. The knowledge graph's typed connections enable contradiction detection (CONTRADICTS edge type). Resolution requires either recency-wins, confidence-wins, or escalate-to-human logic. Per NLAH: verifier alignment data (which we now collect) can inform which resolution strategy matches human judgment.</td>
         </tr>
         <tr>
-          <td>No quantitative benchmarks</td>
-          <td>Can't quantitatively prove "memory helps" or "graph beats filesystem." Letta scores 74% on LoCoMo with a plain filesystem.</td>
-          <td>We now have eval suites infrastructure (YAML-defined tasks, grader registry, result tracking). Need to build memory-specific eval tasks that test what we're actually good at: discovery, reasoning, evolution, and governance &mdash; not just retrieval speed.</td>
+          <td>Benchmarks measuring the wrong things</td>
+          <td>Quantitative benchmarks were added early (eval suites infrastructure with YAML-defined tasks, grader registry, result tracking, and the verifier alignment log). They run, but they measure retrieval speed and recall &mdash; not the things the substrate is actually good at: discovery (connections not sought), reasoning (propositional claims as installed capabilities), evolution (forgetting at scale), governance (trust tiers, lens-scoped permission resolution), and longitudinal compounding. Without the right metrics, we can't validate that the system is working end-to-end or improve it deliberately.</td>
+          <td>Build memory-specific eval tasks aligned to the substrate's value: cross-frame connection-discovery rate, decision-trace coverage, lens-scoped permission-resolver correctness, supersession lineage accuracy under contradiction, suppression-honoring rate after rejection, and longitudinal compounding (does the same task produce a richer view six months in than at start). Measurement is ongoing, not setup-only &mdash; phased calibration windows (7d standup &rarr; 30d steady-state) drive threshold tuning per surface.</td>
         </tr>
       </tbody>
     </table>
@@ -1096,60 +1080,59 @@ flowchart LR
     <h2>Architecture Vision</h2>
     <div class="rule"></div>
 
-    <p>The vision is federated memory with two tiers and a governed bridge. We're building this for personal and intra-team use today, architected to scale. The local tier is operational. The organizational tier is where the knowledge graph, propositional claims, and graph traversal live. Quality gates apply at the promotion boundary, not at local writes.</p>
+    <p>The substrate, lenses, and frames are operational. The vision is what comes next: the architectural shape carrying forward to additional consumer classes (enterprise, customer-facing), additional input sources (interaction memory beyond the local agent loop), and longitudinal compounding measured against the right metrics &mdash; not against retrieval-speed benchmarks borrowed from RAG.</p>
 
     <div class="diagram">
-      <div class="diagram-label">Current state to target state</div>
+      <div class="diagram-label">From operational to extended</div>
       <pre class="mermaid">
 flowchart TB
-    subgraph today["Current State (operational)"]
-        L3["Living Memory store<br/>(lessons, connections, entities)"]
-        L4["Agentic learning loop<br/>(getContext, reflection, shared)"]
-        harness["Harness engineering<br/>(evals, guardrails, failure taxonomy)"]
-        L3 --> L4
-        L4 --> harness
+    subgraph now["Operational"]
+        S["Substrate<br/>(facts, state-changes,<br/>decision traces, interactions)"]
+        L["Lens contracts<br/>(7-lens roster, RBAC)"]
+        F["Frame primitive<br/>(intents, footprint, suppression)"]
+        D["Dreams<br/>(retrospective synthesis,<br/>local-LLM scheduled)"]
+        S --> L
+        S --> F
+        L --> F
+        S -.->|"feeds"| D
+        D -.->|"proposes mutations to"| S
     end
 
-    subgraph target["Target State (in progress)"]
-        local["<b>Local tier</b><br/>.md files, git-backed<br/>personal/team scope<br/><i>Cornelius: vault as identity</i>"]
-        bridge["<b>Bridge</b><br/>Quality gates at<br/>promotion boundary<br/><i>Wiki gates (built)</i>"]
-        org["<b>Alexandria graph</b><br/>Propositional claims<br/>graph traversal<br/><i>Karpathy: LLM OS file system</i>"]
-        ctx["<b>Context serving</b><br/>Token-budgeted<br/>berrypicking, disclosure<br/><i>Cherny: context engineering</i>"]
-        local <-->|"query / promote"| bridge
-        bridge <-->|"governed"| org
-        org --> ctx
+    subgraph extending["Extending"]
+        IM["Interaction memory<br/>(meeting transcripts, calls,<br/>messaging &mdash; opt-in)"]
+        LP["Lens packs<br/>(Sales, Success,<br/>Support, On-call, Exec)"]
+        CC["Customer-facing surface<br/>(UXF descendant)"]
+        MET["Substrate-aligned metrics<br/>(discovery, evolution,<br/>governance, compounding)"]
     end
 
-    L4 -.->|"feeds"| bridge
-    L3 -.->|"foundation"| org
+    S -.->|"new producers"| IM
+    L -.->|"productization"| LP
+    L -.->|"new consumer class"| CC
+    now -.->|"validated by"| MET
       </pre>
     </div>
 
-    <h3 class="sub">The federated principle</h3>
-    <p>The filesystem-vs-graph divide is not either/or. Individual developers use lightweight, file-based memory (markdown in a workspace, git-backed). Per Cornelius: "the vault is the riverbed, the sessions are the water." The graph tier provides the governed, cross-domain knowledge layer. The architecture serves both without forcing one onto the other.</p>
-
+    <h3 class="sub">Three directions of growth</h3>
     <div class="card-grid">
       <div class="card">
-        <h4>Local tier (Cornelius's vault)</h4>
-        <p>.md files in workspace, git-backed, personal/team scope. Slash commands (/note, /remember). The agent becomes itself by reading what previous sessions left behind. Low ceremony, high velocity. No quality gates at local writes.</p>
+        <h4>More consumer classes</h4>
+        <p>Today's lens roster covers agents, the principal, and named subsystems. Three additional classes are architecturally supported and ready to onboard: <em>enterprise role lenses</em> (Sales, Success, Support, On-call, Exec) as productizable lens packs; <em>customer-facing lenses</em> as the UXF descendant; <em>peer principals</em> for multi-human collaboration. Adding a class is a seed migration, not a rewrite &mdash; the substrate doesn't fork.</p>
       </div>
       <div class="card">
-        <h4>Alexandria graph (Karpathy's LLM OS)</h4>
-        <p>Knowledge graph as the "file system" of the agent operating system. Cross-domain, propositional, governed, forgetting-enabled. Claims become installed capabilities. Agents are processes; the graph is the shared state they read from and write to.</p>
+        <h4>More input sources</h4>
+        <p>Interaction memory is schema-ready but lightly fed. Capture-chat already accepts external transcripts; the next step is opt-in producers for meetings, calls, and messaging surfaces, scoped by directory or channel. Each new source produces interaction-typed substrate records and feeds Dreams' retrospective window without changing the substrate's shape.</p>
       </div>
-    </div>
-    <div style="max-width: 480px; margin: 0 auto;">
-      <div class="card" style="text-align: center;">
-        <h4>Bidirectional bridge</h4>
-        <p>Local projects query Alexandria for best practices and precedent. Local learnings promote to Alexandria when they have broader value. Quality gates (wiki gates, confidence thresholds) apply at the promotion boundary. Per PAL: structured artifacts flow upward, not free-form prose.</p>
+      <div class="card">
+        <h4>Substrate-aligned measurement</h4>
+        <p>The substrate's value is discovery, evolution, governance, and longitudinal compounding &mdash; not retrieval speed. The eval suites and verifier alignment log run, but the metrics they capture are wrong-shaped. The next benchmark generation tests cross-frame connection-discovery rate, supersession lineage accuracy, suppression-honoring rate, lens-scoped permission-resolver correctness, and whether the same task produces a richer view six months in than at start.</p>
       </div>
     </div>
 
     <h3 class="sub">The Knowledge Interchange Layer</h3>
-    <p>Any source publishes knowledge into the graph through one contract: <strong>{entity, claim, source, confidence, timestamp, author}</strong>. Per Cornelius: notes aren't reminders &mdash; they're callable functions. A well-formed claim is a capability the agent gains on load. The framework grows by accretion, not revolution.</p>
+    <p>Any source publishes knowledge into the substrate through one contract: <strong>{entity, claim, source, confidence, timestamp, author, lens_id, frame_id}</strong>. The lens and frame annotations are what make the contract substrate-shaped &mdash; every write knows whose view produced it and which task it served. A well-formed claim is a capability the agent gains on load. The framework grows by accretion, not revolution.</p>
 
     <div class="callout">
-      <p><strong>The strategic opportunity:</strong> The industry is converging on graphs, agents, learning loops, and forgetting. No one in the evaluated landscape is building the full knowledge engineering discipline: dependency tracking, impact analysis, capability testing, deprecation management for knowledge claims. This moves from a novel framing to a novel discipline &mdash; genuinely unprecedented and difficult to replicate.</p>
+      <p><strong>The strategic opportunity:</strong> The industry is converging on substrate ideas (Sentra), graphs (Glean), and agent memory (Anthropic, Mem0, Zep). What no evaluated competitor ships is the full architectural triad &mdash; substrate <em>plus</em> declared role-shaped lenses <em>plus</em> transient task frames &mdash; with state-change as a typed primitive, intentional non-action at the trigger layer, and substrate-aligned measurement. The substrate generalizes; lens packs are the productizable surface; the credibility artifact is years of solo dogfood under load. Memory fragmentation across per-tool memory is the moat.</p>
     </div>
   </section>
 

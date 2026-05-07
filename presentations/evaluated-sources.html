@@ -293,8 +293,8 @@
   <div class="rule"></div>
   <div class="meta">
     <strong>Companion to:</strong> Living Memory &amp; Alexandria Technical Overview<br>
-    <strong>Evaluation period:</strong> February &ndash; April 2026 (10+ sessions, 30+ sources)<br>
-    <strong>Date:</strong> April 2026 &mdash; <em>updated to include harness engineering, Strata, and thought leadership sources</em>
+    <strong>Evaluation period:</strong> February 2026 &ndash; May 2026 (12+ sessions, 35+ sources)<br>
+    <strong>Date:</strong> 2026-05-07 &mdash; <em>added Sentra Company Brain series, internal architectural sources, and Macmillan prior-art (UXF / ASO26 / EDR)</em>
   </div>
 </header>
 
@@ -311,6 +311,8 @@
     <p>Between February and March 2026, we conducted a structured pressure-test of the Living Memory and Alexandria architecture against <strong>20+ external sources</strong> spanning academic papers, open-source projects, industry articles, and commercial products. Each source was evaluated in a dedicated document that compares its approach to ours, identifies what we should adopt, and notes where our design diverges.</p>
 
     <p>Not all original source materials are preserved (some were live demos, videos, or paywalled content). Where external links exist, they are included below. Our evaluation documents are available in the project repository under <code>docs/research/</code>.</p>
+
+    <p>The May 2026 update adds three categories the earlier supplement omitted: (a) Sentra's <em>Company Brain</em> series, which crystallized substrate-vs-lens vocabulary; (b) internal architectural decision records (ADRs) and planning documents that drive the current architecture; (c) prior-art from Andrew's tenure at Macmillan Learning (UXF, ASO26 / IA-EA, EDR Decision Support), where the substrate-lens pattern shipped in production before Alexandria existed.</p>
   </section>
 
   <!-- KEY CLAIMS -->
@@ -764,6 +766,201 @@
         <a href="https://arxiv.org/abs/2211.10435" target="_blank">arXiv:2211.10435</a>
       </div>
       <div class="source-contribution">Contributed: Structured artifact generation, code-as-reasoning pattern, separation of reasoning from execution</div>
+    </div>
+  </section>
+
+  <!-- 2026 SUBSTRATE VOCABULARY -->
+  <section>
+    <div class="section-label">2026 substrate vocabulary</div>
+    <h2>Sentra Company Brain Series</h2>
+    <div class="rule"></div>
+
+    <p>The 2026 source most directly shaping current architecture. A multi-part series by Ashwin Gopinath (Sentra) crystallizing the three-layer memory model (factual / interaction / action) and the substrate-vs-lens vocabulary. Read in the May 2026 review session; produced the current substrate-lens-frame architecture as the synthesis output.</p>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Company Brain Series</span>
+        <span class="source-type type-industry">Thought Leadership</span>
+      </div>
+      <div class="source-author">Ashwin Gopinath &mdash; Sentra (founder)</div>
+      <div class="source-summary">
+        Three-layer memory model: factual (what happened), interaction (why, what was meant, what was debated), action (procedural / trigger / execution / outcome). Substrate-vs-lens vocabulary: substrate generalizes; ontologies on top of it do not. Doing nothing as a first-class action. Validated the architectural posture we were already building toward; named primitives we had implicitly. Local amendment: non-action only counts when intentional, decisive, and persisted with rationale. Local addition: <em>frame</em> as the missing transient task-binding layer Sentra and others don't ship.
+      </div>
+      <div class="source-contribution">Contributed: substrate / lens vocabulary, factual / interaction / action three-layer model, intentional non-action framing. Synthesis output: substrate-lens strategy + implementation plan, May 2026.</div>
+    </div>
+  </section>
+
+  <!-- INTERNAL ARCHITECTURAL SOURCES -->
+  <section>
+    <div class="section-label">Internal architectural sources</div>
+    <h2>ADRs and Planning Documents</h2>
+    <div class="rule"></div>
+
+    <p>The architecture documented in the technical overview is anchored in a set of internal ADRs and planning documents. Each is the durable artifact behind a specific architectural commitment.</p>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Memory: Filesystem over Embeddings</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">Substrate philosophy: filesystem + LLM semantic reasoning over vector embeddings for memory. Sets the substrate's storage shape; rules out the graph-DB / pgvector path that competitors default to.</div>
+      <div class="source-contribution">Contributed: substrate-as-semantic-filesystem commitment, no-embeddings constraint on memory retrieval</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Alexandria MVP Retrieval Contract</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">BM25 + Jaccard + session-diversity retrieval contract for Alexandria. Defines the substrate's read interface that the lens layer reads through.</div>
+      <div class="source-contribution">Contributed: retrieval contract; lens layer reads through this</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Bi-Temporal Validity</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">Bi-temporal validity columns (valid_at, invalid_at) on Alexandria claims. Adopted from Graphiti's bi-temporal schema. Enables point-in-time queries and supersession chains. The substrate's existing state-change semantics; the typed state-change projection surfaces it as named events.</div>
+      <div class="source-contribution">Contributed: bi-temporal validity primitive, supersession chain semantics</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Capture-Chat Ingestion</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">Ingest external transcripts (Granola, Claude.app, ChatGPT) via the session-end path into raw chunks &rarr; decision traces &rarr; learning proposals. The producer for interaction-typed substrate records.</div>
+      <div class="source-contribution">Contributed: interaction memory producer; substrate's external-ingestion contract</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Per-Ticket Continuity</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">Per-ticket durable continuity tier with plan / next_step / invariants / history. Motivated by ghost-claim and silent-divergence incidents that exposed missing transient task-state. The frame primitive in disguise &mdash; later generalized to support tickets, tasks, and exploration as frame types.</div>
+      <div class="source-contribution">Contributed: frame primitive precursor; the empirical case for transient task-binding state</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Karpathy AgentMemory Evaluation</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">Evaluation of Karpathy's LLM Wiki / agentmemory.org against the Alexandria architecture. Source of the compounding-vs-rediscovery framing for episodic recall and the filesystem-as-LLM-OS analogy. Confirmed the substrate posture; refined the episodic-continuity tier naming.</div>
+      <div class="source-contribution">Contributed: compounding-vs-rediscovery framing, episodic-tier validation</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Knowledge Ratchet Pipeline</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">The pipeline that promotes raw lessons &rarr; claims &rarr; wiki facts. The substrate's write-side discipline; complements the digestive pipeline.</div>
+      <div class="source-contribution">Contributed: knowledge-ratchet promotion semantics</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Learning Effectiveness Measurement</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">How learning effectiveness is measured (retrieval counts, decision-trace coverage, gate alignment). The metric layer behind the outcome &rarr; procedure feedback loop's calibration.</div>
+      <div class="source-contribution">Contributed: learning-effectiveness metrics; basis for outcome-loop calibration</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Cross-Project Memory Architecture</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">Workspace-level memory inheritance across all Development projects. Sets the substrate's cross-project scope.</div>
+      <div class="source-contribution">Contributed: cross-project substrate scoping</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ADR &mdash; Alexandria Spike (April 2026)</span>
+        <span class="source-type type-internal">Internal ADR</span>
+      </div>
+      <div class="source-summary">Alexandria architecture spike findings. Cited Graphiti's bi-temporal schema as the gold standard. Source of the storage decisions that grounded later ADRs.</div>
+      <div class="source-contribution">Contributed: Graphiti adoption rationale, storage-shape decisions</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Agentic Memory &amp; Learning Master Plan (April 2026)</span>
+        <span class="source-type type-internal">Planning</span>
+      </div>
+      <div class="source-summary">April 2026 master plan for the agentic memory system. The roadmap that the May 2026 substrate-lens strategy doc augments (not supersedes).</div>
+      <div class="source-contribution">Contributed: April-2026 phasing baseline</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Substrate-Lens Strategy (May 2026)</span>
+        <span class="source-type type-internal">Planning</span>
+      </div>
+      <div class="source-summary">Strategy document derived from Sentra series review. Declares substrate-vs-lens as the orthogonal interpretation axis on top of 3-tier storage. Adds frame as the transient task-binding layer Sentra doesn't ship. Synthesis output of the May 2026 review pass.</div>
+      <div class="source-contribution">Contributed: substrate / lens / frame canonical vocabulary; six architectural commitments; lens-pack productization as preserved option-value</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Substrate-Lens Implementation Plan (May 2026)</span>
+        <span class="source-type type-internal">Planning</span>
+      </div>
+      <div class="source-summary">Survey-driven implementation plan. Schemas, ERDs, approval matrices, calibration cadences. Lockdown decisions of 2026-05-07: 7-lens roster, canonical 10 intents, suppression TTL, dashboard surfaces.</div>
+      <div class="source-contribution">Contributed: complete implementation plan with locked schemas and approval matrices</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Alexandria Document Fabric (May 2026)</span>
+        <span class="source-type type-internal">Planning</span>
+      </div>
+      <div class="source-summary">Parallel design indexing reference documents (ADRs, planning docs, design catalogs) into Alexandria. Coordinates with the substrate-lens plan on read-budget allocation.</div>
+      <div class="source-contribution">Contributed: document-fabric retrieval strategy</div>
+    </div>
+  </section>
+
+  <!-- PRIOR ART (MACMILLAN) -->
+  <section>
+    <div class="section-label">Prior art (Macmillan)</div>
+    <h2>Substrate-Lens Pattern in Production</h2>
+    <div class="rule"></div>
+
+    <p>Substrate-vs-lens is not a new architectural bet. The same pattern shipped in production at Macmillan Learning under three different names. These are prior-art sources for the architecture documented in the technical overview.</p>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">UXF &mdash; Customer Experience Contextualization Framework</span>
+        <span class="source-type type-internal">Prior art</span>
+      </div>
+      <div class="source-author">Andrew Crenshaw &mdash; Macmillan Learning</div>
+      <div class="source-summary">Customer-experience substrate with role-shaped lenses. Two-tier identity (Profile + Context) maps directly to lens-vs-frame: Profile is the persistent consumer-keyed contract; Context is the transient task-binding. Validated the substrate-lens pattern years before Sentra named it.</div>
+      <div class="source-contribution">Contributed: substrate-lens pattern proof in production; Profile/Context maps to Lens/Frame</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">ASO26 / IA-EA &mdash; Adoption Details</span>
+        <span class="source-type type-internal">Prior art</span>
+      </div>
+      <div class="source-author">Andrew Crenshaw &mdash; Macmillan Learning</div>
+      <div class="source-summary">Per-course persistent record (course + institution + time) as substrate. SFDC decision-trace objects with as-is vs as-was fields as state-change primitive in microcosm &mdash; exactly the typed event consolidation the current substrate ships in Alexandria. Sales / support / leadership dashboards as role-conditioned lenses over the same memory. The credibility artifact for substrate-lens-frame at production scale.</div>
+      <div class="source-contribution">Contributed: state-change as first-class primitive (proven), bounded entity timeline, role-conditioned lens proof</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">EDR &gt; Decision Support</span>
+        <span class="source-type type-internal">Prior art</span>
+      </div>
+      <div class="source-author">Andrew Crenshaw &mdash; Macmillan Learning</div>
+      <div class="source-summary">Role-conditioned decision-support surfaces (CEO vs sales vs support) over a shared memory layer. Validated that lenses don't compound restriction &mdash; wearing more lenses widens scope. The pattern that Alexandria's multi-lens UNION rule formalizes.</div>
+      <div class="source-contribution">Contributed: role-conditioned-surface proof; multi-lens scope semantics</div>
     </div>
   </section>
 

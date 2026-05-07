@@ -804,40 +804,28 @@
   <!-- SLIDE 7: Five Levels -->
   <section class="slide" data-slide="6">
     <div class="slide-content wide">
-      <h3 class="reveal">Five Levels</h3>
-      <h2 class="reveal reveal-delay-1">From static files to organizational memory.</h2>
+      <h3 class="reveal">Architecture</h3>
+      <h2 class="reveal reveal-delay-1">Three axes, not one ladder.</h2>
       <div class="rule reveal reveal-delay-2"></div>
-      <div class="level-grid reveal reveal-delay-3">
-        <div class="level-item">
-          <div class="level-num">1</div>
-          <div class="level-name">Basic Context</div>
-          <div class="level-desc">Skills, rules, scratchpads. No learning loop. Every session starts the same.</div>
+      <div class="card-grid reveal reveal-delay-3">
+        <div class="card">
+          <span class="card-icon">&#9670;</span>
+          <h4>Storage Axis</h4>
+          <p>Living Memory (user/workspace) &mdash; Alexandria (cross-session) &mdash; Episodic Continuity (scratchpads + frames). Tells you <em>where</em> a fact lives.</p>
         </div>
-        <div class="level-item">
-          <div class="level-num">2</div>
-          <div class="level-name">Reflections</div>
-          <div class="level-desc">Session-end lessons stored in a DB. getContext at start. Light pruning.</div>
+        <div class="card">
+          <span class="card-icon">&#9670;</span>
+          <h4>Interpretation Axis</h4>
+          <p>Substrate (universal state) &mdash; Lens (DB-resident, RBAC, consumer-keyed) &mdash; Frame (DB-resident, transient, task-keyed). Tells you <em>whose view</em>.</p>
         </div>
-        <div class="level-item">
-          <div class="level-num">3</div>
-          <div class="level-name">Living Memory</div>
-          <div class="level-desc">Layered scope, entity anchoring, forgetting by design, multi-workflow.</div>
-        </div>
-        <div class="level-item active">
-          <div class="level-num">4</div>
-          <div class="level-name">Agentic Memory</div>
-          <div class="level-desc">Shared learning loop. Memory manages itself. Feeds and draws from the store.</div>
-          <span class="level-badge">We are here</span>
-        </div>
-        <div class="level-item vision">
-          <div class="level-num">5</div>
-          <div class="level-name">Alexandria</div>
-          <div class="level-desc">Org-wide library. Knowledge graph. Propositional claims. Progressive disclosure.</div>
-          <span class="level-badge vision-badge">Vision</span>
+        <div class="card">
+          <span class="card-icon">&#9670;</span>
+          <h4>Action Axis</h4>
+          <p>Typed state-changes &mdash; outcome &rarr; procedure feedback &mdash; intentional non-action. Tells you <em>how it evolves</em>.</p>
         </div>
       </div>
-      <p class="reveal reveal-delay-4" style="margin-top: 1rem;">
-        Most teams are at Level 1 or 2. We operate at <em>Level 4</em> today: agents learn from each other's sessions, share precedent across workflows, and the memory system maintains itself. Level 5 is the full org-wide knowledge library.
+      <p class="reveal reveal-delay-4" style="margin-top: 1.5rem;">
+        Five-level ladders force a single dimension. Three-axis classification is what an architecture this rich actually needs. Every memory feature gets a coordinate on each axis &mdash; storage tells you where it lives, interpretation tells you whose view, action tells you how it evolves.
       </p>
     </div>
   </section>
@@ -845,40 +833,43 @@
   <!-- SLIDE 8: M/L/P Architecture -->
   <section class="slide" data-slide="7">
     <div class="slide-content">
-      <h3 class="reveal">Architecture</h3>
-      <h2 class="reveal reveal-delay-1">Memory. Learning. Personalization.</h2>
+      <h3 class="reveal">2026 Vocabulary</h3>
+      <h2 class="reveal reveal-delay-1">Substrate. Lens. Frame.</h2>
       <div class="rule reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2" style="font-family: var(--serif); font-size: 1.2rem; color: var(--accent); font-style: italic; margin-bottom: 2rem;">
+        view = render(substrate, lens, frame)
+      </p>
       <div class="two-col reveal reveal-delay-3">
         <div>
           <p style="margin-bottom: 1.5rem;">
-            The architecture decomposes into three layers running on different timescales. Most systems have Memory. Few have Learning. Almost none have all three.
+            One substrate, many lenses, transient frames. Sentra named substrate and lens. Frame is the missing transient layer &mdash; without it, per-task plans, intent, and suppression state have nowhere to live.
           </p>
           <div class="layer-stack">
             <div class="layer">
-              <div class="layer-name">Personalization</div>
-              <div class="layer-desc">Right knowledge, right agent, right moment (getContext, retrieval filters, token budgets)</div>
-              <div class="layer-tag">Real-time</div>
+              <div class="layer-name">Frame</div>
+              <div class="layer-desc">Transient. Task-keyed. Holds intent, next-steps, footprint, suppression.</div>
+              <div class="layer-tag">DB</div>
             </div>
             <div class="layer">
-              <div class="layer-name">Learning</div>
-              <div class="layer-desc">Raw experience becomes structured knowledge (reflection, digestive pipeline, condensation, forgetting)</div>
-              <div class="layer-tag">Async</div>
+              <div class="layer-name">Lens</div>
+              <div class="layer-desc">Persistent. Consumer-keyed. RBAC capabilities + defaults + watched state-changes.</div>
+              <div class="layer-tag">DB</div>
             </div>
             <div class="layer">
-              <div class="layer-name">Memory</div>
-              <div class="layer-desc">Where knowledge lives (lessons DB, scratchpads, knowledge graph, Alexandria claims)</div>
+              <div class="layer-name">Substrate</div>
+              <div class="layer-desc">Universal. Entities + facts + state-changes + decision traces + interactions + bi-temporal validity.</div>
               <div class="layer-tag">Storage</div>
             </div>
           </div>
         </div>
         <div>
-          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Why the seams matter</h4>
+          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Why three, not two</h4>
           <p style="margin-bottom: 1.5rem;">
-            A Memory failure is data loss. A Learning failure is a missed insight or false lesson. A Personalization failure is serving the wrong context or overwhelming the agent. Naming the layers prevents conflating a retrieval problem with a storage problem.
+            Sentra ships substrate and lens. So does a well-built enterprise data platform. The transient layer is what's missing in every system we've evaluated: where does the current task's intent live? Where does "I tried this and rejected it" persist across sessions? Per-tool memory (Notion remembers Notion-stuff; Linear remembers Linear-stuff) accumulates substrate without ever building the frame. The frame is the durable position.
           </p>
-          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Agent memory vs. agentic memory</h4>
+          <h4 style="font-family: var(--serif); font-size: 1.3rem; margin-bottom: 1rem; color: var(--text);">Lens packs are the productizable surface</h4>
           <p>
-            <em>Agent memory</em> gives agents access to a store. The store is passive. <em>Agentic memory</em> manages itself via tool calls: ingesting, evaluating, connecting, consolidating, and forgetting. The memory layer is not a database with an API. It is an active participant in its own maintenance. <em>We are building agentic memory.</em>
+            The substrate generalizes. Lenses don't. A Sales lens, Success lens, Support lens, On-call lens, Exec lens &mdash; each is a packaged set of entity defaults, watched state-changes, and RBAC capabilities. <em>Lens packs are what you sell to enterprise; substrate is what you preserve as the platform.</em>
           </p>
         </div>
       </div>
@@ -972,28 +963,28 @@
       <div class="rule reveal reveal-delay-2"></div>
       <div class="diff-grid reveal reveal-delay-3">
         <div class="diff-item">
-          <div class="diff-label">Claims as installed capabilities</div>
-          <div class="diff-desc">Loading a claim doesn't retrieve a record. It gives the agent reasoning it didn't have before. A vague claim is a buggy function. A stale claim is a regression.</div>
+          <div class="diff-label">Substrate generalizes; lenses don't</div>
+          <div class="diff-desc">One substrate, many lenses. Adding a Sales lens or On-call lens doesn't fork the underlying state. Per-tool memory in everyone else's stack does.</div>
         </div>
         <div class="diff-item">
-          <div class="diff-label">Forgetting is first-class</div>
-          <div class="diff-desc">Decay tiers, condensation, supersession, archival. Not a cleanup job. A structural property. The knowledge system that can't prune is the brain that can't think.</div>
+          <div class="diff-label">Frame is first-class</div>
+          <div class="diff-desc">Transient task-binding with intent, next-steps, footprint, suppression. The layer Sentra and Glean don't ship.</div>
         </div>
         <div class="diff-item">
-          <div class="diff-label">Methodology over tooling</div>
-          <div class="diff-desc">Teams don't change their tools. They publish claims in a standard format and query context through a standard interface. The methodology is the coordination surface.</div>
+          <div class="diff-label">State-change as a typed primitive</div>
+          <div class="diff-desc">Every fact mutation emits before/after with consumer and frame annotation. Bi-temporal validity columns answer &ldquo;what did the system believe on date X.&rdquo;</div>
         </div>
         <div class="diff-item">
-          <div class="diff-label">Encountered, not just sought</div>
-          <div class="diff-desc">High-value knowledge is encountered during reading via [[wiki-links]]. Agents encounter reasoning inline, not just query results. Search gives you content. Graphs give you structure.</div>
+          <div class="diff-label">Memory fragmentation is the moat</div>
+          <div class="diff-desc">Notion remembers Notion-stuff. Linear remembers Linear-stuff. Cursor remembers Cursor-stuff. Glean searches across them but doesn't preserve state-change. The substrate that remembers across systems is the durable position.</div>
         </div>
         <div class="diff-item">
-          <div class="diff-label">Shared across people and agents</div>
-          <div class="diff-desc">Every correction, every lesson, every connection improves the graph for the next person and the next agent. The loop compounds across the organization.</div>
+          <div class="diff-label">Forgetting + intentional non-action</div>
+          <div class="diff-desc">Decay, condensation, supersession at write time; trigger-layer act/wait/escalate/no-op decisions at action time. Restraint is structural, not silence.</div>
         </div>
         <div class="diff-item">
-          <div class="diff-label">Graph-first architecture</div>
-          <div class="diff-desc">The industry starts from Naive RAG and patches toward graphs. We start from the graph. Curated traversal handles natively what RAG escalations work around.</div>
+          <div class="diff-label">Personal-scale dogfood, enterprise-shaped</div>
+          <div class="diff-desc">Solo dogfood &gt; enterprise vapor. Years of substrate accumulation under load is the credibility artifact. Lens-pack productization remains option-value.</div>
         </div>
       </div>
     </div>
@@ -1006,10 +997,10 @@
       <h2 class="reveal reveal-delay-1">The industry is converging<br>on what we're building.</h2>
       <div class="rule center reveal reveal-delay-2"></div>
       <p class="reveal reveal-delay-3" style="font-size: clamp(1.1rem, 1.8vw, 1.3rem); color: var(--text-dim); margin-top: 1.5rem;">
-        RAG is adding graphs. Graphs are adding agents. Agent memory is adding learning loops and forgetting. Context engineering is becoming the discipline that ties them together. Living Memory and Alexandria sit at the intersection: <em>agentic memory on a knowledge graph, with context engineering as the serving layer.</em> The pattern has now been validated across two platforms: the PDT (TypeScript/SQLite) and Strata (Python/PostgreSQL+pgvector).
+        RAG added graphs. Graphs added agents. Agent memory added learning loops and forgetting. Sentra named substrate and lens. We added frame. The 2026 architecture is one substrate, many lenses, transient frames &mdash; <em>view = render(substrate, lens, frame)</em>. Validated across two platforms: Forge (an agentic project-orchestration platform on TypeScript / SQLite) and Strata (an autonomous job-search OS on Python / PostgreSQL + pgvector).
       </p>
       <p class="reveal reveal-delay-4" style="margin-top: 2rem; font-family: var(--serif); font-size: 1.3rem; color: var(--accent); font-style: italic;">
-        Memory is the multiplier. Agency is the force.
+        Memory fragmentation is the moat. The substrate that remembers across systems is the durable position.
       </p>
     </div>
   </section>
