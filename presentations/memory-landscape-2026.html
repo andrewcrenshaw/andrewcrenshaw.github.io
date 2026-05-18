@@ -933,13 +933,13 @@
       <h2 class="reveal reveal-delay-1">Validated against 30+ external sources.</h2>
       <div class="rule reveal reveal-delay-2"></div>
       <p class="reveal reveal-delay-2" style="margin-bottom: 1.5rem;">
-        We pressure-tested the architecture against LangChain, Engram, ALMA, MemGPT/Letta, Cognee, MAPLE, Anthropic's memory tool, a major 2026 academic survey, 8 RAG architecture patterns, the NLAH paper on harness engineering, Thoughtworks and OpenAI harness patterns, and the thought leadership of Karpathy, Cherny, and PAL. What we found:
+        We pressure-tested the architecture against LangChain, Engram, ALMA, MemGPT/Letta, Cognee, MAPLE, Anthropic's memory tool, a major 2026 academic survey, 8 RAG architecture patterns, the NLAH paper on harness engineering, Thoughtworks and OpenAI harness patterns, and the thought leadership of Karpathy, Cherny, and PAL. Two 2026 empirical papers additionally quantify Karpathy's file-system principle: Cao et al. (arXiv 2603.20432) show agents with filesystem-organized context outperforming SoTA by +17.3%; Lee et al. / Stanford (arXiv 2603.28052) show +7.7 points with 4&times; fewer tokens. What we found:
       </p>
       <div class="card-grid reveal reveal-delay-3">
         <div class="card">
           <span class="card-icon" style="color: var(--green);">&#10003;</span>
           <h4>Validated strengths</h4>
-          <p>Hierarchical token-level memory (academic gold standard). Memory evolution (decay, condensation, supersession) ahead of the field. Propositional framing matches the "retrieve-then-generate" paradigm the industry is moving toward. Forgetting design is the most complete in any source evaluated.</p>
+          <p>Hierarchical token-level memory (academic gold standard). Memory evolution (decay, condensation, supersession) ahead of the field. Propositional framing matches the "retrieve-then-generate" paradigm the industry is moving toward. Forgetting design is the most complete in any source evaluated. File-system-as-state: independently confirmed by two 2026 empirical papers (Cao et al. +17.3%; Lee et al. / Stanford +7.7pt) — the exact pattern this architecture already implements in .agent-data/, scratchpads, and decision traces.</p>
         </div>
         <div class="card">
           <span class="card-icon" style="color: var(--orange);">&#9670;</span>
