@@ -9,16 +9,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0c0f14;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --bg-card-hover: rgba(255, 255, 255, 0.07);
-      --text: #e8e4df;
-      --text-dim: #8a857e;
-      --accent: #c9a54e;
-      --accent-dim: rgba(201, 165, 78, 0.15);
-      --accent-glow: rgba(201, 165, 78, 0.08);
-      --red: #c75b5b;
-      --green: #6bab73;
+      --bg: #06202b;
+      --bg-card: rgba(120, 200, 220, 0.06);
+      --bg-card-hover: rgba(120, 200, 220, 0.11);
+      --text: #dce9ed;
+      --text-dim: #7fa3ad;
+      --accent: #58c5d8;
+      --accent-dim: rgba(88, 197, 216, 0.15);
+      --accent-glow: rgba(88, 197, 216, 0.10);
+      --red: #d98a8a;
+      --green: #7fc8a0;
       --serif: 'Cormorant Garamond', Georgia, serif;
       --sans: 'Outfit', -apple-system, sans-serif;
       --pad: clamp(2rem, 6vw, 5rem);
@@ -34,7 +34,10 @@
 
     body {
       font-family: var(--sans);
-      background: var(--bg);
+      background:
+        radial-gradient(120% 50% at 50% -10%, rgba(130, 215, 235, 0.10), transparent 60%),
+        linear-gradient(180deg, #0b2c3a 0%, #06202b 55%, #041820 100%);
+      background-attachment: fixed;
       color: var(--text);
       overflow-x: hidden;
       line-height: 1.6;

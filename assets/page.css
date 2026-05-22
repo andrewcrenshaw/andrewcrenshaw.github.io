@@ -27,18 +27,24 @@ body {
 
 /* ---- category identities ---- */
 body.cat-writing {
-  --page-tint: #E8DFC2; --accent: #8A6B33;
-  /* ruled wheat-tan writing paper + light fibrous texture */
+  --page-tint: #EAE3D2; --accent: #8A6B33;
+  /* ruled parchment writing paper (muted, less yellow) + light fibrous texture */
   background-image:
     linear-gradient(rgba(74,56,26,0.10) 1px, transparent 1px),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.34 0 0 0 0 0.28 0 0 0 0 0.13 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.30 0 0 0 0 0.26 0 0 0 0 0.16 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
   background-size: 100% 34px, 200px 200px;
 }
 body.cat-deepdives {
-  --page-tint: #DAE6F0; --accent: #1F6E9C;
-  /* dot-grid "ocean depth" paper */
-  background-image: radial-gradient(rgba(20,50,75,0.12) 1px, transparent 1px);
-  background-size: 22px 22px;
+  --page-tint: #C9DCEA; --accent: #14546E;
+  background-color: #BFD4E4;
+  /* underwater: surface light + caustic ripples + dot grid + depth gradient */
+  background-image:
+    radial-gradient(140% 55% at 50% -12%, rgba(255,255,255,0.55), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011 0.017' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.84 0 0 0 0 0.92 0 0 0 0 1 0 0 0 0.13 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E"),
+    radial-gradient(rgba(12,52,75,0.13) 1px, transparent 1px),
+    linear-gradient(180deg, #D4E3EE 0%, #A9C6DB 100%);
+  background-size: 100% 100%, 340px 340px, 22px 22px, 100% 100%;
+  background-attachment: fixed, fixed, scroll, fixed;
 }
 body.cat-career {
   --page-tint: #F2EEE4; --accent: #1C3D5A;
