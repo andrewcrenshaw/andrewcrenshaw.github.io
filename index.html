@@ -345,6 +345,12 @@
   .ix-title::after { content: " \2192"; color: var(--blue); opacity: 0; transition: opacity 0.25s var(--ease); }
   .index-row:hover .ix-title::after { opacity: 1; }
   .ix-tag { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-soft); border: 1px solid var(--line); padding: 0.24rem 0.6rem; border-radius: 100px; white-space: nowrap; }
+  /* Deep-dive rows dive into the deep on hover: a glimpse of the underwater page */
+  .tint-deepdives .index-row:hover { background: linear-gradient(180deg, #0d2f3d, #07212c); }
+  .tint-deepdives .index-row:hover .ix-title,
+  .tint-deepdives .index-row:hover .ix-no { color: #eaf5f8; }
+  .tint-deepdives .index-row:hover .ix-title::after { color: #58c5d8; }
+  .tint-deepdives .index-row:hover .ix-tag { color: #aee0ea; border-color: rgba(120, 200, 220, 0.45); }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 5rem); }
   @media (max-width: 820px) { .two-col { grid-template-columns: 1fr; gap: 3rem; } }
 
