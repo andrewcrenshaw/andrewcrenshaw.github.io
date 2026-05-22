@@ -284,6 +284,22 @@
       opacity: 0.25;
     }
   </style>
+  <style>
+    /* Deep-ocean retheme (redesign 2026-05) */
+    :root {
+      --bg: #06202b;
+      --bg-card: rgba(120, 200, 220, 0.06);
+      --border: rgba(120, 200, 220, 0.16);
+      --accent: #58c5d8;
+      --accent-dim: rgba(88, 197, 216, 0.15);
+    }
+    body {
+      background:
+        radial-gradient(120% 50% at 50% -10%, rgba(130, 215, 235, 0.10), transparent 60%),
+        linear-gradient(180deg, #0b2c3a 0%, #06202b 55%, #041820 100%);
+      background-attachment: fixed;
+    }
+  </style>
 </head>
 <body>
 
@@ -308,9 +324,9 @@
 
     <p>The technical overview makes claims about the state of the field, validated strengths, and gaps. This supplement provides the sources behind those claims so readers can evaluate them independently.</p>
 
-    <p>Between February and March 2026, we conducted a structured pressure-test of the Living Memory and Alexandria architecture against <strong>20+ external sources</strong> spanning academic papers, open-source projects, industry articles, and commercial products. Each source was evaluated in a dedicated document that compares its approach to ours, identifies what we should adopt, and notes where our design diverges.</p>
+    <p>Between February and May 2026, we conducted a structured pressure-test of the Living Memory and Alexandria architecture against <strong>35+ external sources</strong> spanning academic papers, open-source projects, industry articles, and commercial products. Each source was evaluated in a dedicated document that compares its approach to ours, identifies what we should adopt, and notes where our design diverges.</p>
 
-    <p>Not all original source materials are preserved (some were live demos, videos, or paywalled content). Where external links exist, they are included below. Our evaluation documents are available in the project repository under <code>docs/research/</code>.</p>
+    <p>Not all original source materials are preserved (some were live demos, videos, or paywalled content). Where external links exist, they are included below so you can evaluate each source directly.</p>
 
     <p>The May 2026 update adds three categories the earlier supplement omitted: (a) Sentra's <em>Company Brain</em> series, which crystallized substrate-vs-lens vocabulary; (b) internal architectural decision records (ADRs) and planning documents that drive the current architecture; (c) prior-art from Andrew's tenure at Macmillan Learning (UXF, ASO26 / IA-EA, EDR Decision Support), where the substrate-lens pattern shipped in production before Alexandria existed.</p>
   </section>
@@ -359,7 +375,7 @@
         </tr>
         <tr>
           <td>No one is building the full knowledge engineering discipline</td>
-          <td>All 20+ sources</td>
+          <td>All evaluated sources</td>
           <td>No evaluated system treats knowledge claims as installed capabilities requiring dependency tracking, impact analysis, capability testing, and deprecation management. This is an absence claim; future sources may disprove it.</td>
         </tr>
         <tr>
@@ -443,6 +459,19 @@
       <div class="source-author">Cornelius (@molt_cornelius)</div>
       <div class="source-summary">24-article series on knowledge management. Article 24 ("What Search Cannot Find") crystallized the graph-vs-search distinction: search retrieves what you ask for; graph traversal discovers what you didn't know to ask. Foundation for our knowledge graph architecture.</div>
       <div class="source-contribution">Contributed: Graph-vs-search framing, metabolism metaphor, Alexandria naming inspiration</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">World Models, AGI &amp; Life&ndash;Mind Continuity</span>
+        <span class="source-type type-paper">Paper</span>
+      </div>
+      <div class="source-author">Safron et al., Phil. Trans. R. Soc. A 384:20240533 (2026); contributors incl. Levin, Krakauer, Mitchell, Gershman, Tenenbaum</div>
+      <div class="source-summary">Editorial introduction to a Royal Society themed issue (18 contributions) on world models in natural and artificial intelligence; read as a gateway, not a single paper. Its useful contribution is a vocabulary for distinguishing kinds of world models (causal vs. self-referential, individual goal-directed vs. collective, narrative vs. mechanistic), which sharpens the loosely-used "context, frame, lens, substrate, world model" terms in our architecture. Source bias flagged up front: curated by the active-inference / Free Energy Principle community, with the scaling hypothesis represented mostly as a foil.</div>
+      <div class="source-links">
+        <a href="https://royalsocietypublishing.org/rsta/article/384/2320/20240533" target="_blank">Royal Society (rsta)</a>
+      </div>
+      <div class="source-contribution">Contributed: vocabulary for distinguishing world-model types; gateway to 18 contributed papers for on-demand depth</div>
     </div>
   </section>
 

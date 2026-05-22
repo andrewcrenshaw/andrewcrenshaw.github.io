@@ -1,151 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Local Inference at the Edge: A Four-Machine Fleet — Andrew Crenshaw</title>
-  <meta name="description" content="Building a home inference cluster across four Apple Silicon machines — schedule-driven model switching, oMLX routing, and the economics of zero variable inference cost.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0a0e14;
-      --bg-surface: #0f1319;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.06);
-      --border-accent: rgba(78, 168, 201, 0.25);
-      --text: #e4e8ed;
-      --text-dim: #7e8a97;
-      --text-faint: #4a5568;
-      --accent: #4ea8c9;
-      --accent-dim: rgba(78, 168, 201, 0.15);
-      --accent-glow: rgba(78, 168, 201, 0.08);
-      --green: #6bab73;
-      --orange: #c9954e;
-      --serif: 'Cormorant Garamond', Georgia, serif;
-      --sans: 'Outfit', -apple-system, sans-serif;
-      --mono: 'JetBrains Mono', monospace;
-      --pad: clamp(1.5rem, 5vw, 5rem);
-      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-      line-height: 1.7;
-      font-weight: 300;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.25;
-    }
-
-    .top-bar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 500;
-      padding: 1rem var(--pad);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(10, 14, 20, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .top-bar .name { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; color: var(--text); text-decoration: none; }
-    .top-bar .back-link { font-size: 0.8rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; transition: color 0.3s; }
-    .top-bar .back-link:hover { color: var(--accent); }
-
-    .article-wrapper { max-width: 720px; margin: 0 auto; padding: 8rem var(--pad) 4rem; position: relative; z-index: 1; }
-    .article-label { font-family: var(--sans); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 0.8rem; }
-    .article-title { font-family: var(--serif); font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; line-height: 1.15; color: var(--text); letter-spacing: -0.01em; margin-bottom: 1rem; }
-    .article-subtitle { font-size: clamp(0.95rem, 1.3vw, 1.1rem); color: var(--text-dim); margin-bottom: 2.5rem; max-width: 600px; }
-    .rule { width: 40px; height: 2px; background: var(--accent); margin-bottom: 2.5rem; }
-
-    .article-body p { font-size: clamp(0.95rem, 1.3vw, 1.08rem); line-height: 1.85; color: var(--text-dim); max-width: none; margin-bottom: 1.5rem; }
-    .article-body p strong { color: var(--text); font-weight: 500; }
-    .article-body p em { font-style: italic; color: var(--accent); font-family: var(--serif); font-size: 1.05em; }
-    .article-body h3 { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--text); }
-
-    .callout { background: var(--bg-card); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.2rem 1.5rem; margin: 2rem 0; font-size: 0.95rem; color: var(--text); line-height: 1.7; }
-    .callout.orange { border-left-color: var(--orange); }
-
-    .data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; }
-    .data-table th { font-family: var(--sans); font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; color: var(--accent); text-align: left; padding: 0.8rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .data-table td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-dim); vertical-align: top; line-height: 1.5; }
-    .data-table td:first-child { color: var(--text); font-weight: 400; }
-
-    .article-footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-    .article-footer a { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; color: var(--accent); transition: opacity 0.3s; }
-    .article-footer a:hover { opacity: 0.7; }
-    .article-footer .date { font-size: 0.78rem; color: var(--text-faint); }
-
-    .fade-in { opacity: 0; transform: translateY(20px); animation: fadeUp 0.6s var(--ease) forwards; }
-    .fade-in-d1 { animation-delay: 0.1s; }
-    .fade-in-d2 { animation-delay: 0.2s; }
-    .fade-in-d3 { animation-delay: 0.3s; }
-    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Local Inference at the Edge: A Four-Machine Fleet — Andrew Crenshaw</title>
+<meta name="description" content="From two Mac Minis to a four-machine Apple Silicon cluster: schedule-driven model switching, oMLX routing, and local inference wired into every layer of the stack." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/page.css" />
 </head>
-<body>
+<body class="cat-writing">
+<header>
+  <div class="bar">
+    <a href="../index.html#writing" class="back">&larr; Andrew Crenshaw</a>
+    <span class="crumb">Writing</span>
+  </div>
+</header>
+<article>
+  <div class="eyebrow"><span class="rule"></span> Build log &middot; Updated May 2026</div>
+  <h1>Local Inference at the Edge: A Four-Machine Fleet</h1>
+  <p class="lede">From two Mac Minis to a four-machine Apple Silicon cluster: schedule-driven model switching, oMLX routing, and what it looks like to wire local inference into every layer of the stack.</p>
 
-<div class="top-bar">
-  <a href="/" class="name">Andrew Crenshaw</a>
-  <a href="/#writing" class="back-link">&larr; Back to Writing</a>
-</div>
+  <p>Every conversation about running local AI eventually hits the same question: <em>why bother?</em></p>
 
-<article class="article-wrapper">
-  <div class="article-label fade-in">Lessons from Building</div>
-  <h1 class="article-title fade-in fade-in-d1">Local Inference at the Edge: A Four-Machine Fleet</h1>
-  <p class="article-subtitle fade-in fade-in-d2">From two Mac Minis to a four-machine Apple Silicon cluster — schedule-driven model switching, oMLX routing, and what it looks like to wire local inference into every layer of the stack.</p>
-  <div class="rule fade-in fade-in-d2"></div>
+  <p>The honest answer isn't "API costs." I've spent more on hardware than I'd spend on API costs in years of current-volume operation. That's not the story.</p>
 
-  <div class="article-body fade-in fade-in-d3">
-    <p>Every conversation about running local AI eventually hits the same question: <em>why bother?</em></p>
+  <p>The story is control, privacy, and what you learn by actually running the models. For the kind of work I'm doing with Strata, where the job-scoring pipeline handles salary data, career targets, and interview coaching content, everything staying local isn't optional. Beyond that: when you manage your own inference fleet, you configure temperature, quantization, context windows, and thinking-on/thinking-off per workload. You can't do any of that through an API. And frontier lab pricing is demonstrably subsidized; tightening usage tiers are already the story. Converting that uncertainty to a fixed electricity bill is structurally sound.</p>
 
-    <p>The honest answer isn't "API costs." I've spent more on hardware than I'd spend on API costs in years of current-volume operation. That's not the story.</p>
+  <p>So I built a four-machine cluster, three Mac Minis and a Mac Studio, running local model inference on Apple Silicon via oMLX. Here's what the setup looks like today and what I've learned from running it.</p>
 
-    <p>The story is control, privacy, and what you learn by actually running the models. For the kind of work I'm doing with Strata — where the job-scoring pipeline handles salary data, career targets, and interview coaching content — everything staying local isn't optional. Beyond that: when you manage your own inference fleet, you configure temperature, quantization, context windows, and thinking-on/thinking-off per workload. You can't do any of that through an API. And frontier lab pricing is demonstrably subsidized; tightening usage tiers are already the story. Converting that uncertainty to a fixed electricity bill is structurally sound.</p>
+  <h3>The infrastructure</h3>
 
-    <p>So I built a four-machine cluster — three Mac Minis and a Mac Studio — running local model inference on Apple Silicon via oMLX. Here's what the setup looks like today and what I've learned from running it.</p>
-
-    <h3>The infrastructure</h3>
-
+  <div class="table-wrap">
     <table class="data-table">
       <thead><tr><th>Machine</th><th>Spec</th><th>Primary Role</th></tr></thead>
       <tbody>
-        <tr><td>mac-studio1</td><td>M3 Ultra, 96GB RAM, 28 cores</td><td>Primary oMLX host — all production inference (Strata + Alexandria); OWC storage hub (22TB SMB exports)</td></tr>
-        <tr><td>mac-mini3</td><td>M4 Pro, 64GB RAM, 4TB internal</td><td>Secondary oMLX host — Alexandria librarian + overnight synthesis; Strata failover</td></tr>
-        <tr><td>mac-mini1</td><td>M4, 16GB RAM, 228GB internal</td><td>Edge oMLX — <code>extract-fast</code> + <code>embed-fast</code>, always-on</td></tr>
-        <tr><td>mac-mini2</td><td>M4, 16GB RAM, 228GB internal</td><td>Edge oMLX mirror — round-robin load balance + failover for mini1</td></tr>
+        <tr><td>mac-studio1</td><td>M3 Ultra, 96GB RAM, 28 cores</td><td>Primary oMLX host: all production inference (Strata + Alexandria); OWC storage hub (22TB SMB exports)</td></tr>
+        <tr><td>mac-mini3</td><td>M4 Pro, 64GB RAM, 4TB internal</td><td>Secondary oMLX host: Alexandria librarian + overnight synthesis; Strata failover</td></tr>
+        <tr><td>mac-mini1</td><td>M4, 16GB RAM, 228GB internal</td><td>Edge oMLX: <code>extract-fast</code> + <code>embed-fast</code>, always-on</td></tr>
+        <tr><td>mac-mini2</td><td>M4, 16GB RAM, 228GB internal</td><td>Edge oMLX mirror: round-robin load balance + failover for mini1</td></tr>
       </tbody>
     </table>
+  </div>
 
-    <p>All four machines are connected via Ethernet on the same LAN. Each also runs a Tailscale node, giving my laptop encrypted WireGuard access from anywhere. No port forwarding, no dynamic DNS, no exposed services.</p>
+  <p>All four machines are connected via Ethernet on the same LAN. Each also runs a Tailscale node, giving my laptop encrypted WireGuard access from anywhere. No port forwarding, no dynamic DNS, no exposed services.</p>
 
-    <p>Inference runs as <code>launchd</code> daemons — macOS's native service manager. They start on boot, restart on crash, and log to standard locations. No Docker, no Kubernetes, no orchestration layer. The infrastructure should be proportional to the actual complexity.</p>
+  <p>Inference runs as <code>launchd</code> daemons, macOS's native service manager. They start on boot, restart on crash, and log to standard locations. No Docker, no Kubernetes, no orchestration layer. The infrastructure should be proportional to the actual complexity.</p>
 
-    <h3>The inference engine: oMLX, not Ollama or vanilla MLX</h3>
+  <h3>The inference engine: oMLX, not Ollama or vanilla MLX</h3>
 
-    <p>The serving runtime matters more than I expected. The fleet runs <strong>oMLX 0.3.8</strong> — a purpose-built Mac inference server that's distinct from both Apple's MLX framework and Ollama. The difference: oMLX adds DFlash (token-budget-aware attention caching for single-request throughput), TurboQuant (dynamic quantization at high context lengths), and continuous-batching profiles for multi-agent fan-out. It exposes an OpenAI-compatible API on port 8000, which means any client that speaks that protocol can route to it.</p>
+  <p>The serving runtime matters more than I expected. The fleet runs <strong>oMLX 0.3.8</strong>, a purpose-built Mac inference server that's distinct from both Apple's MLX framework and Ollama. The difference: oMLX adds DFlash (token-budget-aware attention caching for single-request throughput), TurboQuant (dynamic quantization at high context lengths), and continuous-batching profiles for multi-agent fan-out. It exposes an OpenAI-compatible API on port 8000, which means any client that speaks that protocol can route to it.</p>
 
-    <p>The fleet is organized into three tiers by hardware capability:</p>
+  <p>The fleet is organized into three tiers by hardware capability:</p>
 
-    <p><strong>Heavy tier — mac-studio1</strong> (M3 Ultra, 96GB, ~820 GB/s memory bandwidth) carries all production online inference. Two Qwen3.6 models resident simultaneously:</p>
+  <p><strong>Heavy tier, mac-studio1</strong> (M3 Ultra, 96GB, ~820 GB/s memory bandwidth) carries all production online inference. Two Qwen3.6 models resident simultaneously:</p>
 
+  <div class="table-wrap">
     <table class="data-table">
       <thead><tr><th>Model</th><th>Size</th><th>Slots</th></tr></thead>
       <tbody>
@@ -154,82 +65,85 @@
         <tr><td>DFlash draft weight (~0.93 GB)</td><td>&lt;1 GB</td><td>Required for DFlash-ON profile on the 35B MoE</td></tr>
       </tbody>
     </table>
+  </div>
 
-    <p>With DFlash enabled on the 35B MoE, interactive throughput reaches 245–326 tok/s for single requests. The 27B Dense model runs with thinking enabled for synthesis work — it hits 91.9% TruthfulQA, which matters when generating interview coaching content or Alexandria knowledge bootstraps where accuracy is the constraint, not speed.</p>
+  <p>With DFlash enabled on the 35B MoE, interactive throughput reaches 245&ndash;326 tok/s for single requests. The 27B Dense model runs with thinking enabled for synthesis work, it hits 91.9% TruthfulQA, which matters when generating interview coaching content or Alexandria knowledge bootstraps where accuracy is the constraint, not speed.</p>
 
-    <p><strong>Medium tier — mac-mini3</strong> (M4 Pro, 64GB, 4TB internal) is the dedicated Alexandria worker. One model loaded permanently:</p>
+  <p><strong>Medium tier, mac-mini3</strong> (M4 Pro, 64GB, 4TB internal) is the dedicated Alexandria worker. One model loaded permanently:</p>
 
+  <div class="table-wrap">
     <table class="data-table">
       <thead><tr><th>Model</th><th>Size</th><th>Profile</th></tr></thead>
       <tbody>
-        <tr><td><code>Qwen3.6-27B-MLX-8bit</code> (Dense)</td><td>~27 GB</td><td>Thinking ON, TurboQuant ON at ≥65K context, 65K context window</td></tr>
+        <tr><td><code>Qwen3.6-27B-MLX-8bit</code> (Dense)</td><td>~27 GB</td><td>Thinking ON, TurboQuant ON at &ge;65K context, 65K context window</td></tr>
       </tbody>
     </table>
+  </div>
 
-    <p>mini3 runs the nightly Alexandria schedule — synthesis-detector, wiki-lint, link-builder, dedup — on its own hardware so it never competes with studio1's live traffic. With 64GB and a 4TB local drive for model storage, it handles librarian-curate passes that take an hour without impacting anything else on the fleet.</p>
+  <p>mini3 runs the nightly Alexandria schedule, synthesis-detector, wiki-lint, link-builder, dedup, on its own hardware so it never competes with studio1's live traffic. With 64GB and a 4TB local drive for model storage, it handles librarian-curate passes that take an hour without impacting anything else on the fleet.</p>
 
-    <p><strong>Edge tier — mac-mini1 + mac-mini2</strong> (M4, 16GB each, mirrored config) serve Living Memory's near-real-time slots. Two models co-loaded per machine (~2.5 GB total):</p>
+  <p><strong>Edge tier, mac-mini1 + mac-mini2</strong> (M4, 16GB each, mirrored config) serve Living Memory's near-real-time slots. Two models co-loaded per machine (~2.5 GB total):</p>
 
+  <div class="table-wrap">
     <table class="data-table">
       <thead><tr><th>Model</th><th>Size</th><th>Slot</th></tr></thead>
       <tbody>
-        <tr><td><code>Qwen3.6-2B-MLX-4bit</code></td><td>~1.6 GB</td><td><code>extract-fast</code> — dup-check, chunk summarize, quick classification</td></tr>
-        <tr><td><code>snowflake-arctic-embed-l-v2.0-8bit</code></td><td>~600 MB</td><td><code>embed-fast</code> — 1024-dim embeddings</td></tr>
+        <tr><td><code>Qwen3.6-2B-MLX-4bit</code></td><td>~1.6 GB</td><td><code>extract-fast</code>: dup-check, chunk summarize, quick classification</td></tr>
+        <tr><td><code>snowflake-arctic-embed-l-v2.0-8bit</code></td><td>~600 MB</td><td><code>embed-fast</code>: 1024-dim embeddings</td></tr>
       </tbody>
     </table>
+  </div>
 
-    <p>The edge machines exist for one reason: isolation. When an agent is actively coding and a duplicate-check fires, I want a sub-3s response regardless of what studio1 is doing (which might be a long synthesis job or a Strata batch run). mini1 is primary, mini2 is immediate failover. Resolver routes <code>extract-fast</code> and <code>embed-fast</code> to the edge tier first; falls back to studio1 only if both edge machines are unreachable.</p>
+  <p>The edge machines exist for one reason: isolation. When an agent is actively coding and a duplicate-check fires, I want a sub-3s response regardless of what studio1 is doing (which might be a long synthesis job or a Strata batch run). mini1 is primary, mini2 is immediate failover. Resolver routes <code>extract-fast</code> and <code>embed-fast</code> to the edge tier first; falls back to studio1 only if both edge machines are unreachable.</p>
 
-    <h3>The slot layer: how applications talk to the fleet</h3>
+  <h3>The slot layer: how applications talk to the fleet</h3>
 
-    <p>Application code doesn't call specific models or machines — it calls <em>slots</em>. The role-resolver maps each slot to a <code>(model_name, profile, host)</code> tuple at runtime. Change the binding, not the code.</p>
+  <p>Application code doesn't call specific models or machines, it calls <em>slots</em>. The role-resolver maps each slot to a <code>(model_name, profile, host)</code> tuple at runtime. Change the binding, not the code.</p>
 
+  <div class="table-wrap">
     <table class="data-table">
       <thead><tr><th>Slot</th><th>Host</th><th>Model</th><th>Used For</th></tr></thead>
       <tbody>
         <tr><td><code>embed-fast</code></td><td>mini1/2</td><td>snowflake-arctic-embed-l</td><td>Embeddings for Living Memory retrieval</td></tr>
-        <tr><td><code>extract-fast</code></td><td>mini1/2 → studio1</td><td>2B MLX-4bit → 35B MoE</td><td>Dup-check, chunk summarize, quick extraction</td></tr>
+        <tr><td><code>extract-fast</code></td><td>mini1/2 &rarr; studio1</td><td>2B MLX-4bit &rarr; 35B MoE</td><td>Dup-check, chunk summarize, quick extraction</td></tr>
         <tr><td><code>score-fast</code></td><td>studio1</td><td>35B MoE + DFlash + continuous batching</td><td>Strata Stage 2A: fast scoring, ~290 tok/s aggregate</td></tr>
         <tr><td><code>score-deep</code></td><td>studio1</td><td>35B MoE, no DFlash</td><td>Strata Stage 2B: deep evaluation</td></tr>
-        <tr><td><code>chat-interactive</code></td><td>studio1</td><td>35B MoE + DFlash</td><td>Interactive agent turns, 245–326 tok/s</td></tr>
+        <tr><td><code>chat-interactive</code></td><td>studio1</td><td>35B MoE + DFlash</td><td>Interactive agent turns, 245&ndash;326 tok/s</td></tr>
         <tr><td><code>synth-deep</code></td><td>studio1 / mini3</td><td>27B Dense, thinking ON</td><td>Coach synthesis, Alexandria knowledge bootstrap</td></tr>
         <tr><td><code>librarian-curate</code></td><td>mini3 (nightly)</td><td>27B Dense, thinking ON, 65K ctx</td><td>Wiki lint, link-builder, dedup, staleness detection</td></tr>
       </tbody>
     </table>
+  </div>
 
-    <p>One oMLX quirk worth knowing: 0.3.8 supports one profile per loaded model name. To run the same base model under two different profiles (e.g., 27B Dense with thinking ON for synthesis vs. thinking OFF for fast scoring), you load it under two distinct names using symlinks. Same weights on disk, two registered model IDs, two independent profile configs. It doesn't double memory usage as long as only one is active at a time.</p>
+  <p>One oMLX quirk worth knowing: 0.3.8 supports one profile per loaded model name. To run the same base model under two different profiles (e.g., 27B Dense with thinking ON for synthesis vs. thinking OFF for fast scoring), you load it under two distinct names using symlinks. Same weights on disk, two registered model IDs, two independent profile configs. It doesn't double memory usage as long as only one is active at a time.</p>
 
-    <p>Alexandria's knowledge operations — session priming, daily digests, knowledge queries — route to mini3 and studio1 via the same slot abstraction. When mini3 is running a long librarian pass, studio1's live-traffic capacity is untouched. Retrieval happens locally against SQLite/LanceDB on the calling machine; the LLM only runs for synthesis steps that actually need it.</p>
+  <p>Alexandria's knowledge operations, session priming, daily digests, knowledge queries, route to mini3 and studio1 via the same slot abstraction. When mini3 is running a long librarian pass, studio1's live-traffic capacity is untouched. Retrieval happens locally against SQLite/LanceDB on the calling machine; the LLM only runs for synthesis steps that actually need it.</p>
 
-    <h3>Shadow-mode calibration</h3>
+  <h3>Shadow-mode calibration</h3>
 
-    <p>Here's the part most teams skip. You can't just deploy a local model and hope it's "good enough." You need <em>data</em> proving it.</p>
+  <p>Here's the part most teams skip. You can't just deploy a local model and hope it's "good enough." You need <em>data</em> proving it.</p>
 
-    <div class="callout">
-      <strong>Shadow mode</strong> means running both the cloud model and the local model on the same input simultaneously, then comparing results. You keep using the cloud model for production scoring while silently collecting local model outputs for evaluation. The local model earns production traffic by demonstrating agreement on real data, not synthetic benchmarks.
-    </div>
+  <div class="callout"><strong>Shadow mode</strong> means running both the cloud model and the local model on the same input simultaneously, then comparing results. You keep using the cloud model for production scoring while silently collecting local model outputs for evaluation. The local model earns production traffic by demonstrating agreement on real data, not synthetic benchmarks.</div>
 
-    <p>The metrics we track:</p>
+  <p>The metrics we track:</p>
 
+  <div class="table-wrap">
     <table class="data-table">
       <thead><tr><th>Metric</th><th>What It Measures</th><th>Target</th></tr></thead>
       <tbody>
-        <tr><td>Pearson R correlation</td><td>Numerical score agreement between cloud and local</td><td>≥ 0.85</td></tr>
-        <tr><td>Routing-tier agreement</td><td>Same match tier (Strong/Medium/Weak/No) assigned</td><td>≥ 90%</td></tr>
-        <tr><td>Latency per evaluation</td><td>Time-to-score for a single listing</td><td>≤ 30s</td></tr>
-        <tr><td>Failure rate</td><td>Malformed or empty responses</td><td>≤ 2%</td></tr>
+        <tr><td>Pearson R correlation</td><td>Numerical score agreement between cloud and local</td><td>&ge; 0.85</td></tr>
+        <tr><td>Routing-tier agreement</td><td>Same match tier (Strong/Medium/Weak/No) assigned</td><td>&ge; 90%</td></tr>
+        <tr><td>Latency per evaluation</td><td>Time-to-score for a single listing</td><td>&le; 30s</td></tr>
+        <tr><td>Failure rate</td><td>Malformed or empty responses</td><td>&le; 2%</td></tr>
       </tbody>
     </table>
-
-    <p>When the local model consistently meets these thresholds on a large enough sample (100+ evaluations), you can start routing production traffic to it. The routing is gradual: start with "easy" matches (high-confidence Strong or No Match), then expand the routing as confidence grows.</p>
-
   </div>
 
-  <div class="article-footer">
-    <a href="/#writing">&larr; All posts</a>
-    <span class="date">Updated May 2026</span>
-  </div>
+  <p>When the local model consistently meets these thresholds on a large enough sample (100+ evaluations), you can start routing production traffic to it. The routing is gradual: start with "easy" matches (high-confidence Strong or No Match), then expand the routing as confidence grows.</p>
+
+  <div class="end-rule"></div>
+  <a href="../index.html#writing" class="more">&larr; All writing</a>
 </article>
-
+<footer><div class="fbar"><span>&copy; 2026 Andrew Crenshaw</span><span>Enterprise AI &middot; Built, not theorized</span></div></footer>
 </body>
 </html>
