@@ -35,9 +35,9 @@ body.cat-writing {
   background-size: 100% 34px, 200px 200px;
 }
 body.cat-deepdives {
-  --page-tint: #E2E8DB; --accent: #566B3C;
-  /* dot-grid "engineering paper" */
-  background-image: radial-gradient(rgba(27,26,22,0.10) 1px, transparent 1px);
+  --page-tint: #DAE6F0; --accent: #1F6E9C;
+  /* dot-grid "ocean depth" paper */
+  background-image: radial-gradient(rgba(20,50,75,0.12) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 body.cat-career {
