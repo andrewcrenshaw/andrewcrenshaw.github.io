@@ -23,7 +23,7 @@
   var bar = document.createElement('div');
   bar.className = 'ac-topbar';
   bar.innerHTML =
-    '<a class="ac-name" href="../index.html">← Andrew Crenshaw</a>' +
+    '<a class="ac-name" href="../index.html#deep-dives">← Andrew Crenshaw</a>' +
     '<nav class="ac-links">' +
       '<a href="https://www.linkedin.com/in/andrewcrenshaw/" target="_blank" rel="noopener">LinkedIn</a>' +
       '<a href="mailto:andrewcrenshaw123@gmail.com">Email</a>' +
