@@ -449,13 +449,15 @@
       <div class="flagship reveal">
         <span class="flag-tag">Flagship</span>
         <h3>Living Memory &amp; Knowledge System</h3>
-        <p>A memory architecture that lets agents accumulate and reuse knowledge across sessions, agents, and machines, instead of starting cold every time. Three orthogonal axes: where knowledge is stored, how each role is allowed to interpret it, and how it drives action.</p>
+        <p>A shared memory substrate for agents, humans, and subsystems, in production across two systems. The hard part is not storing knowledge, it is deciding what to keep: the system reconciles contradictions, forgets what has gone stale, and turns each session's experience into knowledge the next agent inherits, so the fleet compounds instead of starting cold.</p>
         <details open>
           <summary><span class="chev">›</span> Model &amp; mechanics</summary>
           <div class="det-body">
-            One shared memory, role-shaped views, task-scoped context<br />
-            Remembers across sessions, agents, and machines &nbsp;·&nbsp; curated, not hoarded<br />
-            Time-aware validity &nbsp;·&nbsp; decision traces &nbsp;·&nbsp; approval-gated writes
+            In production on Forge (TypeScript / Node / SQLite) and Strata (Python / FastAPI / Postgres + pgvector)<br />
+            Decision traces: a durable, queryable record of what was decided, why, and what was rejected<br />
+            Token-budgeted, entity-anchored retrieval, so the right knowledge reaches the right agent at the right moment<br />
+            A digestive pipeline (reduce, reflect, reweave, verify, archive) that runs after every session<br />
+            Forgetting by design: pruning, supersession, condensation, and stale-detection
           </div>
         </details>
       </div>
@@ -464,13 +466,15 @@
       <div class="flagship reveal">
         <span class="flag-tag">Flagship</span>
         <h3>autogenous-synthesis Forge</h3>
-        <p>A development operating system where twelve specialized agents plan, build, review, and ship code under enforced TDD and multi-stage approval gates, with memory that persists across sessions.</p>
+        <p>A development operating system where twelve specialized agents plan, build, review, and ship code, with the human reserved for direction and cross-ticket judgment. The backlog is a live state machine, not a task list: agents claim work, hand off across phases without losing context, and nothing reaches "done" without clearing an automated review gate.</p>
         <details open>
           <summary><span class="chev">›</span> Stack &amp; mechanics</summary>
           <div class="det-body">
-            TypeScript / Node.js &nbsp;·&nbsp; SQLite &nbsp;·&nbsp; 12 specialized agents<br />
-            gates: lint + 700-test suite + Eval + code-review + pre-commit<br />
-            persistent session memory &nbsp;·&nbsp; agent SOPs
+            12 specialized agents, auto-routed and skill-aware, with collision detection and bounded authority<br />
+            TDD enforced mechanically (RED &rarr; GREEN &rarr; REFACTOR) against machine-verifiable acceptance criteria<br />
+            Review gate: lint + 700-test suite + Eval + code review + pre-commit, auto-closing on pass or relaunching a fix on fail<br />
+            Persistent scratchpads and session memory survive context limits; phase handoffs run without a restart<br />
+            TypeScript / Node.js &nbsp;·&nbsp; SQLite
           </div>
         </details>
         <a href="https://andrewcrenshaw.dev/autogenous-synthesis/" target="_blank" rel="noopener" style="display:inline-block;margin-top:1rem;font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Documentation ↗</a>
