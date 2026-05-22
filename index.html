@@ -115,11 +115,12 @@
     height: 62px;
   }
   .brand {
-    font-family: var(--mono); font-weight: 600; font-size: 0.82rem;
-    letter-spacing: 0.04em; display: flex; align-items: center; gap: 0.6rem;
+    font-family: var(--serif); font-weight: 600; font-size: 1.2rem;
+    letter-spacing: -0.01em; color: var(--ink); display: flex; align-items: center; gap: 0.55rem;
   }
   .brand .dot { width: 7px; height: 7px; background: var(--rust); border-radius: 50%; display:inline-block; }
-  .nav-links { display: flex; gap: 1.6rem; align-items: center; }
+  .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
   .nav-links a {
     font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--ink-soft);
@@ -132,13 +133,14 @@
   .nav-links a:hover { color: var(--blue); }
   .nav-links a:hover::after { width: 100%; }
   .nav-links .src { color: var(--ink-faint); }
-  @media (max-width: 720px) { .nav-links a:not(.cta-mini) { display: none; } }
-  .cta-mini {
-    border: 1px solid var(--ink); padding: 0.45rem 0.85rem !important;
-    border-radius: 2px; color: var(--ink) !important;
+  .nav-contact { display: flex; gap: 1.1rem; align-items: center; padding-left: 1.5rem; border-left: 1px solid var(--line); }
+  .nav-contact a { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.06em; color: var(--blue); transition: color 0.25s var(--ease); }
+  .nav-contact a:hover { color: var(--blue-bright); }
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+    .nav-contact { padding-left: 0; border-left: 0; gap: 0.9rem; }
+    .brand { font-size: 1.05rem; }
   }
-  .cta-mini::after { display: none; }
-  .cta-mini:hover { background: var(--ink); color: var(--paper) !important; }
 
   /* ---------- hero ---------- */
   .hero { padding-top: clamp(3rem, 9vw, 7rem); padding-bottom: clamp(2.5rem, 6vw, 4.5rem); }
@@ -157,6 +159,7 @@
   }
   .hero h1 .ital { font-style: italic; font-weight: 400; }
   .hero-role { font-family: var(--serif); font-style: italic; font-size: clamp(1rem, 1.5vw, 1.22rem); color: var(--ink-soft); margin-bottom: 1.1rem; letter-spacing: 0.01em; }
+  .hero-name { font-family: var(--serif); font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.85rem); color: var(--ink); letter-spacing: -0.015em; margin-bottom: 0.9rem; }
   .hero .lede {
     font-size: clamp(1.05rem, 1.6vw, 1.32rem);
     color: var(--ink-soft); max-width: 34ch; line-height: 1.5;
@@ -311,7 +314,9 @@
   .tenets { display: flex; flex-direction: column; gap: 2rem; max-width: 60ch; }
   .tenet { font-family: var(--serif); font-size: clamp(1.25rem, 2.4vw, 1.7rem); line-height: 1.34; color: var(--ink); padding-left: 1.5rem; border-left: 2px solid var(--blue); }
   .tenet em { color: var(--blue); font-style: italic; }
-  .mem-stack { margin-top: 2.6rem; max-width: 60ch; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; position: relative; background: color-mix(in srgb, var(--paper-2) 45%, transparent); }
+  .mem-stack { margin-top: 1rem; max-width: 60ch; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; position: relative; background: color-mix(in srgb, var(--paper-2) 45%, transparent); }
+  .mem-stack:first-of-type { margin-top: 2.6rem; }
+  .mem-label { font-family: var(--serif); font-style: italic; font-size: clamp(1rem, 1.5vw, 1.18rem); color: var(--ink-soft); max-width: 60ch; margin: 2rem 0 0; }
   .mem-stack::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(var(--blue), var(--rust)); }
   .mem-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.05rem 1.3rem 1.05rem 1.7rem; border-bottom: 1px solid var(--line); }
   .mem-row:last-child { border-bottom: 0; }
@@ -362,9 +367,7 @@
   @media (max-width: 820px) { .two-col { grid-template-columns: 1fr; gap: 3rem; } }
 
   /* ---------- contact ---------- */
-  .contact { text-align: left; position: relative; }
-  .contact .wrap { position: relative; z-index: 1; }
-  #build-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+  .contact { text-align: left; }
   .contact h2 { font-size: clamp(2.4rem, 6vw, 4rem); margin-bottom: 1.4rem; }
   .contact p { font-size: 1.15rem; color: var(--ink-soft); max-width: 60ch; margin-bottom: 2.2rem; }
   .contact-links { display: flex; gap: 1.6rem; flex-wrap: wrap; }
@@ -389,14 +392,20 @@
 
 <header>
   <nav class="nav wrap">
-    <a href="#top" class="brand"><span class="dot"></span> ANDREW CRENSHAW</a>
-    <div class="nav-links">
-      <a href="#work">Work</a>
-      <a href="#approach">Approach</a>
-      <a href="#thinking">Thinking</a>
-      <a href="#writing">Writing</a>
-      <a href="https://github.com/andrewcrenshaw?tab=repositories" class="src" target="_blank" rel="noopener">Source ↗</a>
-      <a href="#contact" class="cta-mini">Get in touch</a>
+    <a href="#top" class="brand"><span class="dot"></span> Andrew Crenshaw</a>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#work">Work</a>
+        <a href="#approach">Approach</a>
+        <a href="#thinking">Thinking</a>
+        <a href="#writing">Writing</a>
+        <a href="https://github.com/andrewcrenshaw?tab=repositories" class="src" target="_blank" rel="noopener">Source ↗</a>
+      </div>
+      <div class="nav-contact">
+        <a href="https://www.linkedin.com/in/andrewcrenshaw/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:andrewcrenshaw123@gmail.com">Email</a>
+        <a href="https://github.com/andrewcrenshaw" target="_blank" rel="noopener">GitHub</a>
+      </div>
     </div>
   </nav>
 </header>
@@ -407,14 +416,15 @@
   <section class="hero">
     <div class="wrap hero-grid">
       <div class="hero-text">
-        <div class="hero-eyebrow reveal">
+        <p class="hero-name reveal">Andrew Crenshaw</p>
+        <div class="hero-eyebrow reveal" style="transition-delay:.03s">
           <span class="rule"></span>
-          <span class="eyebrow">Agentic Engineering</span>
+          <span class="eyebrow">Portfolio &middot; Agentic Engineering</span>
         </div>
         <h1 class="reveal" style="transition-delay:.05s">Built,<br /><span class="ital">not theorized.</span></h1>
         <p class="hero-role reveal" style="transition-delay:.09s">Enterprise AI Architecture &amp; Engineering</p>
         <p class="lede reveal" style="transition-delay:.12s">
-          I design and build <strong>custom AI products</strong>: multi-agent systems engineered with <strong>enterprise rigor</strong> to solve real problems and weather real use.
+          I personally <strong>design, code, and ship</strong> every system here: custom AI products and multi-agent systems, built with <strong>enterprise rigor</strong> to solve real problems and weather real use. Not specs, not slideware. Working software I wrote.
         </p>
         <div class="cta-row reveal" style="transition-delay:.18s">
           <a href="#work" class="btn btn-primary">See the work →</a>
@@ -447,11 +457,11 @@
   <section class="block tint-work" id="work">
     <div class="wrap">
       <div class="sec-head reveal">
-        <h2>Custom AI Products &amp; Systems</h2>
+        <h2>What I've built</h2>
         <span class="sheet-no">01 / WORK</span>
       </div>
       <p class="sec-intro reveal">
-        Custom applications and products, built to solve real problems and survive real use. Different domains, same architecture spine: multi-agent collaboration, under governance, over shared memory.
+        Every system below I built myself, end to end, the architecture and the code. Not specs, not slideware: working software I designed, wrote, and run. Different domains, same architecture spine: multi-agent collaboration, under governance, over shared memory.
       </p>
 
       <!-- Flagship 1 -->
@@ -462,7 +472,7 @@
           <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
         </div>
         <h3>Living Memory &amp; Knowledge System</h3>
-        <p>A shared memory substrate for agents, humans, and subsystems, in production across two systems. The hard part is not storing knowledge, it is deciding what to keep: the system reconciles contradictions, forgets what has gone stale, and turns each session's experience into knowledge the next agent inherits, so the fleet compounds instead of starting cold.</p>
+        <p>I designed and built a shared memory substrate for agents, humans, and subsystems, in production across two systems. The hard part is not storing knowledge, it is deciding what to keep: the system reconciles contradictions, forgets what has gone stale, and turns each session's experience into knowledge the next agent inherits, so the fleet compounds instead of starting cold.</p>
         <details open>
           <summary><span class="chev">›</span> Model &amp; mechanics</summary>
           <div class="det-body">
@@ -483,7 +493,7 @@
           <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
         </div>
         <h3>autogenous-synthesis Forge</h3>
-        <p>A development operating system where twelve specialized agents plan, build, review, and ship code, with the human reserved for direction and cross-ticket judgment. The backlog is a live state machine, not a task list: agents claim work, hand off across phases without losing context, and nothing reaches "done" without clearing an automated review gate.</p>
+        <p>I built a development operating system where twelve specialized agents plan, build, review, and ship code, with the human reserved for direction and cross-ticket judgment. The backlog is a live state machine, not a task list: agents claim work, hand off across phases without losing context, and nothing reaches "done" without clearing an automated review gate.</p>
         <details open>
           <summary><span class="chev">›</span> Stack &amp; mechanics</summary>
           <div class="det-body">
@@ -602,6 +612,23 @@
         </div>
       </div>
 
+      <p class="mem-label reveal">And the interpretation model underneath it: substrate / lens / frame.</p>
+      <div class="mem-stack reveal">
+        <div class="mem-row">
+          <div><h4>Substrate</h4><p>One shared memory: the universal state every agent reads and writes</p></div>
+          <span class="mem-tag is-blue">Ground truth</span>
+        </div>
+        <div class="mem-row">
+          <div><h4>Lens</h4><p>A persistent, role-shaped filter onto the substrate</p></div>
+          <span class="mem-tag is-blue">Per role</span>
+        </div>
+        <div class="mem-row">
+          <div><h4>Frame</h4><p>The transient task binding, gone when the work is done</p></div>
+          <span class="mem-tag is-rust">Per task</span>
+        </div>
+      </div>
+      <p class="reveal" style="font-family:ui-monospace,Menlo,monospace; font-size:0.85rem; color:var(--blue); margin-top:1rem; letter-spacing:0.01em;">view = render(substrate, lens, frame)</p>
+
     </div>
   </section>
 
@@ -642,7 +669,6 @@
 
   <!-- ========== CONTACT ========== -->
   <section class="block contact" id="contact">
-    <canvas id="build-bg" aria-hidden="true"></canvas>
     <div class="wrap">
       <span class="eyebrow reveal">Let's talk</span>
       <h2 class="reveal" style="transition-delay:.05s">What should we build?</h2>
@@ -653,6 +679,10 @@
         <a href="https://www.linkedin.com/in/andrewcrenshaw/" target="_blank" rel="noopener">LinkedIn ↗</a>
         <a href="mailto:andrewcrenshaw123@gmail.com">Email ↗</a>
         <a href="https://github.com/andrewcrenshaw" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+      <div class="flag-plate reveal" style="margin-top:2.6rem; max-width:540px;" aria-hidden="true">
+        <canvas id="plate-build"></canvas>
+        <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
       </div>
     </div>
   </section>
@@ -860,45 +890,42 @@
     start();
   })();
 
-  // ---- Contact background: blueprint construction ("what should we build?") ----
+  // ---- Contact plate: blueprint assembly ("what should we build?") ----
   (function () {
-    var canvas = document.getElementById('build-bg');
+    var canvas = document.getElementById('plate-build');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var TAU = Math.PI * 2, T = 15000;
+    var TAU = Math.PI * 2, T = 7000;
     var BLUE = '27,61,90';
-    var mods = [
-      { x: 0.13, y: 0.24, w: 60, h: 32, o: 0.00 },
-      { x: 0.50, y: 0.13, w: 54, h: 26, o: 0.30 },
-      { x: 0.87, y: 0.22, w: 52, h: 30, o: 0.16 },
-      { x: 0.85, y: 0.84, w: 50, h: 30, o: 0.55 },
-      { x: 0.50, y: 0.92, w: 56, h: 24, o: 0.78 },
-      { x: 0.15, y: 0.84, w: 58, h: 30, o: 0.42 }
-    ];
+    var nodes = [{ x: 0.15, y: 0.50 }, { x: 0.39, y: 0.27 }, { x: 0.39, y: 0.73 }, { x: 0.65, y: 0.50 }, { x: 0.87, y: 0.50 }];
+    var edges = [[0, 1], [0, 2], [1, 3], [2, 3], [3, 4]];
     var W = 0, H = 0, dpr = 1, raf = 0;
     function resize() { var r = canvas.getBoundingClientRect(); W = r.width; H = r.height; dpr = Math.min(window.devicePixelRatio || 1, 2); canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
-    function mA(m, phase) { var t = (phase + m.o) % 1; return Math.max(0, Math.sin(t * Math.PI)); }
+    function ss(a, b, t) { if (t <= a) return 0; if (t >= b) return 1; var u = (t - a) / (b - a); return u * u * (3 - 2 * u); }
+    function box(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
     function draw(now) {
       var phase = (now % T) / T;
       ctx.clearRect(0, 0, W, H);
-      for (var i = 0; i < mods.length; i++) {
-        var a = mods[i], b = mods[(i + 1) % mods.length];
-        var aa = mA(a, phase) * mA(b, phase);
-        if (aa > 0.05) {
-          ctx.strokeStyle = 'rgba(' + BLUE + ',' + (0.15 * aa) + ')'; ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.moveTo(a.x * W, a.y * H); ctx.lineTo(b.x * W, a.y * H); ctx.lineTo(b.x * W, b.y * H); ctx.stroke();
+      var gOut = 1 - ss(0.88, 1.0, phase);
+      function nA(i) { return ss(i * 0.13, i * 0.13 + 0.11, phase) * gOut; }
+      for (var e = 0; e < edges.length; e++) {
+        var a = nodes[edges[e][0]], b = nodes[edges[e][1]];
+        var ea = Math.min(nA(edges[e][0]), nA(edges[e][1]));
+        if (ea > 0.02) {
+          ctx.strokeStyle = 'rgba(' + BLUE + ',' + (0.55 * ea) + ')'; ctx.lineWidth = 1.2;
+          var ax = a.x * W, ay = a.y * H, bx = b.x * W, by = b.y * H, mx = (ax + bx) / 2;
+          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(mx, ay); ctx.lineTo(mx, by); ctx.lineTo(bx, by); ctx.stroke();
         }
       }
-      for (var k = 0; k < mods.length; k++) {
-        var m = mods[k], al = mA(m, phase); if (al < 0.03) continue;
-        var cxp = m.x * W, cyp = m.y * H;
-        ctx.strokeStyle = 'rgba(' + BLUE + ',' + (0.26 * al) + ')'; ctx.lineWidth = 1;
-        ctx.strokeRect(cxp - m.w / 2, cyp - m.h / 2, m.w, m.h);
-        ctx.fillStyle = 'rgba(' + BLUE + ',' + (0.34 * al) + ')';
-        ctx.beginPath(); ctx.arc(cxp - m.w / 2, cyp - m.h / 2, 1.6, 0, TAU); ctx.fill();
-        ctx.strokeStyle = 'rgba(' + BLUE + ',' + (0.16 * al) + ')';
-        ctx.beginPath(); ctx.moveTo(cxp - m.w / 2 + 5, cyp); ctx.lineTo(cxp + m.w / 2 - 5, cyp); ctx.stroke();
+      for (var i = 0; i < nodes.length; i++) {
+        var al = nA(i); if (al < 0.02) continue;
+        var x = nodes[i].x * W, y = nodes[i].y * H, w = 26, h = 15;
+        ctx.fillStyle = 'rgba(' + BLUE + ',' + (0.10 * al) + ')';
+        ctx.strokeStyle = 'rgba(' + BLUE + ',' + (0.85 * al) + ')'; ctx.lineWidth = 1.2;
+        box(x - w / 2, y - h / 2, w, h, 2); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle = 'rgba(' + BLUE + ',' + (0.4 * al) + ')';
+        ctx.beginPath(); ctx.moveTo(x - w / 2 + 4, y); ctx.lineTo(x + w / 2 - 5, y); ctx.stroke();
       }
       if (!reduce) raf = requestAnimationFrame(draw);
     }
