@@ -1,191 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Building an AI Job Search OS from Scratch — Andrew Crenshaw</title>
-  <meta name="description" content="Why I built Strata: eight governed agents, three-layer dedup, local Gemma inference, and the architecture decisions that make it run for $10/month.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0a0e14;
-      --bg-surface: #0f1319;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.06);
-      --border-accent: rgba(78, 168, 201, 0.25);
-      --text: #e4e8ed;
-      --text-dim: #7e8a97;
-      --text-faint: #4a5568;
-      --accent: #4ea8c9;
-      --accent-dim: rgba(78, 168, 201, 0.15);
-      --accent-glow: rgba(78, 168, 201, 0.08);
-      --green: #6bab73;
-      --orange: #c9954e;
-      --serif: 'Cormorant Garamond', Georgia, serif;
-      --sans: 'Outfit', -apple-system, sans-serif;
-      --mono: 'JetBrains Mono', monospace;
-      --pad: clamp(1.5rem, 5vw, 5rem);
-      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-      line-height: 1.7;
-      font-weight: 300;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.25;
-    }
-
-    .top-bar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 500;
-      padding: 1rem var(--pad);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(10, 14, 20, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .top-bar .name { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; color: var(--text); text-decoration: none; }
-    .top-bar .back-link { font-size: 0.8rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; transition: color 0.3s; }
-    .top-bar .back-link:hover { color: var(--accent); }
-
-    .article-wrapper { max-width: 720px; margin: 0 auto; padding: 8rem var(--pad) 4rem; position: relative; z-index: 1; }
-    .article-label { font-family: var(--sans); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 0.8rem; }
-    .article-title { font-family: var(--serif); font-size: clamp(2rem, 5vw, 3rem); font-weight: 400; line-height: 1.15; color: var(--text); letter-spacing: -0.01em; margin-bottom: 1rem; }
-    .article-subtitle { font-size: clamp(0.95rem, 1.3vw, 1.1rem); color: var(--text-dim); margin-bottom: 2.5rem; max-width: 600px; }
-    .rule { width: 40px; height: 2px; background: var(--accent); margin-bottom: 2.5rem; }
-
-    .article-body p { font-size: clamp(0.95rem, 1.3vw, 1.08rem); line-height: 1.85; color: var(--text-dim); max-width: none; margin-bottom: 1.5rem; }
-    .article-body p strong { color: var(--text); font-weight: 500; }
-    .article-body p em { font-style: italic; color: var(--accent); font-family: var(--serif); font-size: 1.05em; }
-    .article-body h3 { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--text); }
-
-    .callout { background: var(--bg-card); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 1.2rem 1.5rem; margin: 2rem 0; font-size: 0.95rem; color: var(--text); line-height: 1.7; }
-
-    .data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; }
-    .data-table th { font-family: var(--sans); font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; color: var(--accent); text-align: left; padding: 0.8rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .data-table td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-dim); vertical-align: top; line-height: 1.5; }
-    .data-table td:first-child { color: var(--text); font-weight: 400; }
-
-    pre.code { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; font-family: var(--mono); font-size: 0.82rem; line-height: 1.6; color: var(--text-dim); overflow-x: auto; white-space: pre; }
-
-    .article-footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-    .article-footer a { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; color: var(--accent); transition: opacity 0.3s; }
-    .article-footer a:hover { opacity: 0.7; }
-    .article-footer .date { font-size: 0.78rem; color: var(--text-faint); }
-
-    .fade-in { opacity: 0; transform: translateY(20px); animation: fadeUp 0.6s var(--ease) forwards; }
-    .fade-in-d1 { animation-delay: 0.1s; }
-    .fade-in-d2 { animation-delay: 0.2s; }
-    .fade-in-d3 { animation-delay: 0.3s; }
-    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Building an AI Job Search OS from Scratch — Andrew Crenshaw</title>
+<meta name="description" content="Why I built Strata: eight governed agents, three-layer dedup, local inference, and the architecture decisions behind it." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/page.css" />
 </head>
-<body>
+<body class="cat-writing">
+<header>
+  <div class="bar">
+    <a href="../index.html#writing" class="back">&larr; Andrew Crenshaw</a>
+    <span class="crumb">Writing</span>
+  </div>
+</header>
+<article>
+  <div class="eyebrow"><span class="rule"></span> Build log &middot; April 2026</div>
+  <h1>Building an AI Job Search OS from Scratch</h1>
+  <p class="lede">Why I built Strata: eight governed agents, three-layer dedup, local inference, and the architecture decisions behind it.</p>
 
-<div class="top-bar">
-  <a href="/" class="name">Andrew Crenshaw</a>
-  <a href="/#writing" class="back-link">&larr; Back to Writing</a>
-</div>
+  <p>Job searching in 2026 is broken in a specific, structural way. There are hundreds of career pages, dozens of ATS platforms (each with different APIs, or no API at all), and the signal-to-noise ratio is terrible. You either spend hours scrolling job boards, or you spray applications and hope. Neither is a strategy.</p>
 
-<article class="article-wrapper">
-  <div class="article-label fade-in">Lessons from Building</div>
-  <h1 class="article-title fade-in fade-in-d1">Building an AI Job Search OS from Scratch</h1>
-  <p class="article-subtitle fade-in fade-in-d2">Why I built Strata: eight governed agents, three-layer dedup, local Gemma inference, and the architecture decisions that make it run for $10/month.</p>
-  <div class="rule fade-in fade-in-d2"></div>
+  <p>I built Strata to solve this for myself, and to prove out a set of architecture ideas I'd been developing in a completely different context.</p>
 
-  <div class="article-body fade-in fade-in-d3">
-    <p>Job searching in 2026 is broken in a specific, structural way. There are hundreds of career pages, dozens of ATS platforms (each with different APIs, or no API at all), and the signal-to-noise ratio is terrible. You either spend hours scrolling job boards, or you spray applications and hope. Neither is a strategy.</p>
+  <h3>The architecture bet</h3>
 
-    <p>I built Strata to solve this for myself — and to prove out a set of architecture ideas I'd been developing in a completely different context.</p>
+  <p>Strata isn't a script that scrapes LinkedIn. It's an operating system with <strong>eight specialized agents</strong> collaborating through a governed PostgreSQL database. Each agent has a specific job, scoped database access, and a clear boundary with every other agent.</p>
 
-    <h3>The architecture bet</h3>
-
-    <p>Strata isn't a script that scrapes LinkedIn. It's an operating system with <strong>eight specialized agents</strong> collaborating through a governed PostgreSQL database. Each agent has a specific job, scoped database access, and a clear boundary with every other agent.</p>
-
+  <div class="table-wrap">
     <table class="data-table">
       <thead><tr><th>Agent</th><th>Job</th><th>Human Gate</th></tr></thead>
       <tbody>
-        <tr><td>Profile</td><td>Resume → Candidate Intelligence Profile</td><td>Yes</td></tr>
+        <tr><td>Profile</td><td>Resume to Candidate Intelligence Profile</td><td>Yes</td></tr>
         <tr><td>Target</td><td>Manage company list with priority tiers</td><td>Yes</td></tr>
         <tr><td>Scraper</td><td>Daily career page sweeps via strata-harvest</td><td>No</td></tr>
-        <tr><td>Match</td><td>Two-stage scoring (vector gate → LLM tiers)</td><td>No</td></tr>
+        <tr><td>Match</td><td>Two-stage scoring (vector gate, then LLM tiers)</td><td>No</td></tr>
         <tr><td>Apply</td><td>Tailored resumes + cover letters</td><td>Yes (never auto-submits)</td></tr>
         <tr><td>Skills</td><td>Gap analysis + learning recommendations</td><td>No</td></tr>
         <tr><td>Network</td><td>Contact intelligence + outreach timing</td><td>Partial</td></tr>
         <tr><td>Brand</td><td>Content generation + positioning</td><td>Yes</td></tr>
       </tbody>
     </table>
+  </div>
 
-    <p>The governance model isn't optional. The Scraper Agent can't modify your profile. The Profile Agent can't submit applications. Access is enforced at the repository layer through <code>ScopedRepository</code>, not by convention.</p>
+  <p>The governance model isn't optional. The Scraper Agent can't modify your profile. The Profile Agent can't submit applications. Access is enforced at the repository layer through <code>ScopedRepository</code>, not by convention.</p>
 
-    <h3>The cost problem (and how we solved it)</h3>
+  <h3>Spend compute where it matters</h3>
 
-    <p><strong>The breakthrough insight: you don't need to LLM-score every listing.</strong> Most matches are obvious non-matches. The architecture uses a three-layer dedup funnel that eliminates 95%+ of noise before any LLM call happens:</p>
+  <p><strong>The breakthrough insight: you don't need to LLM-score every listing.</strong> Most matches are obvious non-matches. The architecture uses a three-layer dedup funnel that eliminates 95%+ of noise before any LLM call happens:</p>
 
+  <div class="table-wrap">
     <table class="data-table">
-      <thead><tr><th>Layer</th><th>Method</th><th>Cost</th><th>What It Catches</th></tr></thead>
+      <thead><tr><th>Layer</th><th>Method</th><th>What It Catches</th></tr></thead>
       <tbody>
-        <tr><td>L1: URL/ID</td><td>Exact match</td><td>Free</td><td>Same listing scraped twice</td></tr>
-        <tr><td>L2: Content Hash</td><td>SHA-256 of normalized text</td><td>Free</td><td>Same listing, different URL</td></tr>
-        <tr><td>L3: Vector Similarity</td><td>pgvector cosine distance</td><td>~$0.0001</td><td>Same job reworded or reposted</td></tr>
+        <tr><td>L1: URL/ID</td><td>Exact match</td><td>Same listing scraped twice</td></tr>
+        <tr><td>L2: Content Hash</td><td>SHA-256 of normalized text</td><td>Same listing, different URL</td></tr>
+        <tr><td>L3: Vector Similarity</td><td>pgvector cosine distance</td><td>Same job reworded or reposted</td></tr>
       </tbody>
     </table>
-
-    <p>After dedup, a <em>vector floor filter</em> eliminates listings that are clearly irrelevant (cosine distance > 0.30 from your profile embedding). Only then does the Match Agent invoke LLM scoring — and even that uses 80/15/5 model routing: easy matches go to GPT-4o-mini (80%), medium to Haiku (15%), hard to Sonnet (5%).</p>
-
-    <div class="callout">
-      <strong>The numbers:</strong> From ~800-1,200 raw listings discovered daily, the funnel reduces to ~15-25 deep-scored and ~3-5 applications per week. Total LLM cost with optimizations: $7-10/month. Full operating cost including hosting: $10-36/month.
-    </div>
-
-    <h3>The three-repo strategy</h3>
-
-    <p>Strata splits into three repositories. The private repo contains the full application — agents, governance, pipelines, dashboard. Two public repos are standalone, stateless libraries published to PyPI:</p>
-
-    <p><strong>strata-harvest</strong> — Career page scraping and ATS parsing. Point it at any company careers page, get back structured job listings. Auto-detects Greenhouse, Lever, Ashby; falls back to LLM extraction for unknown ATS platforms. <code>pip install strata-harvest</code>.</p>
-
-    <p><strong>strata-match</strong> — Two-stage vector + LLM job-to-profile matching. Feed it a job listing and a candidate profile, get back a nuanced match score with detailed reasoning. <code>pip install strata-match</code>.</p>
-
-    <p>Public libraries return data. The private repo decides what to persist and how to govern it. This separation means anyone can use the scraping and matching engines independently.</p>
-
-    <h3>What I learned</h3>
-
-    <p><strong>Governance is the feature, not the constraint.</strong> I came into this project with governance patterns from the multi-agent orchestration framework I'd been building. Strata validated them in a completely different language and stack (Python/FastAPI vs TypeScript/Node). The ScopedRepository pattern — where each agent declares which tables it can write to at the class level — is the single best architectural decision in the project. It prevents entire categories of bugs.</p>
-
-    <p><strong>The dedup funnel is where the real engineering lives.</strong> The LLM calls are the easy part. The hard part is building the filtering pipeline that ensures you only invoke expensive models when it actually matters. Three free/cheap layers before any LLM call is the pattern.</p>
-
-    <p><strong>Local inference changes the economics entirely.</strong> Running Gemma on a Mac Mini via MLX means the medium-tier deep scoring is effectively free. Shadow-mode calibration (running both cloud and local models, comparing results) lets you validate quality before switching. We're tracking Pearson R correlation and routing-tier agreement to know exactly when local is good enough.</p>
-
-    <p><strong>Build it for yourself first.</strong> Strata exists because I needed it. That's the best forcing function for honest architecture. When you're the user, you can't hand-wave over UX problems or defer the hard parts. Every agent governance gap I found, I found because it affected my own job search.</p>
-
-    <p>The source for strata-harvest and strata-match is public. The architecture patterns — governed multi-agent systems, cost-conscious LLM pipelines, three-layer dedup — are applicable to any domain where you need agents to collaborate reliably at scale.</p>
   </div>
 
-  <div class="article-footer">
-    <a href="/#writing">&larr; All posts</a>
-    <span class="date">April 2026</span>
-  </div>
+  <p>After dedup, a <em>vector floor filter</em> eliminates listings that are clearly irrelevant (cosine distance > 0.30 from your profile embedding). Only then does the Match Agent invoke LLM scoring, and even that uses tiered model routing: easy matches go to a small fast model, ambiguous ones escalate to a frontier model.</p>
+
+  <div class="callout"><strong>The numbers:</strong> From ~800-1,200 raw listings discovered daily, the funnel reduces to ~15-25 deep-scored and ~3-5 applications per week.</div>
+
+  <h3>The three-repo strategy</h3>
+
+  <p>Strata splits into three repositories. The private repo contains the full application: agents, governance, pipelines, dashboard. Two public repos are standalone, stateless libraries published to PyPI:</p>
+
+  <p><strong>strata-harvest</strong>: Career page scraping and ATS parsing. Point it at any company careers page, get back structured job listings. Auto-detects Greenhouse, Lever, Ashby; falls back to LLM extraction for unknown ATS platforms. <code>pip install strata-harvest</code>.</p>
+
+  <p><strong>strata-match</strong>: Two-stage vector + LLM job-to-profile matching. Feed it a job listing and a candidate profile, get back a nuanced match score with detailed reasoning. <code>pip install strata-match</code>.</p>
+
+  <p>Public libraries return data. The private repo decides what to persist and how to govern it. This separation means anyone can use the scraping and matching engines independently.</p>
+
+  <h3>What I learned</h3>
+
+  <p><strong>Governance is the feature, not the constraint.</strong> I came into this project with governance patterns from the multi-agent orchestration framework I'd been building. Strata validated them in a completely different language and stack (Python/FastAPI vs TypeScript/Node). The ScopedRepository pattern, where each agent declares which tables it can write to at the class level, is the single best architectural decision in the project. It prevents entire categories of bugs.</p>
+
+  <p><strong>The dedup funnel is where the real engineering lives.</strong> The LLM calls are the easy part. The hard part is building the filtering pipeline that ensures you only invoke expensive models when it actually matters. Three free/cheap layers before any LLM call is the pattern.</p>
+
+  <p><strong>Local inference changes the calculus entirely.</strong> Running local models on Apple Silicon via MLX means the medium-tier deep scoring runs on hardware I already own. Shadow-mode calibration (running both cloud and local models, comparing results) lets you validate quality before switching. We're tracking Pearson R correlation and routing-tier agreement to know exactly when local is good enough.</p>
+
+  <p><strong>Build it for yourself first.</strong> Strata exists because I needed it. That's the best forcing function for honest architecture. When you're the user, you can't hand-wave over UX problems or defer the hard parts. Every agent governance gap I found, I found because it affected my own job search.</p>
+
+  <p>The source for strata-harvest and strata-match is public. The architecture patterns, governed multi-agent systems, cost-conscious LLM pipelines, three-layer dedup, are applicable to any domain where you need agents to collaborate reliably at scale.</p>
+
+  <div class="end-rule"></div>
+  <a href="../index.html#writing" class="more">&larr; All writing</a>
 </article>
-
+<footer><div class="fbar"><span>&copy; 2026 Andrew Crenshaw</span><span>Enterprise AI &middot; Built, not theorized</span></div></footer>
 </body>
 </html>

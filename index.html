@@ -1,1086 +1,748 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Andrew Crenshaw — Enterprise AI Architecture & Engineering</title>
-  <meta name="description" content="Enterprise technology leader building multi-agent systems on a substrate / lens / frame memory architecture with human-in-the-loop governance.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
-  <style>
-    :root {
-      --bg: #0a0e14;
-      --bg-surface: #0f1319;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --bg-card-hover: rgba(255, 255, 255, 0.07);
-      --border: rgba(255, 255, 255, 0.06);
-      --border-accent: rgba(78, 168, 201, 0.25);
-      --text: #e4e8ed;
-      --text-dim: #7e8a97;
-      --text-faint: #4a5568;
-      --accent: #4ea8c9;
-      --accent-dim: rgba(78, 168, 201, 0.15);
-      --accent-glow: rgba(78, 168, 201, 0.08);
-      --red: #c75b5b;
-      --green: #6bab73;
-      --orange: #c9954e;
-      --serif: 'Cormorant Garamond', Georgia, serif;
-      --sans: 'Outfit', -apple-system, sans-serif;
-      --mono: 'JetBrains Mono', monospace;
-      --pad: clamp(1.5rem, 5vw, 5rem);
-      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-      line-height: 1.7;
-      font-weight: 300;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.25;
-    }
-
-    /* Navigation */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 500;
-      padding: 1rem var(--pad);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.4s var(--ease);
-    }
-
-    nav.scrolled {
-      background: rgba(10, 14, 20, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    nav .name {
-      font-family: var(--serif);
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text);
-      text-decoration: none;
-    }
-
-    nav .links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    nav .links a {
-      font-size: 0.8rem;
-      font-weight: 400;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    nav .links a:hover { color: var(--accent); }
-
-    @media (max-width: 768px) {
-      nav .links { display: none; }
-    }
-
-    /* Sections */
-    section {
-      padding: clamp(4rem, 10vh, 8rem) var(--pad);
-      position: relative;
-    }
-
-    section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .section-inner {
-      max-width: 1000px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    .section-inner.wide { max-width: 1200px; }
-    .section-inner.narrow { max-width: 760px; }
-
-    .rule {
-      width: 40px;
-      height: 2px;
-      background: var(--accent);
-      margin-bottom: 1.5rem;
-    }
-
-    .rule.center { margin-left: auto; margin-right: auto; }
-
-    .section-label {
-      font-family: var(--sans);
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--accent);
-      margin-bottom: 0.8rem;
-    }
-
-    /* Typography */
-    h1 {
-      font-family: var(--serif);
-      font-size: clamp(3.5rem, 10vw, 7rem);
-      font-weight: 400;
-      line-height: 1.0;
-      color: var(--text);
-      letter-spacing: -0.03em;
-    }
-
-    h2 {
-      font-family: var(--serif);
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 400;
-      line-height: 1.15;
-      color: var(--text);
-      letter-spacing: -0.01em;
-      margin-bottom: 1.2rem;
-    }
-
-    h3 {
-      font-family: var(--serif);
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.6rem;
-    }
-
-    p {
-      font-size: clamp(0.95rem, 1.3vw, 1.1rem);
-      line-height: 1.7;
-      color: var(--text-dim);
-      max-width: 680px;
-    }
-
-    p + p { margin-top: 1rem; }
-
-    em {
-      font-style: italic;
-      color: var(--accent);
-      font-family: var(--serif);
-      font-size: 1.05em;
-    }
-
-    /* Hero */
-    #hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding-top: 6rem;
-    }
-
-    #hero::before {
-      background:
-        radial-gradient(ellipse at 15% 50%, var(--accent-glow) 0%, transparent 55%),
-        radial-gradient(ellipse at 85% 20%, rgba(78, 168, 201, 0.04) 0%, transparent 50%);
-    }
-
-    .hero-subtitle {
-      font-family: var(--sans);
-      font-size: clamp(0.85rem, 1.3vw, 1.05rem);
-      font-weight: 400;
-      color: var(--text-dim);
-      margin-top: 1.5rem;
-      max-width: 640px;
-      line-height: 1.8;
-    }
-
-    .hero-cta {
-      margin-top: 2.5rem;
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .hero-cta a {
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      text-decoration: none;
-      padding: 0.8rem 2rem;
-      border-radius: 6px;
-      transition: all 0.3s var(--ease);
-    }
-
-    .cta-primary {
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-    .cta-primary:hover {
-      background: #5bbad5;
-      transform: translateY(-1px);
-    }
-
-    .cta-secondary {
-      border: 1px solid var(--border-accent);
-      color: var(--accent);
-    }
-
-    .cta-secondary:hover {
-      background: var(--accent-dim);
-      border-color: var(--accent);
-    }
-
-    /* Card grid */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2.5rem;
-    }
-
-    @media (min-width: 960px) {
-      .card-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 2rem;
-      transition: all 0.4s var(--ease);
-    }
-
-    .card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-accent);
-      transform: translateY(-2px);
-    }
-
-    .card-icon {
-      font-size: 1.6rem;
-      margin-bottom: 1rem;
-      display: block;
-      color: var(--accent);
-    }
-
-    .card h3 {
-      font-family: var(--serif);
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 0.6rem;
-    }
-
-    .card p {
-      font-size: 0.9rem;
-      line-height: 1.6;
-    }
-
-    .card .tech-tags {
-      margin-top: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-
-    .tech-tag {
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      padding: 0.2rem 0.5rem;
-      background: var(--accent-dim);
-      border-radius: 4px;
-      color: var(--accent);
-    }
-
-    .card-doc-link {
-      display: inline-block;
-      margin-top: 1rem;
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--accent);
-      text-decoration: none;
-      opacity: 0.75;
-      transition: opacity 0.2s ease;
-    }
-
-    .card-doc-link:hover {
-      opacity: 1;
-      text-decoration: underline;
-    }
-
-    /* Layer stack */
-    .layer-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      margin: 2.5rem 0;
-      max-width: 600px;
-    }
-
-    .layer {
-      padding: 1.4rem 1.5rem;
-      border-left: 3px solid var(--accent);
-      background: var(--bg-card);
-      position: relative;
-      transition: all 0.3s var(--ease);
-    }
-
-    .layer:first-child { border-radius: 10px 10px 0 0; border-top: 1px solid var(--border); }
-    .layer:last-child { border-radius: 0 0 10px 10px; border-bottom: 1px solid var(--border); }
-    .layer:hover { background: var(--bg-card-hover); }
-
-    .layer-name {
-      font-family: var(--serif);
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .layer-desc {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      margin-top: 0.2rem;
-    }
-
-    .layer-tag {
-      font-size: 0.65rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--accent);
-      opacity: 0.7;
-      position: absolute;
-      right: 1.5rem;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .layer.highlight {
-      border-left-color: var(--orange);
-      background: rgba(201, 149, 78, 0.04);
-    }
-
-    .layer.highlight .layer-tag { color: var(--orange); }
-
-    /* Two column */
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: start;
-      margin-top: 2.5rem;
-    }
-
-    @media (max-width: 768px) {
-      .two-col { grid-template-columns: 1fr; gap: 2rem; }
-    }
-
-    .two-col p { max-width: 100%; }
-
-    /* Timeline */
-    .timeline {
-      margin-top: 2.5rem;
-      position: relative;
-      padding-left: 2rem;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0.5rem;
-      bottom: 0.5rem;
-      width: 1px;
-      background: linear-gradient(to bottom, var(--accent), var(--border));
-    }
-
-    .timeline-item {
-      position: relative;
-      padding-bottom: 2.5rem;
-    }
-
-    .timeline-item:last-child { padding-bottom: 0; }
-
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: -2rem;
-      top: 0.5rem;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-      transform: translateX(-3px);
-    }
-
-    .timeline-date {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-      margin-bottom: 0.3rem;
-    }
-
-    .timeline-title {
-      font-family: var(--serif);
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.2rem;
-    }
-
-    .timeline-company {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      margin-bottom: 0.5rem;
-    }
-
-    .timeline-desc {
-      font-size: 0.88rem;
-      color: var(--text-dim);
-      line-height: 1.6;
-      max-width: 560px;
-    }
-
-    /* Presentations grid */
-    .pres-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.2rem;
-      margin-top: 2.5rem;
-    }
-
-    .pres-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.5rem;
-      text-decoration: none;
-      transition: all 0.4s var(--ease);
-      display: block;
-    }
-
-    .pres-card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-accent);
-      transform: translateY(-2px);
-    }
-
-    .pres-card .pres-type {
-      font-size: 0.6rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      display: inline-block;
-      margin-bottom: 0.8rem;
-    }
-
-    .type-arch { background: rgba(78, 168, 201, 0.15); color: var(--accent); }
-    .type-strategy { background: rgba(201, 149, 78, 0.15); color: var(--orange); }
-    .type-research { background: rgba(107, 206, 123, 0.15); color: #6bce7b; }
-
-    .pres-card h4 {
-      font-family: var(--serif);
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.4rem;
-    }
-
-    .pres-card .pres-desc {
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-    }
-
-    /* Writing section */
-    .writing-list {
-      margin-top: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .writing-item {
-      padding: 1.2rem 1.5rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      text-decoration: none;
-      display: block;
-      transition: all 0.3s var(--ease);
-    }
-
-    .writing-item:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-accent);
-    }
-
-    .writing-item h4 {
-      font-family: var(--serif);
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.3rem;
-    }
-
-    .writing-item .writing-desc {
-      font-size: 0.82rem;
-      color: var(--text-dim);
-    }
-
-    /* Contact */
-    #contact {
-      text-align: center;
-      padding-bottom: clamp(6rem, 12vh, 10rem);
-    }
-
-    #contact h2 {
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      margin-bottom: 1rem;
-    }
-
-    #contact p {
-      margin: 0 auto 2rem;
-      text-align: center;
-      max-width: 520px;
-    }
-
-    .contact-links {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .contact-links a {
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      text-decoration: none;
-      color: var(--accent);
-      padding: 0.7rem 1.8rem;
-      border: 1px solid var(--border-accent);
-      border-radius: 6px;
-      transition: all 0.3s var(--ease);
-    }
-
-    .contact-links a:hover {
-      background: var(--accent-dim);
-      border-color: var(--accent);
-    }
-
-    /* Divider */
-    .section-divider {
-      height: 1px;
-      background: var(--border);
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    /* Reveal animations */
-    .reveal {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
-
-    /* Big quote */
-    .big-quote {
-      font-family: var(--serif);
-      font-size: clamp(1.4rem, 3vw, 2.2rem);
-      font-weight: 400;
-      line-height: 1.4;
-      color: var(--text);
-      font-style: italic;
-      position: relative;
-      padding-left: 2rem;
-      max-width: 700px;
-      margin: 2rem 0;
-    }
-
-    .big-quote::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0.2em;
-      bottom: 0.2em;
-      width: 3px;
-      background: var(--accent);
-    }
-
-    /* Footer */
-    footer {
-      padding: 2rem var(--pad);
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--text-faint);
-      border-top: 1px solid var(--border);
-    }
-
-    /* Progress bar */
-    .progress-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 2px;
-      background: var(--accent);
-      z-index: 600;
-      transition: width 0.15s linear;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Andrew Crenshaw — Enterprise AI Architecture & Engineering</title>
+<meta name="description" content="I design and build custom AI products: multi-agent systems engineered with enterprise rigor to solve real problems and weather real use." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    /* Palette: architect's paper + graphite ink + blueprint accent */
+    --paper:      #F2EEE4;
+    --paper-2:    #ECE6D8;
+    --paper-3:    #E4DCCB;
+    --ink:        #1B1A16;
+    --ink-soft:   #514D44;
+    --ink-faint:  #87817395;
+    --line:       rgba(27, 26, 22, 0.16);
+    --line-soft:  rgba(27, 26, 22, 0.08);
+    --blue:       #1C3D5A;
+    --blue-bright:#235e8e;
+    --rust:       #9C4A23;
+    /* wayfinding paper tints, one per SECTION: hover preview === destination page background */
+    --tint-work:      #EEDFD0;
+    --tint-thinking:  #DFE6EB;
+    --tint-writing:   #E8DFC2;
+    --tint-deepdives: #E2E8DB;
+    /* saturated accents (header sheet-numbers + swatches) */
+    --acc-work:      #A85A2E;
+    --acc-thinking:  #1C3D5A;
+    --acc-writing:   #8A6B33;
+    --acc-deepdives: #566B3C;
+
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans:  "IBM Plex Sans", system-ui, sans-serif;
+    /* "mono" now routes to Plex Sans (uppercase + tracking gives the technical-label feel) so the page uses two families, not three */
+    --mono:  "IBM Plex Sans", system-ui, sans-serif;
+
+    --maxw: 1180px;
+    --gutter: clamp(1.25rem, 5vw, 4.5rem);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background-color: var(--paper);
+    /* faint engineering grid */
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 32px 32px;
+    line-height: 1.6;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* subtle paper grain overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  ::selection { background: var(--blue); color: var(--paper); }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gutter); }
+
+  /* ---------- shared type ---------- */
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+  }
+  .sheet-no {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    font-weight: 600;
+    color: var(--accent, var(--blue));
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .sheet-no::before { content: ""; width: 8px; height: 8px; border-radius: 1px; background: var(--accent, var(--blue)); }
+
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.04; letter-spacing: -0.015em; }
+
+  /* ---------- header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(8px);
+    background: color-mix(in srgb, var(--paper) 82%, transparent);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 62px;
+  }
+  .brand {
+    font-family: var(--mono); font-weight: 600; font-size: 0.82rem;
+    letter-spacing: 0.04em; display: flex; align-items: center; gap: 0.6rem;
+  }
+  .brand .dot { width: 7px; height: 7px; background: var(--rust); border-radius: 50%; display:inline-block; }
+  .nav-links { display: flex; gap: 1.6rem; align-items: center; }
+  .nav-links a {
+    font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-soft);
+    position: relative; padding-bottom: 2px; transition: color 0.25s var(--ease);
+  }
+  .nav-links a::after {
+    content: ""; position: absolute; left: 0; bottom: -1px; width: 0; height: 1px;
+    background: var(--blue); transition: width 0.3s var(--ease);
+  }
+  .nav-links a:hover { color: var(--blue); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links .src { color: var(--ink-faint); }
+  @media (max-width: 720px) { .nav-links a:not(.cta-mini) { display: none; } }
+  .cta-mini {
+    border: 1px solid var(--ink); padding: 0.45rem 0.85rem !important;
+    border-radius: 2px; color: var(--ink) !important;
+  }
+  .cta-mini::after { display: none; }
+  .cta-mini:hover { background: var(--ink); color: var(--paper) !important; }
+
+  /* ---------- hero ---------- */
+  .hero { padding-top: clamp(3rem, 9vw, 7rem); padding-bottom: clamp(2.5rem, 6vw, 4.5rem); }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.15fr 0.85fr; gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+
+  .hero-eyebrow { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.6rem; }
+  .hero-eyebrow .rule { height: 1px; width: 38px; background: var(--blue); }
+
+  .hero h1 {
+    font-size: clamp(2.9rem, 7.5vw, 5.4rem);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 .ital { font-style: italic; font-weight: 400; }
+  .hero-role { font-family: var(--serif); font-style: italic; font-size: clamp(1rem, 1.5vw, 1.22rem); color: var(--ink-soft); margin-bottom: 1.1rem; letter-spacing: 0.01em; }
+  .hero .lede {
+    font-size: clamp(1.05rem, 1.6vw, 1.32rem);
+    color: var(--ink-soft); max-width: 34ch; line-height: 1.5;
+    margin-bottom: 2.2rem;
+  }
+  .hero .lede strong { color: var(--ink); font-weight: 600; }
+
+  .cta-row { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+  .btn {
+    font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 0.85rem 1.5rem; border-radius: 2px;
+    transition: all 0.28s var(--ease); display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-primary { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
+  .btn-primary:hover { background: var(--blue); border-color: var(--blue); transform: translateY(-2px); }
+  .btn-ghost { border: 1px solid var(--line); color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--ink); transform: translateY(-2px); }
+
+  /* hero plate = reserved animation slot */
+  .plate {
+    position: relative; aspect-ratio: 4 / 3.4; border: 1px solid var(--line);
+    background:
+      linear-gradient(135deg, var(--paper-2), var(--paper-3));
+    border-radius: 3px; overflow: hidden;
+  }
+  .plate-grid {
+    position: absolute; inset: 0; opacity: 0.5;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+  /* corner ticks like a drawing sheet */
+  .plate .tick { position: absolute; width: 13px; height: 13px; border: 1px solid var(--blue); }
+  .plate .tick.tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+  .plate .tick.tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+  .plate .tick.bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+  .plate .tick.br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+  .plate-label {
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ink-faint); text-align: center; width: 90%;
+  }
+  /* static "substrate" hint — placeholder for Andrew's future animation */
+  .substrate { position: absolute; inset: 0; }
+  #substrate-canvas { width: 100%; height: 100%; display: block; }
+
+  /* ---------- proof bar ---------- */
+  .proof {
+    border-block: 1px solid var(--line); margin-top: clamp(2rem, 5vw, 3.5rem);
+    background: color-mix(in srgb, var(--paper-2) 60%, transparent);
+  }
+  .proof-inner {
+    display: grid; grid-template-columns: repeat(2, auto);
+    justify-content: center; justify-items: center; align-items: center;
+    gap: 0.85rem 2.6rem; padding-block: 1.25rem;
+    font-family: var(--mono); font-size: 0.84rem; text-align: center;
+  }
+  .proof-inner .proof-item:nth-child(-n+2) { padding-bottom: 0.7rem; border-bottom: 1px solid var(--line-soft); }
+  @media (max-width: 480px) {
+    .proof-inner { grid-template-columns: 1fr; gap: 0.7rem; }
+    .proof-inner .proof-item:nth-child(-n+2) { padding-bottom: 0; border-bottom: 0; }
+  }
+  .proof-item { display: inline-flex; align-items: baseline; gap: 0.45rem; color: var(--ink); }
+  .proof-item b { color: var(--blue); font-weight: 600; }
+  .proof-sep { color: var(--line); }
+  .proof-anchor { color: var(--ink-soft); font-style: italic; font-family: var(--serif); font-size: 1rem; }
+
+  /* ---------- section scaffolding ---------- */
+  section.block { padding-block: clamp(3.5rem, 8vw, 6.5rem); }
+  .sec-head {
+    display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2.4rem;
+    border-bottom: 1px solid var(--line); padding-bottom: 1.1rem;
+  }
+  .sec-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); }
+  .sec-head .sheet-no { margin-left: auto; }
+  .sec-intro { font-size: clamp(1.1rem, 1.7vw, 1.35rem); color: var(--ink-soft); max-width: 56ch; margin-bottom: 2.6rem; font-family: var(--serif); font-style: italic; line-height: 1.4; }
+
+  /* flagship cards */
+  .flagship { border: 1px solid var(--line); border-radius: 3px; padding: clamp(1.4rem, 3vw, 2.2rem); background: color-mix(in srgb, var(--paper-2) 50%, transparent); margin-bottom: 1.3rem; transition: border-color 0.3s var(--ease), transform 0.3s var(--ease); }
+  /* Work products are static content (modals deferred) — no clickable hover affordance */
+  .flag-tag { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rust); margin-bottom: 0.7rem; display: inline-block; }
+  .flagship h3 { font-size: clamp(1.35rem, 2.6vw, 1.9rem); margin-bottom: 0.7rem; }
+  .flagship p { color: var(--ink-soft); max-width: 64ch; }
+
+  /* details / progressive disclosure */
+  details { margin-top: 1.1rem; border-top: 1px dashed var(--line); padding-top: 0.9rem; }
+  details summary {
+    cursor: pointer; list-style: none; font-family: var(--mono); font-size: 0.72rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue);
+    display: inline-flex; align-items: center; gap: 0.5rem; user-select: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary .chev { transition: transform 0.3s var(--ease); display: inline-block; }
+  details[open] summary .chev { transform: rotate(90deg); }
+  details .det-body {
+    font-family: var(--mono); font-size: 0.82rem; line-height: 1.8; color: var(--ink-soft);
+    margin-top: 0.9rem; padding-left: 1rem; border-left: 2px solid var(--line);
+    animation: reveal 0.4s var(--ease);
+  }
+  @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  code { font-family: ui-monospace, Menlo, "SF Mono", monospace; background: var(--paper-3); padding: 0.1em 0.35em; border-radius: 2px; font-size: 0.9em; }
+
+  /* secondary grid */
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.3rem; }
+  @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+  .card { border: 1px solid var(--line); border-radius: 3px; padding: 1.3rem 1.4rem; background: color-mix(in srgb, var(--paper-2) 35%, transparent); transition: border-color 0.3s var(--ease), transform 0.3s var(--ease); }
+  /* .card hover intentionally static — cards are not links; only the Details toggle is interactive */
+  .card h4 { font-family: var(--serif); font-size: 1.18rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .card p { font-size: 0.95rem; color: var(--ink-soft); }
+  .card details { margin-top: 0.8rem; }
+
+  /* ---------- bridge ---------- */
+  .bridge {
+    color: var(--paper); border-radius: 4px; padding: clamp(2.2rem, 6vw, 4.2rem);
+    position: relative; overflow: hidden;
+    background-color: #0b161c;
+    /* Ocean-storm atmosphere built from gradients. To use a real photo later:
+       background-image: url('storm.jpg'), <the three gradients below>; background-size: cover; */
+    background-image:
+      radial-gradient(130% 100% at 12% -25%, rgba(96,150,175,0.45), transparent 55%),
+      radial-gradient(120% 130% at 98% 120%, rgba(10,28,40,0.92), transparent 50%),
+      linear-gradient(155deg, #182c36 0%, #0d191f 60%, #070f14 100%);
+  }
+  /* wispy storm-cloud texture */
+  .bridge::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='460'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011 0.022' numOctaves='4' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.62 0 0 0 0 0.76 0 0 0 0 0.84 0 0 0 0.85 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
+    background-size: cover; opacity: 0.26; mix-blend-mode: screen;
+  }
+  .bridge::after {
+    content: ""; position: absolute; inset: 0; opacity: 0.05; pointer-events: none;
+    background-image: linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .bridge > * { position: relative; z-index: 1; }
+  .bridge .eyebrow { color: #7fb0d6; }
+  .bridge h2 { color: var(--paper); font-size: clamp(1.9rem, 4vw, 2.9rem); margin-block: 1rem 1.6rem; position: relative; }
+  .bridge p { color: #d8d2c4; max-width: 66ch; margin-bottom: 1.2rem; position: relative; font-size: 1.08rem; }
+  .bridge p strong { color: var(--paper); font-weight: 600; }
+  .bridge .ln { color: #9fc4e0; font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; border-bottom: 1px solid #5a7d99; padding-bottom: 2px; transition: color 0.25s; position: relative; }
+  .bridge .ln:hover { color: #fff; }
+
+  /* ---------- architecture thinking ---------- */
+  .tenets { display: flex; flex-direction: column; gap: 2rem; max-width: 60ch; }
+  .tenet { font-family: var(--serif); font-size: clamp(1.25rem, 2.4vw, 1.7rem); line-height: 1.34; color: var(--ink); padding-left: 1.5rem; border-left: 2px solid var(--blue); }
+  .tenet em { color: var(--blue); font-style: italic; }
+  .mem-stack { margin-top: 2.6rem; max-width: 60ch; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; position: relative; background: color-mix(in srgb, var(--paper-2) 45%, transparent); }
+  .mem-stack::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(var(--blue), var(--rust)); }
+  .mem-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.05rem 1.3rem 1.05rem 1.7rem; border-bottom: 1px solid var(--line); }
+  .mem-row:last-child { border-bottom: 0; }
+  .mem-row h4 { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; line-height: 1.1; margin-bottom: 0.2rem; }
+  .mem-row p { font-size: 0.95rem; color: var(--ink-soft); margin: 0; }
+  .mem-tag { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; }
+  .mem-tag.is-blue { color: var(--blue); }
+  .mem-tag.is-rust { color: var(--rust); }
+
+  .deep-links { margin-top: 2.6rem; display: flex; flex-direction: column; max-width: 64ch; }
+  .deep-links a {
+    font-family: var(--serif); font-size: 1.12rem; font-weight: 500; color: var(--ink);
+    display: flex; align-items: baseline; gap: 0.6rem;
+    padding: 0.85rem 0.7rem; margin-inline: -0.7rem; border-radius: 2px;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.3s var(--ease), color 0.25s var(--ease);
+  }
+  .deep-links a::after { content: "\2192"; color: var(--blue); opacity: 0; margin-left: auto; transition: opacity 0.25s var(--ease); }
+  .deep-links a:hover { background: var(--tint, var(--paper-3)); color: var(--blue); }
+  .deep-links a:hover::after { opacity: 1; }
+
+  /* wayfinding tint classes — set on a SECTION so all its rows/links inherit one color */
+  .tint-work      { --tint: var(--tint-work);      --accent: var(--acc-work); }
+  .tint-thinking  { --tint: var(--tint-thinking);  --accent: var(--acc-thinking); }
+  .tint-writing   { --tint: var(--tint-writing);   --accent: var(--acc-writing); }
+  .tint-deepdives { --tint: var(--tint-deepdives); --accent: var(--acc-deepdives); }
+
+  /* ---------- index list (writing / talks) ---------- */
+  .index-row {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 1.2rem; align-items: baseline;
+    padding: 1.05rem 0.7rem; margin-inline: -0.7rem; border-bottom: 1px solid var(--line);
+    border-radius: 2px; transition: background 0.3s var(--ease);
+  }
+  .index-row:hover { background: var(--tint, var(--paper-3)); }
+  .index-row:hover .ix-title, .index-row:hover .ix-no { color: var(--blue); }
+  .ix-no { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-soft); transition: color 0.25s; }
+  .ix-title { font-family: var(--serif); font-size: 1.12rem; transition: color 0.25s; }
+  .ix-title::after { content: " \2192"; color: var(--blue); opacity: 0; transition: opacity 0.25s var(--ease); }
+  .index-row:hover .ix-title::after { opacity: 1; }
+  .ix-tag { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-soft); border: 1px solid var(--line); padding: 0.24rem 0.6rem; border-radius: 100px; white-space: nowrap; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 5rem); }
+  @media (max-width: 820px) { .two-col { grid-template-columns: 1fr; gap: 3rem; } }
+
+  /* ---------- contact ---------- */
+  .contact { text-align: left; }
+  .contact h2 { font-size: clamp(2.4rem, 6vw, 4rem); margin-bottom: 1.4rem; }
+  .contact p { font-size: 1.15rem; color: var(--ink-soft); max-width: 60ch; margin-bottom: 2.2rem; }
+  .contact-links { display: flex; gap: 1.6rem; flex-wrap: wrap; }
+  .contact-links a { font-family: var(--mono); font-size: 0.84rem; letter-spacing: 0.06em; border-bottom: 1px solid var(--ink); padding-bottom: 3px; transition: all 0.25s var(--ease); }
+  .contact-links a:hover { color: var(--blue); border-color: var(--blue); }
+
+  footer { border-top: 1px solid var(--line); padding-block: 2rem; }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  footer span { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-faint); letter-spacing: 0.06em; }
+
+  /* ---------- scroll reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
 </head>
 <body>
 
-<div class="progress-bar" id="progress"></div>
-
-<nav id="nav">
-  <a href="#hero" class="name">Andrew Crenshaw</a>
-  <ul class="links">
-    <li><a href="#work">Work</a></li>
-    <li><a href="#architecture">Architecture</a></li>
-    <li><a href="#career">Career</a></li>
-    <li><a href="#presentations">Presentations</a></li>
-    <li><a href="#writing">Writing</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="https://gist.github.com/andrewcrenshaw/ef2f4e84b0a5d4fced230267e108889f" target="_blank" rel="noopener">Source</a></li>
-  </ul>
-</nav>
-
-<!-- ==================== HERO ==================== -->
-<section id="hero">
-  <div class="section-inner">
-    <div class="rule reveal"></div>
-    <h1 class="reveal reveal-delay-1">Enterprise AI.<br>Built, Not Theorized.</h1>
-    <p class="hero-subtitle reveal reveal-delay-2">
-      I design and build multi-agent AI operating systems with living memory, local inference, and human-in-the-loop governance. 25+ years of enterprise architecture — now building the agentic infrastructure that compounds knowledge across sessions, agents, and machines. The rare combination of deep enterprise experience and hands-on AI systems building.
-    </p>
-    <div class="hero-cta reveal reveal-delay-3">
-      <a href="#work" class="cta-primary">See the work</a>
-      <a href="#contact" class="cta-secondary">Get in touch</a>
+<header>
+  <nav class="nav wrap">
+    <a href="#top" class="brand"><span class="dot"></span> ANDREW CRENSHAW</a>
+    <div class="nav-links">
+      <a href="#work">Work</a>
+      <a href="#approach">Approach</a>
+      <a href="#thinking">Thinking</a>
+      <a href="#writing">Writing</a>
+      <a href="https://github.com/andrewcrenshaw?tab=repositories" class="src" target="_blank" rel="noopener">Source ↗</a>
+      <a href="#contact" class="cta-mini">Get in touch</a>
     </div>
-  </div>
-</section>
+  </nav>
+</header>
 
-<div class="section-divider"></div>
+<main id="top">
 
-<!-- ==================== WHAT I BUILD ==================== -->
-<section id="work">
-  <div class="section-inner">
-    <div class="section-label reveal">What I Build</div>
-    <h2 class="reveal">Different domains. Same architecture spine.</h2>
-    <div class="rule reveal"></div>
-    <p class="reveal">Most organizations experimenting with AI agents are running single-agent demos against isolated problems. I design and build systems where multiple specialized agents collaborate under structured governance, building on each other's work through shared memory. I also ship practical AI-powered tools that real teams use every day.</p>
+  <!-- ========== HERO ========== -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <div class="hero-eyebrow reveal">
+          <span class="rule"></span>
+          <span class="eyebrow">Agentic Engineering</span>
+        </div>
+        <h1 class="reveal" style="transition-delay:.05s">Built,<br /><span class="ital">not theorized.</span></h1>
+        <p class="hero-role reveal" style="transition-delay:.09s">Enterprise AI Architecture &amp; Engineering</p>
+        <p class="lede reveal" style="transition-delay:.12s">
+          I design and build <strong>custom AI products</strong>: multi-agent systems engineered with <strong>enterprise rigor</strong> to solve real problems and weather real use.
+        </p>
+        <div class="cta-row reveal" style="transition-delay:.18s">
+          <a href="#work" class="btn btn-primary">See the work →</a>
+          <a href="#contact" class="btn btn-ghost">Get in touch</a>
+        </div>
+      </div>
 
-    <div class="card-grid">
-      <div class="card reveal reveal-delay-1">
-        <span class="card-icon"><i class="ph ph-brain"></i></span>
+      <!-- Reserved animation slot. Replace the .substrate block with Andrew's hero animation. -->
+      <div class="plate reveal" style="transition-delay:.24s" aria-hidden="true">
+        <div class="plate-grid"></div>
+        <canvas class="substrate" id="substrate-canvas"></canvas>
+        <span class="tick tl"></span><span class="tick tr"></span>
+        <span class="tick bl"></span><span class="tick br"></span>
+        <div class="plate-label">fig. 01 &middot; living memory substrate</div>
+      </div>
+    </div>
+
+    <!-- ========== PROOF BAR ========== -->
+    <div class="proof">
+      <div class="wrap proof-inner">
+        <span class="proof-item"><b>25 years</b> · dot-com to enterprise to AI</span>
+        <span class="proof-item"><b>$250M</b> pipeline · 5,000-user platforms</span>
+        <span class="proof-item">multi-agent systems <b>built and running</b></span>
+        <span class="proof-item"><b>unified data</b> → decision support at scale</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 01 WORK ========== -->
+  <section class="block tint-work" id="work">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Custom AI Products &amp; Systems</h2>
+        <span class="sheet-no">01 / WORK</span>
+      </div>
+      <p class="sec-intro reveal">
+        Custom applications and products, built to solve real problems and survive real use. Different domains, same architecture spine: multi-agent collaboration, under governance, over shared memory.
+      </p>
+
+      <!-- Flagship 1 -->
+      <div class="flagship reveal">
+        <span class="flag-tag">Flagship</span>
         <h3>Living Memory &amp; Knowledge System</h3>
-        <p>A memory architecture where AI agents, humans, and subsystems share one substrate. Three orthogonal axes: <em>storage</em> (Living Memory, Alexandria, Episodic Continuity), <em>interpretation</em> (substrate &mdash; universal state; lens &mdash; persistent role-shaped filter; frame &mdash; transient task-binding), and <em>action</em> (typed state-changes, outcome &rarr; procedure feedback, intentional non-action). The render equation: <em>view = render(substrate, lens, frame)</em>. Sentra named substrate and lens; we add frame as the missing transient layer. The same pattern shipped years earlier at Macmillan as UXF / ASO26 / EDR &mdash; this is its solo-scale continuation.</p>
-        <div class="tech-tags">
-          <span class="tech-tag">substrate / lens / frame</span>
-          <span class="tech-tag">typed state-changes</span>
-          <span class="tech-tag">bi-temporal validity</span>
-          <span class="tech-tag">decision traces</span>
-          <span class="tech-tag">RBAC lens contracts</span>
-          <span class="tech-tag">intentional non-action</span>
-          <span class="tech-tag">decay + consolidation</span>
-          <span class="tech-tag">approval-gated mutation</span>
-        </div>
+        <p>A memory architecture that lets agents accumulate and reuse knowledge across sessions, agents, and machines, instead of starting cold every time. Three orthogonal axes: where knowledge is stored, how each role is allowed to interpret it, and how it drives action.</p>
+        <details open>
+          <summary><span class="chev">›</span> Model &amp; mechanics</summary>
+          <div class="det-body">
+            One shared memory, role-shaped views, task-scoped context<br />
+            Remembers across sessions, agents, and machines &nbsp;·&nbsp; curated, not hoarded<br />
+            Time-aware validity &nbsp;·&nbsp; decision traces &nbsp;·&nbsp; approval-gated writes
+          </div>
+        </details>
       </div>
 
-      <div class="card reveal reveal-delay-2">
-        <span class="card-icon"><i class="ph ph-lightning"></i></span>
+      <!-- Flagship 2 -->
+      <div class="flagship reveal">
+        <span class="flag-tag">Flagship</span>
         <h3>autogenous-synthesis Forge</h3>
-        <p>The development OS behind every project here. Forge is a harness engineering framework — it doesn't add AI to an existing process, it replaces the process entirely. Twelve specialized agents (architect, builder, analyst, reviewer, tester, debugger, and more) operate under structured SOPs, a governed backlog, TDD enforcement, and persistent session memory. The loop: a planning agent decomposes work into tickets via the Forge backlog API; Stewart grooms intake to ready with verified AC and an agent assignment; the dashboard auto-generates an agent-scoped prompt at the ready→in-progress transition; one click on Launch copies it to the clipboard, the agent runs in a fresh session, and submission triggers an automated multi-stage review gate (lint, 700+ test suites, Eval, code review, pre-commit) that auto-closes the ticket on pass or stages a "fix it" prompt via a Relaunch button on fail. When something fails, the fix is never "try harder" — it's "what capability is missing, and how do we make it legible to the agent?"</p>
-        <div class="tech-tags">
-          <span class="tech-tag">harness engineering</span>
-          <span class="tech-tag">TypeScript / Node.js</span>
-          <span class="tech-tag">SQLite</span>
-          <span class="tech-tag">12 specialized agents</span>
-          <span class="tech-tag">approval gates</span>
-          <span class="tech-tag">TDD enforcement</span>
-          <span class="tech-tag">session memory</span>
-          <span class="tech-tag">agent SOPs</span>
-        </div>
-        <a href="https://andrewcrenshaw.dev/autogenous-synthesis/" target="_blank" rel="noopener" class="card-doc-link">Documentation →</a>
-      </div>
-
-      <div class="card reveal reveal-delay-3">
-        <span class="card-icon"><i class="ph ph-buildings"></i></span>
-        <h3>Enterprise Workflow Automation</h3>
-        <p>Applied the Forge framework to Salesforce development workflows with bidirectional Jira integration, Confluence documentation sync, and automated requirements traceability from business need to deployed code.</p>
-        <div class="tech-tags">
-          <span class="tech-tag">Salesforce (Apex / MCP)</span>
-          <span class="tech-tag">confidence evaluation</span>
-          <span class="tech-tag">brownfield discovery</span>
-          <span class="tech-tag">human-agent co-development</span>
-          <span class="tech-tag">Jira integration</span>
-          <span class="tech-tag">test coverage</span>
-        </div>
-      </div>
-
-      <div class="card reveal reveal-delay-1">
-        <span class="card-icon"><i class="ph ph-film-slate"></i></span>
-        <h3>HR Media Campaign Platform</h3>
-        <p>Designed and built an internal media campaign management system used by the HR People Team. Multi-format content creation (AI-generated audio, avatar video, text), Slack distribution, branded media player with engagement analytics. In active daily use.</p>
-        <div class="tech-tags">
-          <span class="tech-tag">Node.js / Express</span>
-          <span class="tech-tag">PostgreSQL</span>
-          <span class="tech-tag">Google TTS / HeyGen</span>
-          <span class="tech-tag">Slack integration</span>
-          <span class="tech-tag">SSO</span>
-        </div>
-      </div>
-
-      <div class="card reveal reveal-delay-2">
-        <span class="card-icon"><i class="ph ph-graduation-cap"></i></span>
-        <h3>niKi: Now I Know It</h3>
-        <p>A product bet exploring AI-powered compounding learning. Students upload course notes (images, PDFs, docs) and an LLM extracts atomic concepts with prerequisites and cross-course connections into a personal knowledge graph. Builds scoped study guides, with 8 built-in skills (concept extraction, confusion pair detection, exam postmortem, bridge detection). The same knowledge-graph-plus-learning-layer pattern from the enterprise work, applied to student learning.</p>
-        <div class="tech-tags">
-          <span class="tech-tag">Node.js</span>
-          <span class="tech-tag">LLM vision API</span>
-          <span class="tech-tag">knowledge graphs</span>
-          <span class="tech-tag">prompt templates</span>
-          <span class="tech-tag">portable / self-contained</span>
-        </div>
-      </div>
-
-      <div class="card reveal reveal-delay-3">
-        <span class="card-icon"><i class="ph ph-user-focus"></i></span>
-        <h3>Customer Contextualization Framework</h3>
-        <p>Designed a framework for synthesizing customer engagement signals across touchpoints into a unified context layer. Identity resolution, CRM architecture, behavioral data, and real-time orchestration powering personalization and support cost reduction.</p>
-        <div class="tech-tags">
-          <span class="tech-tag">identity resolution</span>
-          <span class="tech-tag">rules engine</span>
-          <span class="tech-tag">relevance scoring</span>
-          <span class="tech-tag">Builder.io</span>
-          <span class="tech-tag">AWS Redshift</span>
-          <span class="tech-tag">Salesforce CRM</span>
-        </div>
-      </div>
-
-      <div class="card reveal reveal-delay-1">
-        <span class="card-icon"><i class="ph ph-crosshair"></i></span>
-        <h3>Strata: AI Job Search OS</h3>
-        <p>An autonomous AI operating system where eight specialized agents collaborate through governed PostgreSQL to discover, evaluate, match, and help apply to jobs. Three-layer dedup eliminates 95% of noise before LLM scoring. Local inference handles the majority of scoring via a four-machine Apple Silicon fleet — Qwen3.6-35B MoE for fast evaluation, Qwen3.6-27B Dense for synthesis — with cloud API as fallback only. Two public PyPI libraries (strata-match, strata-harvest). Variable API cost: $2–5/month.</p>
-        <div class="tech-tags">
-          <span class="tech-tag">FastAPI / PostgreSQL</span>
-          <span class="tech-tag">pgvector</span>
-          <span class="tech-tag">8 governed agents</span>
-          <span class="tech-tag">ARQ + Redis</span>
-          <span class="tech-tag">3-layer dedup</span>
-          <span class="tech-tag">open source (PyPI)</span>
-        </div>
-        <a href="https://andrewcrenshaw.dev/strata/" target="_blank" rel="noopener" class="card-doc-link">Documentation →</a>
-      </div>
-
-      <div class="card reveal reveal-delay-2">
-        <span class="card-icon"><i class="ph ph-cpu"></i></span>
-        <h3>Local AI Infrastructure</h3>
-        <p>A four-machine Apple Silicon cluster running oMLX 0.3.8 across all nodes. mac-studio1 (M3 Ultra, 96GB) is the primary inference host: Qwen3.6-35B MoE (8bit, DFlash) for interactive and scoring workloads at 245–326 tok/s; Qwen3.6-27B Dense (8bit, thinking ON) for synthesis and coaching at 91.9% TruthfulQA. mac-mini3 (M4 Pro, 64GB, 4TB) is the dedicated Alexandria worker — nightly librarian schedule (synthesis-detector, wiki-lint, link-builder, dedup) without competing with studio1's live traffic. mac-mini1 + mac-mini2 (M4, 16GB each) are the always-on edge tier: Qwen3.6-2B-MLX-4bit + snowflake-arctic-embed for sub-3s extract-fast and embed-fast regardless of studio1 load. Application code calls named slots (score-fast, score-deep, synth-deep, extract-fast, embed-fast); the role-resolver maps each to the right host, model, and oMLX profile. Alexandria session priming, daily digests, and agent knowledge retrieval all run on-device. Shadow-mode calibration benchmarks local quality against cloud continuously.</p>
-        <div class="tech-tags">
-          <span class="tech-tag">oMLX 0.3.8</span>
-          <span class="tech-tag">Qwen3.6-35B MoE (8bit)</span>
-          <span class="tech-tag">Qwen3.6-27B Dense (thinking)</span>
-          <span class="tech-tag">snowflake-arctic-embed</span>
-          <span class="tech-tag">role-slot resolver</span>
-          <span class="tech-tag">launchd daemons</span>
-          <span class="tech-tag">Tailscale VPN</span>
-          <span class="tech-tag">shadow-mode eval</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="section-divider"></div>
-
-<!-- ==================== ARCHITECTURE ==================== -->
-<section id="architecture">
-  <div class="section-inner">
-    <div class="section-label reveal">Architecture Thinking</div>
-    <h2 class="reveal">Memory is the multiplier. Agency is the force.</h2>
-    <div class="rule reveal"></div>
-
-    <div class="two-col">
-      <div class="reveal">
-        <p>Without memory, agency does the same work repeatedly. An agent fleet without shared memory is individually capable but collectively starts over every time. The architecture I designed solves this with three distinct layers, each with its own failure modes and quality signals.</p>
-        <p style="margin-top: 1rem;">The learning layer is the part most teams skip. It's where raw experience becomes structured understanding: what worked, what didn't, what should be applied next time. Without it, you have storage and retrieval but no compounding.</p>
-      </div>
-      <div class="reveal reveal-delay-1">
-        <div class="layer-stack">
-          <div class="layer">
-            <div class="layer-name">Retrieval</div>
-            <div class="layer-desc">Right knowledge, right agent, right moment</div>
-            <div class="layer-tag">Personalization</div>
+        <p>A development operating system where twelve specialized agents plan, build, review, and ship code under enforced TDD and multi-stage approval gates, with memory that persists across sessions.</p>
+        <details open>
+          <summary><span class="chev">›</span> Stack &amp; mechanics</summary>
+          <div class="det-body">
+            TypeScript / Node.js &nbsp;·&nbsp; SQLite &nbsp;·&nbsp; 12 specialized agents<br />
+            gates: lint + 700-test suite + Eval + code-review + pre-commit<br />
+            persistent session memory &nbsp;·&nbsp; agent SOPs
           </div>
-          <div class="layer highlight">
-            <div class="layer-name">Learning</div>
-            <div class="layer-desc">Reduce, reflect, consolidate</div>
-            <div class="layer-tag">Most skip this</div>
-          </div>
-          <div class="layer">
-            <div class="layer-name">Storage</div>
-            <div class="layer-desc">Where knowledge lives</div>
-            <div class="layer-tag">Infrastructure</div>
-          </div>
+        </details>
+        <a href="https://andrewcrenshaw.dev/autogenous-synthesis/" target="_blank" rel="noopener" style="display:inline-block;margin-top:1rem;font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Documentation ↗</a>
+      </div>
+
+      <!-- Secondary grid -->
+      <div class="grid-2">
+        <div class="card reveal">
+          <h4>Strata</h4>
+          <p>An autonomous job-search system, built in the open: eight agents, three-layer deduplication, fully local inference.</p>
+          <details>
+            <summary><span class="chev">›</span> Details</summary>
+            <div class="det-body">8 agents · 3-layer dedup · local inference (Qwen via oMLX) · PostgreSQL + pgvector · ARQ + Redis · open-source PyPI libraries. Active build, shared as an engineering reference.</div>
+          </details>
+          <a href="https://andrewcrenshaw.dev/strata/" target="_blank" rel="noopener" style="display:inline-block;margin-top:0.8rem;font-family:var(--mono);font-size:0.7rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Documentation ↗</a>
+        </div>
+
+        <div class="card reveal">
+          <h4>Local AI Infrastructure</h4>
+          <p>A four-machine Apple Silicon cluster running open models entirely on-prem, keeping inference private and cost-free at the edge.</p>
+          <details>
+            <summary><span class="chev">›</span> Details</summary>
+            <div class="det-body">Qwen3.6 35B MoE, 27B Dense, 2B · snowflake-arctic-embed · oMLX · 245–326 tok/s · 91.9% TruthfulQA</div>
+          </details>
+        </div>
+
+        <div class="card reveal">
+          <h4>Customer Contextualization Framework</h4>
+          <p>Identity resolution unifying CRM and behavioral data into a single, trustworthy customer view.</p>
+          <details>
+            <summary><span class="chev">›</span> Details</summary>
+            <div class="det-body">Identity resolution · SSOT · CRM + behavioral data · Salesforce custom objects · AWS Redshift · Builder.io · Ada chatbots</div>
+          </details>
+        </div>
+
+        <div class="card reveal">
+          <h4>Enterprise Workflow Automation</h4>
+          <p>Salesforce and Jira integration with end-to-end test traceability across the delivery loop.</p>
+          <details>
+            <summary><span class="chev">›</span> Details</summary>
+            <div class="det-body">Salesforce (MCP + CLI) + Jira + Confluence integration · automated test traceability</div>
+          </details>
+        </div>
+
+        <div class="card reveal">
+          <h4>HR Media Campaign Platform</h4>
+          <p>A platform generating personalized video campaigns from text, wired into Slack and SSO.</p>
+          <details>
+            <summary><span class="chev">›</span> Details</summary>
+            <div class="det-body">Node.js / Express · PostgreSQL · Google TTS + HeyGen · Slack · SSO</div>
+          </details>
+        </div>
+
+        <div class="card reveal">
+          <h4>niKi: Now I Know It</h4>
+          <p>A proof-of-concept AI learning platform built on knowledge graphs.</p>
+          <details>
+            <summary><span class="chev">›</span> Details</summary>
+            <div class="det-body">Knowledge-graph architecture · 8 built-in skills · prototype / POC</div>
+          </details>
         </div>
       </div>
     </div>
+  </section>
 
-    <div class="big-quote reveal" style="margin-top: 3rem;">
-      The difference between agents with a vector database and agents with a memory system that compounds is the difference between a tool and a team.
-    </div>
-
-    <div class="two-col" style="margin-top: 3rem;">
-      <div class="reveal">
-        <h3>Governance as Architecture</h3>
-        <p>Speed without governance means fast in the wrong direction. The framework enforces bounded authority (each agent has a narrow, architecturally enforced scope), continuous approval gates, automatic audit trails, and session isolation with conflict detection. Governance isn't a policy layer. It's a first-class architectural concern.</p>
-      </div>
-      <div class="reveal reveal-delay-1">
-        <h3>Enterprise Reality</h3>
-        <p>The system is designed for real enterprise infrastructure: Salesforce with governor limits, Jira with all its workflow complexity, Confluence as a living documentation target. Most agent demonstrations run in isolation. This one operates where the constraints are real and the consequences matter.</p>
-      </div>
-    </div>
-
-    <div class="big-quote reveal" style="margin-top: 3rem;">
-      Standing on strong shoulders. Taking it further.
-    </div>
-
-    <div class="two-col" style="margin-top: 2rem;">
-      <div class="reveal">
-        <h3>Inspirations &amp; Synthesis</h3>
-        <p>This architecture didn't emerge in isolation. It synthesizes ideas from <em>Ashwin Gopinath / Sentra</em> (Company Brain &mdash; substrate &amp; lens vocabulary), <em>Andrej Karpathy</em> (Software 2.0, LLM OS &mdash; memory is the file system), <em>Boris Cherny</em> (context engineering as the core discipline), and <em>Program-Aided Language Models (PAL)</em> (structured reasoning through code). The deeper lineage runs through <em>UXF / ASO26 / EDR</em> at Macmillan Learning, where the substrate-vs-lens pattern shipped in production years before Sentra named it. The key insight: most agentic systems bolt memory onto agents as an afterthought. We built the substrate as the foundation, declared lenses as the role-shaped filter, and added frames as the transient layer Sentra and others don't ship. Two 2026 papers now supply empirical grounding for Karpathy's file-system principle: Cao et al. (arXiv 2603.20432) show agents with filesystem-organized context outperforming SoTA by +17.3% across long-context reasoning, RAG, and QA; Lee et al. / Stanford (arXiv 2603.28052) show +7.7 points on text classification with 4&times; fewer tokens. The scratchpads, decision traces, and <em>.agent-data/</em> files in this architecture are exactly what both papers measure.</p>
-      </div>
-      <div class="reveal reveal-delay-1">
-        <h3>Where We're Different</h3>
-        <p>Memory platforms like <em>Mem0</em>, <em>Zep</em>, and <em>LangMem</em> solve recall. Orchestration frameworks like <em>CrewAI</em> and <em>LangGraph</em> solve coordination. Per-tool memory in <em>Notion</em>, <em>Linear</em>, and <em>Cursor</em> remembers each tool's own stuff. <em>Glean</em> searches across them but doesn't preserve state-change. None of them ship the layer that matters: one substrate that remembers across systems, with role-shaped lenses on top and transient task frames inside. The substrate generalizes; lenses don't. Memory fragmentation in everyone else's stack is the moat &mdash; the substrate that remembers state-changes across systems and renders them through a Sales lens, On-call lens, or Exec lens is the durable position.</p>
+  <!-- ========== 02 BRIDGE ========== -->
+  <section class="block" id="approach">
+    <div class="wrap">
+      <div class="bridge reveal">
+        <span class="eyebrow">02 / Approach</span>
+        <h2>Built to weather real use</h2>
+        <p>My path runs the full arc of the commercial internet. I started in the early dot-com era, building digital products when the web itself was new and shipping fast and innovating relentlessly were the only rules. I spent the next two decades inside the enterprise: global CRM for 5,000 users, multimillion-dollar technology budgets, and the security, audit, and compliance requirements that do not bend.</p>
+        <p>Now I take that enterprise substrate, the hard-won discipline of architecture, governance, and durability, and apply it to custom AI products. <strong>I believe that combination is rare.</strong> Startup speed without enterprise scar tissue produces demos that collapse under real load. Enterprise rigor without builder instinct produces strategy decks that never ship. I do both, which is why what I build solves real problems and is architected to last.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.8rem 1.8rem;margin-top:0.4rem;">
+          <a href="career.html" class="ln">Full 25-year career history →</a>
+          <a href="presentations/evaluated-sources.html" class="ln">The sources I build on →</a>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="section-divider"></div>
-
-<!-- ==================== CAREER ==================== -->
-<section id="career">
-  <div class="section-inner">
-    <div class="section-label reveal">Career Arc</div>
-    <h2 class="reveal">25 years of building systems<br>that make organizations smarter</h2>
-    <div class="rule reveal"></div>
-    <p class="reveal">The thread through my career: designing technology systems that help organizations understand their customers, make better decisions, and operate more intelligently. The actors have changed over 25 years. The architecture thinking hasn't.</p>
-
-    <div class="timeline reveal">
-      <div class="timeline-item">
-        <div class="timeline-date">2025 &ndash; 2026</div>
-        <div class="timeline-title">Agentic AI &amp; Multi-Agent Systems</div>
-        <div class="timeline-company">Head of GTM Engineering</div>
-        <div class="timeline-desc">Designed and built a multi-agent orchestration framework on a substrate / lens / frame memory architecture: one shared substrate (entities, facts, typed state-changes, decision traces, interactions, bi-temporal validity), role-shaped lenses with RBAC, and transient task frames. Human-in-the-loop governance and enterprise workflow automation (3x Salesforce dev acceleration). Built Strata — an autonomous AI job search OS with 8 governed agents, 3-layer dedup, and local LLM inference (Qwen3.6-35B MoE + Qwen3.6-27B Dense via oMLX) across a four-machine Apple Silicon cluster. Shipped an AI media campaign platform for HR. Published two open-source PyPI libraries.</div>
+  <!-- ========== 03 THINKING ========== -->
+  <section class="block tint-thinking" id="thinking">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Memory is the multiplier. Agency is the force.</h2>
+        <span class="sheet-no">03 / THINKING</span>
+      </div>
+      <div class="tenets">
+        <p class="tenet reveal">Without memory, agency does the same work repeatedly. The difference between agents with a vector database and agents with a memory system that <em>compounds</em> is the difference between a tool and a team.</p>
+        <p class="tenet reveal">But more memory is not better memory. Storing what is stale or simply wrong is worse than storing nothing, because agents act on it with confidence. Memory has to <em>curate</em>: reconcile, prune, and forget.</p>
+        <p class="tenet reveal">Speed without governance means fast in the wrong direction. Every agent runs with <em>bounded authority</em>, continuous approval gates, and automatic audit trails.</p>
+        <p class="tenet reveal">Most memory products stop at retrieval. The layer that matters is one substrate that remembers across systems, with <em>role-shaped lenses</em> on top and transient task frames inside.</p>
       </div>
 
-      <div class="timeline-item">
-        <div class="timeline-date">2013 &ndash; 2025</div>
-        <div class="timeline-title">Customer Engagement & GTM Platform</div>
-        <div class="timeline-company">Executive Director, Customer Engagement Solutions</div>
-        <div class="timeline-desc">Architected customer data platforms, identity resolution, CRM strategy, and marketing technology for a major EdTech publisher. Converged 10 product companies onto a single Salesforce instance. Built a fully integrated customer engagement ecosystem with compounding flywheels and feedback loops, providing decision support to sales and execs, and accelerating a $250M pipeline.</div>
+      <div class="mem-stack reveal">
+        <div class="mem-row">
+          <div><h4>Retrieval</h4><p>Right knowledge, right agent, right moment</p></div>
+          <span class="mem-tag is-blue">Personalization</span>
+        </div>
+        <div class="mem-row">
+          <div><h4>Learning</h4><p>Reduce, reflect, consolidate</p></div>
+          <span class="mem-tag is-rust">Most skip this</span>
+        </div>
+        <div class="mem-row">
+          <div><h4>Storage</h4><p>Where knowledge lives</p></div>
+          <span class="mem-tag is-blue">Infrastructure</span>
+        </div>
       </div>
 
-      <div class="timeline-item">
-        <div class="timeline-date">2002 &ndash; 2013</div>
-        <div class="timeline-title">Global CRM & Sales Technology</div>
-        <div class="timeline-company">Executive Director, Major Financial Institution</div>
-        <div class="timeline-desc">Nearly 9 years as global CRM product owner for 5,000 users, then Fixed Income IT portfolio lead managing a $20M technology budget. Built consolidated sales reporting, analysis, and coverage platforms replacing legacy systems.</div>
-      </div>
-
-      <div class="timeline-item">
-        <div class="timeline-date">1996 &ndash; 2002</div>
-        <div class="timeline-title">Digital Product & Platform Engineering</div>
-        <div class="timeline-company">VP Product Management / Sr. Technical PM</div>
-        <div class="timeline-desc">Built digital platforms for performing arts organizations and Fortune 500 companies. Designed e-commerce and ticketing integrations that transformed how Broadway theaters sold tickets online.</div>
+      <div class="deep-links reveal tint-thinking">
+        <a href="presentations/memory-landscape-2026.html">Memory, Context &amp; Graphs: The 2026 Landscape</a>
+        <a href="writing/five-governance-patterns-for-enterprise-ai-agents.html">Five Governance Patterns for Enterprise AI Agents</a>
+        <a href="writing/rag-is-not-a-knowledge-strategy.html">RAG Is Not a Knowledge Strategy</a>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="section-divider"></div>
-
-<!-- ==================== PRESENTATIONS ==================== -->
-<section id="presentations">
-  <div class="section-inner">
-    <div class="section-label reveal">Presentations</div>
-    <h2 class="reveal">Technical presentations and deep-dives</h2>
-    <div class="rule reveal"></div>
-    <p class="reveal">Self-contained, interactive HTML presentations covering the architecture, the research, and the strategic vision. Each one is a complete narrative, not a slide deck.</p>
-
-    <div class="pres-grid">
-      <a href="presentations/knowledge-framework-pitch.html" class="pres-card reveal reveal-delay-1">
-        <span class="pres-type type-strategy">Strategy</span>
-        <h4>Enterprise Knowledge Framework</h4>
-        <p class="pres-desc">Strategic pitch for institutional memory as a moat: one substrate, many role-shaped lenses, transient task frames. UXF / ASO26 / EDR lineage as production prior-art; memory fragmentation across per-tool memory as the durable position.</p>
-      </a>
-
-      <a href="presentations/salesforce-ai-augmented-development.html" class="pres-card reveal reveal-delay-2">
-        <span class="pres-type type-strategy">Strategy</span>
-        <h4>Salesforce AI-Augmented Development</h4>
-        <p class="pres-desc">How multi-agent orchestration transforms the Salesforce delivery lifecycle: confidence evaluation, brownfield discovery, and human-agent co-development.</p>
-      </a>
-
-      <a href="presentations/agentic-memory-architecture.html" class="pres-card reveal reveal-delay-3">
-        <span class="pres-type type-arch">Architecture</span>
-        <h4>Agentic Memory: Technical Overview</h4>
-        <p class="pres-desc">Deep technical walk-through of the three-axis memory architecture (storage &times; interpretation &times; action), the substrate / lens / frame primitives, the render equation <em>view = render(substrate, lens, frame)</em>, and the lens roster of consumers across agents and humans.</p>
-      </a>
-
-      <a href="presentations/customer-contextualization-framework.html" class="pres-card reveal reveal-delay-1">
-        <span class="pres-type type-strategy">Strategy</span>
-        <h4>Customer Contextualization Framework</h4>
-        <p class="pres-desc">Synthesizing engagement signals across customer touchpoints into a unified context layer. Identity resolution, behavioral data, and AI-powered orchestration.</p>
-      </a>
-
-      <a href="presentations/memory-landscape-2026.html" class="pres-card reveal reveal-delay-2">
-        <span class="pres-type type-research">Research</span>
-        <h4>Memory, Context & Graphs: The 2026 Landscape</h4>
-        <p class="pres-desc">Comparative analysis of the 2026 memory landscape: substrate-vs-lens vocabulary from Sentra, three-axis classification, the moat thesis (memory fragmentation in per-tool memory). 35+ sources with claim traceability and gap analysis.</p>
-      </a>
-
-      <a href="presentations/autogenous-synthesis-forge.html" class="pres-card reveal reveal-delay-3">
-        <span class="pres-type type-arch">Architecture</span>
-        <h4>autogenous-synthesis Forge: Technical Deep Dive</h4>
-        <p class="pres-desc">Inside the harness engineering framework: agent network, SOP enforcement, approval gates, TDD pipeline, session continuity, and the execution loop that runs every ticket from plan to done. The architecture that makes the rest of this possible.</p>
-      </a>
+  <!-- ========== 04 / 05 WRITING + TALKS ========== -->
+  <section class="block" id="writing">
+    <div class="wrap two-col">
+      <div class="tint-writing">
+        <div class="sec-head reveal">
+          <h2>Writing</h2>
+          <span class="sheet-no">04</span>
+        </div>
+        <div class="index-list">
+          <a href="writing/the-memory-problem-in-multi-agent-systems.html" class="index-row reveal"><span class="ix-no">01</span><span class="ix-title">The Memory Problem in Multi-Agent Systems</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/agent-memory-vs-agentic-memory.html" class="index-row reveal"><span class="ix-no">02</span><span class="ix-title">Agent Memory vs. Agentic Memory</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/five-governance-patterns-for-enterprise-ai-agents.html" class="index-row reveal"><span class="ix-no">03</span><span class="ix-title">Five Governance Patterns for Enterprise AI Agents</span><span class="ix-tag">Patterns</span></a>
+          <a href="writing/rag-is-not-a-knowledge-strategy.html" class="index-row reveal"><span class="ix-no">04</span><span class="ix-title">RAG Is Not a Knowledge Strategy</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/enterprise-experience-is-the-missing-ingredient.html" class="index-row reveal"><span class="ix-no">05</span><span class="ix-title">Enterprise Experience Is the Missing Ingredient</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/building-an-ai-job-search-os.html" class="index-row reveal"><span class="ix-no">06</span><span class="ix-title">Building an AI Job Search OS from Scratch</span><span class="ix-tag">Build log</span></a>
+          <a href="writing/local-inference-at-the-edge.html" class="index-row reveal"><span class="ix-no">07</span><span class="ix-title">Local Inference at the Edge: A Four-Machine Fleet</span><span class="ix-tag">Build log</span></a>
+        </div>
+      </div>
+      <div class="tint-deepdives">
+        <div class="sec-head reveal">
+          <h2>Deep-dives</h2>
+          <span class="sheet-no">05</span>
+        </div>
+        <div class="index-list">
+          <a href="presentations/knowledge-framework-pitch.html" class="index-row reveal"><span class="ix-no">01</span><span class="ix-title">Enterprise Knowledge Framework</span><span class="ix-tag">Strategy</span></a>
+          <a href="presentations/salesforce-ai-augmented-development.html" class="index-row reveal"><span class="ix-no">02</span><span class="ix-title">Salesforce AI-Augmented Development</span><span class="ix-tag">Strategy</span></a>
+          <a href="presentations/agentic-memory-architecture.html" class="index-row reveal"><span class="ix-no">03</span><span class="ix-title">Agentic Memory: Technical Overview</span><span class="ix-tag">Architecture</span></a>
+          <a href="presentations/customer-contextualization-framework.html" class="index-row reveal"><span class="ix-no">04</span><span class="ix-title">Customer Contextualization Framework</span><span class="ix-tag">Strategy</span></a>
+          <a href="presentations/memory-landscape-2026.html" class="index-row reveal"><span class="ix-no">05</span><span class="ix-title">Memory, Context &amp; Graphs: The 2026 Landscape</span><span class="ix-tag">Research</span></a>
+          <a href="presentations/autogenous-synthesis-forge.html" class="index-row reveal"><span class="ix-no">06</span><span class="ix-title">autogenous-synthesis Forge: Technical Deep Dive</span><span class="ix-tag">Architecture</span></a>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="section-divider"></div>
-
-<!-- ==================== WRITING ==================== -->
-<section id="writing">
-  <div class="section-inner narrow">
-    <div class="section-label reveal">Writing</div>
-    <h2 class="reveal">Lessons from building</h2>
-    <div class="rule reveal"></div>
-    <p class="reveal">Observations from building multi-agent systems for real enterprise work. No theory. Just what I've learned.</p>
-
-    <div class="writing-list">
-      <a href="writing/the-memory-problem-in-multi-agent-systems.html" class="writing-item reveal">
-        <h4>The Memory Problem in Multi-Agent Systems</h4>
-        <p class="writing-desc">Why a dozen fast agents without shared memory is just expensive repetition.</p>
-      </a>
-      <a href="writing/agent-memory-vs-agentic-memory.html" class="writing-item reveal reveal-delay-1">
-        <h4>Agent Memory vs. Agentic Memory</h4>
-        <p class="writing-desc">The distinction most teams miss, and the three-layer architecture that solves it.</p>
-      </a>
-      <a href="writing/five-governance-patterns-for-enterprise-ai-agents.html" class="writing-item reveal reveal-delay-2">
-        <h4>Five Governance Patterns for Enterprise AI Agents</h4>
-        <p class="writing-desc">Approval gates, bounded authority, session isolation, and calibrating the human-in-the-loop.</p>
-      </a>
-      <a href="writing/rag-is-not-a-knowledge-strategy.html" class="writing-item reveal reveal-delay-3">
-        <h4>RAG Is Not a Knowledge Strategy</h4>
-        <p class="writing-desc">Why retrieval-augmented generation solves the search problem but not the knowledge problem.</p>
-      </a>
-      <a href="writing/enterprise-experience-is-the-missing-ingredient.html" class="writing-item reveal">
-        <h4>Enterprise Experience Is the Missing Ingredient</h4>
-        <p class="writing-desc">Decades of enterprise complexity aren't just relevant to the agentic stack — they're the part most teams are missing.</p>
-      </a>
-      <a href="writing/building-an-ai-job-search-os.html" class="writing-item reveal reveal-delay-1">
-        <h4>Building an AI Job Search OS from Scratch</h4>
-        <p class="writing-desc">Why I built Strata: eight governed agents, three-layer dedup, local LLM inference across a four-machine Apple Silicon fleet, and the architecture decisions that make it run for under $5/month in API costs.</p>
-      </a>
-      <a href="writing/local-inference-at-the-edge.html" class="writing-item reveal reveal-delay-2">
-        <h4>Local Inference at the Edge: A Four-Machine Fleet</h4>
-        <p class="writing-desc">Building a four-machine Apple Silicon inference cluster with oMLX — slot-based routing, tiered hardware, and why control and privacy matter more than API cost savings.</p>
-      </a>
+  <!-- ========== CONTACT ========== -->
+  <section class="block contact" id="contact">
+    <div class="wrap">
+      <span class="eyebrow reveal">Let's talk</span>
+      <h2 class="reveal" style="transition-delay:.05s">What should we build?</h2>
+      <p class="reveal" style="transition-delay:.1s">
+        I'm looking for my next role leading AI-native engineering: where actually building agentic systems, architecting for enterprise reality, and shipping production-grade AI all matter.
+      </p>
+      <div class="contact-links reveal" style="transition-delay:.15s">
+        <a href="https://www.linkedin.com/in/andrewcrenshaw/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a href="mailto:andrewcrenshaw123@gmail.com">Email ↗</a>
+        <a href="https://github.com/andrewcrenshaw" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="section-divider"></div>
-
-<!-- ==================== CONTACT ==================== -->
-<section id="contact">
-  <div class="section-inner">
-    <div class="rule center reveal"></div>
-    <h2 class="reveal">Let's talk.</h2>
-    <p class="reveal">I'm looking for my next role leading AI-native engineering organizations — where the ability to actually build agentic systems, architect for enterprise reality, and ship production-grade AI infrastructure all matter. VP/Head of AI Engineering, AI Strategy, or Agentic Platform leadership.</p>
-    <div class="contact-links reveal reveal-delay-1">
-      <a href="https://www.linkedin.com/in/andrewcrenshaw/" target="_blank">LinkedIn</a>
-      <a href="#" onclick="this.href='mailto:'+'andrewcrenshaw123'+'@'+'gmail.com'" target="_blank">Email</a>
-      <a href="https://github.com/andrewcrenshaw" target="_blank">GitHub</a>
-    </div>
-  </div>
-</section>
+</main>
 
 <footer>
-  <p>&copy; 2026 Andrew Crenshaw</p>
+  <div class="wrap">
+    <span>© 2026 Andrew Crenshaw</span>
+    <span>Enterprise AI · Built, not theorized</span>
+  </div>
 </footer>
 
 <script>
   // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
+  (function () {
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var els = document.querySelectorAll('.reveal');
+    if (reduce || !('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  })();
+
+  // Living-memory substrate — animated first pass (canvas, transparent, seamless 12s loop).
+  // Replaceable: swap this <canvas> + script for a Rive/Lottie embed when ready.
+  (function () {
+    var canvas = document.getElementById('substrate-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var TAU = Math.PI * 2;
+    var T = 12000; // loop length (ms); everything is a periodic fn of phase => seamless
+
+    var pts = [
+      [0.28,0.30],[0.62,0.22],[0.78,0.48],[0.50,0.52],
+      [0.22,0.62],[0.70,0.74],[0.40,0.80],[0.86,0.66]
+    ];
+    var edges = [[0,1],[1,2],[3,2],[0,3],[3,4],[4,6],[3,5],[5,7],[5,2],[6,5]];
+    var pulseEdges = [[3,2],[3,4],[3,5],[0,3]]; // an agent reading from the hub outward
+    var ACCENT = 3, DECAY = 7;
+    var BLUE = '27,61,90', RUST = '156,74,35';
+
+    var W = 0, H = 0, dpr = 1, raf = 0;
+
+    function resize() {
+      var r = canvas.getBoundingClientRect();
+      W = r.width; H = r.height;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function px(i) { return [pts[i][0] * W, pts[i][1] * H]; }
+
+    function draw(now) {
+      var phase = (now % T) / T; // 0..1
+      ctx.clearRect(0, 0, W, H);
+
+      // edges: gentle opacity wave (2 cycles/loop => seamless)
+      for (var e = 0; e < edges.length; e++) {
+        var a = px(edges[e][0]), b = px(edges[e][1]);
+        var o = 0.14 + 0.12 * (0.5 + 0.5 * Math.sin(TAU * (phase * 2 + e * 0.13)));
+        ctx.strokeStyle = 'rgba(' + BLUE + ',' + o + ')';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
       }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-  reveals.forEach(el => observer.observe(el));
+      // pulses: travel hub -> outward (2 cycles/loop => seamless), fading at both ends
+      for (var p = 0; p < pulseEdges.length; p++) {
+        var a2 = px(pulseEdges[p][0]), b2 = px(pulseEdges[p][1]);
+        var tt = (phase * 2 + p * 0.25) % 1;
+        var fade = Math.sin(Math.PI * tt);
+        var x = a2[0] + (b2[0] - a2[0]) * tt, y = a2[1] + (b2[1] - a2[1]) * tt;
+        var pg = ctx.createRadialGradient(x, y, 0, x, y, 6);
+        pg.addColorStop(0, 'rgba(' + BLUE + ',' + (0.85 * fade) + ')');
+        pg.addColorStop(1, 'rgba(' + BLUE + ',0)');
+        ctx.fillStyle = pg; ctx.beginPath(); ctx.arc(x, y, 6, 0, TAU); ctx.fill();
+      }
 
-  // Nav scroll effect
-  const nav = document.getElementById('nav');
-  window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 60);
-  });
+      // nodes: breathing; one rust accent (the substrate core); one decaying node
+      for (var i = 0; i < pts.length; i++) {
+        var c = px(i);
+        var hub = (i % 3 === 0);
+        var rad = (hub ? 5.5 : 3.5) * (1 + 0.16 * Math.sin(TAU * (phase + i * 0.2)));
+        var col = (i === ACCENT) ? RUST : BLUE;
+        var alpha;
+        if (i === DECAY) {
+          alpha = 0.22 + 0.5 * (0.5 + 0.5 * Math.cos(TAU * phase)); // dims mid-loop, recovers
+        } else {
+          alpha = (hub ? 0.9 : 0.6) * (0.85 + 0.15 * Math.sin(TAU * (phase + i)));
+        }
+        var hg = ctx.createRadialGradient(c[0], c[1], 0, c[0], c[1], rad * 2.6);
+        hg.addColorStop(0, 'rgba(' + col + ',' + (alpha * 0.45) + ')');
+        hg.addColorStop(1, 'rgba(' + col + ',0)');
+        ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(c[0], c[1], rad * 2.6, 0, TAU); ctx.fill();
+        ctx.fillStyle = 'rgba(' + col + ',' + alpha + ')';
+        ctx.beginPath(); ctx.arc(c[0], c[1], rad, 0, TAU); ctx.fill();
+      }
 
-  // Progress bar
-  const progress = document.getElementById('progress');
-  window.addEventListener('scroll', () => {
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollPercent = (scrollTop / docHeight) * 100;
-    progress.style.width = scrollPercent + '%';
-  });
+      if (!reduce) raf = requestAnimationFrame(draw);
+    }
+
+    function start() { resize(); if (reduce) draw(0); else raf = requestAnimationFrame(draw); }
+    window.addEventListener('resize', function () { resize(); if (reduce) draw(0); });
+    start();
+  })();
 </script>
-
 </body>
 </html>

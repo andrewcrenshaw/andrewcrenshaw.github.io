@@ -1,316 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Five Governance Patterns for Enterprise AI Agents — Andrew Crenshaw</title>
-  <meta name="description" content="Approval gates, bounded authority, session isolation, and calibrating the human-in-the-loop.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0a0e14;
-      --bg-surface: #0f1319;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.06);
-      --border-accent: rgba(78, 168, 201, 0.25);
-      --text: #e4e8ed;
-      --text-dim: #7e8a97;
-      --text-faint: #4a5568;
-      --accent: #4ea8c9;
-      --accent-dim: rgba(78, 168, 201, 0.15);
-      --accent-glow: rgba(78, 168, 201, 0.08);
-      --serif: 'Cormorant Garamond', Georgia, serif;
-      --sans: 'Outfit', -apple-system, sans-serif;
-      --mono: 'JetBrains Mono', monospace;
-      --pad: clamp(1.5rem, 5vw, 5rem);
-      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-      line-height: 1.7;
-      font-weight: 300;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.25;
-    }
-
-    .top-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 500;
-      padding: 1rem var(--pad);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(10, 14, 20, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .top-bar .name {
-      font-family: var(--serif);
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text);
-      text-decoration: none;
-    }
-
-    .top-bar .back-link {
-      font-size: 0.8rem;
-      font-weight: 400;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    .top-bar .back-link:hover { color: var(--accent); }
-
-    .article-wrapper {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 8rem var(--pad) 4rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .article-label {
-      font-family: var(--sans);
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--accent);
-      margin-bottom: 0.8rem;
-    }
-
-    .article-title {
-      font-family: var(--serif);
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 400;
-      line-height: 1.15;
-      color: var(--text);
-      letter-spacing: -0.01em;
-      margin-bottom: 1rem;
-    }
-
-    .article-subtitle {
-      font-size: clamp(0.95rem, 1.3vw, 1.1rem);
-      color: var(--text-dim);
-      margin-bottom: 2.5rem;
-      max-width: 600px;
-    }
-
-    .rule {
-      width: 40px;
-      height: 2px;
-      background: var(--accent);
-      margin-bottom: 2.5rem;
-    }
-
-    .article-hero {
-      width: 100%;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      margin-bottom: 2.5rem;
-    }
-
-    .article-body p {
-      font-size: clamp(0.95rem, 1.3vw, 1.08rem);
-      line-height: 1.85;
-      color: var(--text-dim);
-      max-width: none;
-      margin-bottom: 1.5rem;
-    }
-
-    .article-body p strong {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .article-body p em {
-      font-style: italic;
-      color: var(--accent);
-      font-family: var(--serif);
-      font-size: 1.05em;
-    }
-
-    .article-body .callout {
-      background: var(--bg-card);
-      border-left: 3px solid var(--accent);
-      border-radius: 0 8px 8px 0;
-      padding: 1.2rem 1.5rem;
-      margin: 2rem 0;
-      font-size: 0.95rem;
-      color: var(--text);
-      line-height: 1.7;
-    }
-
-    .article-body .pattern-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-      margin: 2rem 0;
-    }
-
-    .article-body .pattern {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.2rem 1.5rem;
-      transition: border-color 0.3s;
-    }
-
-    .article-body .pattern:hover {
-      border-color: var(--border-accent);
-    }
-
-    .article-body .pattern-number {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--accent);
-      margin-bottom: 0.3rem;
-      display: block;
-    }
-
-    .article-body .pattern-name {
-      font-family: var(--serif);
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.4rem;
-    }
-
-    .article-body .pattern-desc {
-      font-size: 0.92rem;
-      color: var(--text-dim);
-      line-height: 1.7;
-    }
-
-    .article-footer {
-      margin-top: 4rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .article-footer a {
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      text-decoration: none;
-      color: var(--accent);
-      transition: opacity 0.3s;
-    }
-
-    .article-footer a:hover { opacity: 0.7; }
-
-    .article-footer .date {
-      font-size: 0.78rem;
-      color: var(--text-faint);
-    }
-
-    .fade-in {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 0.6s var(--ease) forwards;
-    }
-
-    .fade-in-d1 { animation-delay: 0.1s; }
-    .fade-in-d2 { animation-delay: 0.2s; }
-    .fade-in-d3 { animation-delay: 0.3s; }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Five Governance Patterns for Enterprise AI Agents — Andrew Crenshaw</title>
+<meta name="description" content="The models are ready. The governance usually isn't." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/page.css" />
 </head>
-<body>
+<body class="cat-writing">
+<header>
+  <div class="bar">
+    <a href="../index.html#writing" class="back">&larr; Andrew Crenshaw</a>
+    <span class="crumb">Writing</span>
+  </div>
+</header>
+<article>
+  <div class="eyebrow"><span class="rule"></span> Patterns &middot; 2026</div>
+  <h1>Five Governance Patterns for Enterprise AI Agents</h1>
+  <p class="lede">The models are ready. The governance usually isn't.</p>
 
-<div class="top-bar">
-  <a href="/" class="name">Andrew Crenshaw</a>
-  <a href="/#writing" class="back-link">&larr; Back to Writing</a>
-</div>
+  <img src="../images/governance-patterns.jpg" alt="Five governance patterns for AI agents" class="article-hero" />
 
-<article class="article-wrapper">
-  <div class="article-label fade-in">Lessons from Building</div>
-  <h1 class="article-title fade-in fade-in-d1">Five Governance Patterns for Enterprise AI Agents</h1>
-  <p class="article-subtitle fade-in fade-in-d2">The models are ready. The governance usually isn't.</p>
-  <div class="rule fade-in fade-in-d2"></div>
+  <p>I've spent the last few months running dozens of AI agents against enterprise systems like Salesforce and Jira while connecting with external APIs and MCP servers. A significant takeaway? The models are ready, but the governance usually isn't.</p>
 
-  <img src="/images/governance-patterns.jpg" alt="Five governance patterns for AI agents" class="article-hero fade-in fade-in-d3">
+  <div class="callout">Speed is obviously the goal with agents, but moving fast without oversight is just a recipe for a high-speed collision with a dangerous blast radius.</div>
 
-  <div class="article-body fade-in fade-in-d3">
-    <p>I've spent the last few months running dozens of AI agents against enterprise systems like Salesforce and Jira while connecting with external APIs and MCP servers. A significant takeaway? The models are ready, but the governance usually isn't.</p>
+  <p>After hitting a few walls, I found several patterns that work:</p>
 
-    <div class="callout">Speed is obviously the goal with agents, but moving fast without oversight is just a recipe for a high-speed collision with a dangerous blast radius.</div>
-
-    <p>After hitting a few walls, I found several patterns that work:</p>
-
-    <div class="pattern-list">
-      <div class="pattern">
-        <span class="pattern-number">01</span>
-        <div class="pattern-name">Gates, Not Walls</div>
-        <div class="pattern-desc">Rigid, phase-gated processes kill the speed you introduced agents for. The better approach is continuous, lightweight checkpoints: the agent proposes a path, and a human either validates or redirects. I use a confidence evaluation with interactive dev engagement before, during, and after coding.</div>
-      </div>
-
-      <div class="pattern">
-        <span class="pattern-number">02</span>
-        <div class="pattern-name">Bounded Authority</div>
-        <div class="pattern-desc">A single agent that can "do everything" is a liability. I found much more success with specialized agents — a business analyst agent that does research, a testing agent that only writes tests and deviously tries to break the system. Security and architecture should enforce these boundaries, not just the system prompt.</div>
-      </div>
-
-      <div class="pattern">
-        <span class="pattern-number">03</span>
-        <div class="pattern-name">Conflict Detection</div>
-        <div class="pattern-desc">When you have multiple agents working concurrently, they will step on each other — modifying the same file or invalidating each other's work. You need a management layer that catches these overlaps before they become bugs. It's not glamorous, but it's load-bearing infrastructure. I use specialized debugging and refactoring agents that activate when the gates detect an issue.</div>
-      </div>
-
-      <div class="pattern">
-        <span class="pattern-number">04</span>
-        <div class="pattern-name">Passive Audit Trails</div>
-        <div class="pattern-desc">Logging shouldn't be the agent's decision. Every action, its reasoning, and the final outcome needs to be captured automatically. If your audit trail depends on the agent being "well-intentioned," you don't actually have an audit trail. Use hooks. Validate with metrics — the agent has to show their work. They capture their novel learnings as reflections. These get processed and made available for every next agent. Figure it out once — build project, team, and institutional knowledge.</div>
-      </div>
-
-      <div class="pattern">
-        <span class="pattern-number">05</span>
-        <div class="pattern-name">Risk-Based Loops</div>
-        <div class="pattern-desc">Reviewing every single action turns your human team into an expensive bottleneck. The goal is to auto-approve low-risk tasks — or automatically route them back to be fixed — and flag high-impact ones for a human. Calibrating that threshold is where the art of scaling agentic workflows lives.</div>
-      </div>
+  <div class="stack">
+    <div class="stack-item">
+      <span class="stack-no">01</span>
+      <div><div class="stack-name">Gates, Not Walls</div><div class="stack-desc">Rigid, phase-gated processes kill the speed you introduced agents for. The better approach is continuous, lightweight checkpoints: the agent proposes a path, and a human either validates or redirects. I use a confidence evaluation with interactive dev engagement before, during, and after coding.</div></div>
     </div>
-
-    <p><strong>The teams that successfully scale agents are the ones who've figured out how to manage them and enable continuous learning.</strong> Every session improves the ecosystem.</p>
+    <div class="stack-item">
+      <span class="stack-no">02</span>
+      <div><div class="stack-name">Bounded Authority</div><div class="stack-desc">A single agent that can "do everything" is a liability. I found much more success with specialized agents: a business analyst agent that does research, a testing agent that only writes tests and deviously tries to break the system. Security and architecture should enforce these boundaries, not just the system prompt.</div></div>
+    </div>
+    <div class="stack-item">
+      <span class="stack-no">03</span>
+      <div><div class="stack-name">Conflict Detection</div><div class="stack-desc">When you have multiple agents working concurrently, they will step on each other, modifying the same file or invalidating each other's work. You need a management layer that catches these overlaps before they become bugs. It's not glamorous, but it's load-bearing infrastructure. I use specialized debugging and refactoring agents that activate when the gates detect an issue.</div></div>
+    </div>
+    <div class="stack-item">
+      <span class="stack-no">04</span>
+      <div><div class="stack-name">Passive Audit Trails</div><div class="stack-desc">Logging shouldn't be the agent's decision. Every action, its reasoning, and the final outcome needs to be captured automatically. If your audit trail depends on the agent being "well-intentioned," you don't actually have an audit trail. Use hooks. Validate with metrics: the agent has to show their work. They capture their novel learnings as reflections. These get processed and made available for every next agent. Figure it out once: build project, team, and institutional knowledge.</div></div>
+    </div>
+    <div class="stack-item">
+      <span class="stack-no">05</span>
+      <div><div class="stack-name">Risk-Based Loops</div><div class="stack-desc">Reviewing every single action turns your human team into an expensive bottleneck. The goal is to auto-approve low-risk tasks (or automatically route them back to be fixed) and flag high-impact ones for a human. Calibrating that threshold is where the art of scaling agentic workflows lives.</div></div>
+    </div>
   </div>
 
-  <div class="article-footer">
-    <a href="/#writing">&larr; All posts</a>
-    <span class="date">2026</span>
-  </div>
+  <p><strong>The teams that successfully scale agents are the ones who've figured out how to manage them and enable continuous learning.</strong> Every session improves the ecosystem.</p>
+
+  <div class="end-rule"></div>
+  <a href="../index.html#writing" class="more">&larr; All writing</a>
 </article>
-
+<footer><div class="fbar"><span>&copy; 2026 Andrew Crenshaw</span><span>Enterprise AI &middot; Built, not theorized</span></div></footer>
 </body>
 </html>
