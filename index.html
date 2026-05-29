@@ -203,7 +203,7 @@
     font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.16em;
     text-transform: uppercase; color: var(--ink-faint); text-align: center; width: 90%;
   }
-  /* static "substrate" hint — placeholder for Andrew's future animation */
+  /* static "substrate" hint (placeholder for Andrew's future animation) */
   .substrate { position: absolute; inset: 0; }
   #substrate-canvas { width: 100%; height: 100%; display: block; }
 
@@ -240,7 +240,7 @@
 
   /* flagship cards */
   .flagship { border: 1px solid var(--line); border-radius: 3px; padding: clamp(1.4rem, 3vw, 2.2rem); background: color-mix(in srgb, var(--paper-2) 50%, transparent); margin-bottom: 1.3rem; transition: border-color 0.3s var(--ease), transform 0.3s var(--ease); }
-  /* Work products are static content (modals deferred) — no clickable hover affordance */
+  /* Work products are static content (modals deferred): no clickable hover affordance */
   .flag-tag { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rust); margin-bottom: 0.7rem; display: inline-block; }
   .flagship h3 { font-size: clamp(1.35rem, 2.6vw, 1.9rem); margin-bottom: 0.7rem; }
   .flagship p { color: var(--ink-soft); max-width: 64ch; }
@@ -274,7 +274,7 @@
   .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.3rem; }
   @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
   .card { border: 1px solid var(--line); border-radius: 3px; padding: 1.3rem 1.4rem; background: color-mix(in srgb, var(--paper-2) 35%, transparent); transition: border-color 0.3s var(--ease), transform 0.3s var(--ease); }
-  /* .card hover intentionally static — cards are not links; only the Details toggle is interactive */
+  /* .card hover intentionally static; cards are not links, only the Details toggle is interactive */
   .card h4 { font-family: var(--serif); font-size: 1.18rem; font-weight: 600; margin-bottom: 0.4rem; }
   .card p { font-size: 0.95rem; color: var(--ink-soft); }
   .card details { margin-top: 0.8rem; }
@@ -338,7 +338,7 @@
   .deep-links a:hover { background: var(--tint, var(--paper-3)); color: var(--blue); }
   .deep-links a:hover::after { opacity: 1; }
 
-  /* wayfinding tint classes — set on a SECTION so all its rows/links inherit one color */
+  /* wayfinding tint classes set on a SECTION so all its rows/links inherit one color */
   .tint-work      { --tint: var(--tint-work);      --accent: var(--acc-work); }
   .tint-thinking  { --tint: var(--tint-thinking);  --accent: var(--acc-thinking); }
   .tint-writing   { --tint: var(--tint-writing);   --accent: var(--acc-writing); }
@@ -462,7 +462,7 @@
         <span class="sheet-no">01 / WORK</span>
       </div>
       <p class="sec-intro reveal">
-        Every system below I built myself, end to end, architecture and code, not specs or slideware. Different domains, same architecture spine: multi-agent collaboration, under governance, over shared memory.
+        Every system below I built myself, end to end: architecture and code, down to the working software. Different domains, same architecture spine: multi-agent collaboration, under governance, over shared memory.
       </p>
 
       <!-- Flagship 1 -->
@@ -473,15 +473,15 @@
           <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
         </div>
         <h3>Living Memory &amp; Knowledge System</h3>
-        <p>I designed and built an agent-memory substrate — a lens-projected, provenance-tracked knowledge store where each session captures decisions and lessons that surface to the next — running on my own development fleet. Cross-session retrieval went live this week. The hard part is not storing knowledge, it is deciding what to keep, so the compounding-quality layer — forgetting, reweaving, and conflict resolution — is the current build focus.</p>
+        <p>I designed and built an agent-memory substrate: a lens-projected, provenance-tracked knowledge store where each session captures decisions and lessons that surface to the next, running on my own development fleet. Cross-session retrieval is live. The hard part is deciding what to keep, so the compounding-quality layer (forgetting, reweaving, and conflict resolution) is in active build.</p>
         <details open>
           <summary><span class="chev">›</span> Model &amp; mechanics</summary>
           <div class="det-body">
-            Running on my own fleet — Forge (TypeScript / Node / SQLite) and Strata (Python / FastAPI / Postgres + pgvector)<br />
-            Decision traces: a durable, queryable record of what was decided, why, and what was rejected — 2,200+ lessons and traces captured<br />
-            Token-budgeted, lens-filtered retrieval, so the right knowledge reaches the right agent at the right moment — cross-session retrieval live this week<br />
+            Running on my own fleet: Forge (TypeScript / Node / SQLite) and Strata (Python / FastAPI / Postgres + pgvector)<br />
+            Decision traces: a durable, queryable record of what was decided, why, and what was rejected (2,200+ lessons and traces captured)<br />
+            Token-budgeted, lens-filtered retrieval, so the right knowledge reaches the right agent at the right moment; cross-session retrieval is live<br />
             A session digest (reduce, reflect, archive) runs after each session<br />
-            In active delivery: the compounding loop — reweaving, conflict resolution, and forgetting (pruning, supersession, stale-detection)
+            In active delivery: the compounding loop (reweaving, conflict resolution, and forgetting: pruning, supersession, stale-detection)
           </div>
         </details>
       </div>
@@ -494,7 +494,7 @@
           <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
         </div>
         <h3>autogenous-synthesis Forge</h3>
-        <p>I built a development operating system where twelve specialized agents plan, build, review, and ship code against a live backlog state machine, not a task list. Agents claim work, hand off across phases without losing context, and nothing clears a phase without passing a mechanically-enforced review gate. It runs end to end on its own — I keep a single human-in-the-loop surface, deciding which work dispatches in what sequence, by design.</p>
+        <p>I built a development operating system where twelve specialized agents plan, build, review, and ship code against a live backlog state machine. Agents claim work, hand off across phases without losing context, and nothing clears a phase without passing a mechanically-enforced review gate. It runs end to end on its own; I keep a single human-in-the-loop surface, deciding which work dispatches in what sequence, by design.</p>
         <details open>
           <summary><span class="chev">›</span> Stack &amp; mechanics</summary>
           <div class="det-body">
@@ -720,7 +720,7 @@
     els.forEach(function (el) { io.observe(el); });
   })();
 
-  // Living-memory substrate — animated first pass (canvas, transparent, seamless 12s loop).
+  // Living-memory substrate: animated first pass (canvas, transparent, seamless 12s loop).
   // Replaceable: swap this <canvas> + script for a Rive/Lottie embed when ready.
   (function () {
     var canvas = document.getElementById('substrate-canvas');
@@ -804,7 +804,7 @@
     start();
   })();
 
-  // ---- Flagship plate: Living Memory — knowledge compounds vs. starting cold ----
+  // ---- Flagship plate: Living Memory, knowledge compounds vs. starting cold ----
   (function () {
     var canvas = document.getElementById('plate-memory');
     if (!canvas) return;
