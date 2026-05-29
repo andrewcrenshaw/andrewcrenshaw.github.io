@@ -521,7 +521,7 @@
   <h1>Living Memory &amp; Alexandria</h1>
   <div class="rule"></div>
   <div class="meta">
-    <strong>Status:</strong> Substrate, lens contracts, and frame primitive operational across Forge (an agentic project-orchestration platform) and Strata (an autonomous job-search OS). State-change projection, outcome &rarr; procedure feedback, and the dispatcher contract running in production.<br>
+    <strong>Status (as of 2026-05-29):</strong> The substrate is real and running on my own development fleet &mdash; storage, lens contracts, decision traces, and lens-filtered cross-session retrieval, which went live this week. The compounding-learning loop &mdash; reweaving, conflict resolution, and forgetting &mdash; is in active build, not yet live. The current, canonical version of this architecture review is being consolidated at genarch.dev; some sections below predate the latest model and are being migrated.<br>
     <strong>Date:</strong> 2026-05-07 &mdash; <em>substrate / lens / frame architecture &mdash; updated from April 2026</em>
   </div>
 </header>
@@ -554,7 +554,7 @@
 
     <p>The architecture is orthogonal across three axes. The <strong>storage axis</strong> (Living Memory, Alexandria, Episodic Continuity) tells you where a fact lives. The <strong>interpretation axis</strong> (substrate vs lens vs frame) tells you whose view of the substrate it belongs to. The <strong>action axis</strong> (state-change events, outcome &rarr; procedure feedback, intentional non-action) tells you how the substrate evolves under work. Every memory feature gets classified on all three.</p>
 
-    <p>The substrate is operational on Forge (an agentic project-orchestration platform on TypeScript / Node / SQLite) and validated on Strata (Python / FastAPI / PostgreSQL + pgvector). Lens contracts, the frame primitive, the typed state-change stream, the outcome &rarr; procedure feedback loop, and the intentional non-action dispatcher all run in production. The companion landscape and pitch decks cover positioning; this document is the architectural truth.</p>
+    <p>The substrate runs on my own development fleet &mdash; on Forge (TypeScript / Node / SQLite), with a second implementation under way on Strata (Python / FastAPI / PostgreSQL + pgvector). Lens contracts, decision traces, the frame primitive, the typed state-change stream, and lens-filtered cross-session retrieval are live as of late May 2026; the compounding-learning loop (reweave, conflict resolution, forgetting) is in active build, not yet live. The companion landscape and pitch decks cover positioning; this document is the architectural reference.</p>
   </section>
 
   <!-- 2. WHAT'S BUILT -->
@@ -563,7 +563,7 @@
     <h2>What's Built and Running</h2>
     <div class="rule"></div>
 
-    <p>Everything below is built and running, used daily on the Forge platform and SFDC dev workflows. The goal is to employ it as a real use case, iterate, and prove out the architecture before any broader rollout.</p>
+    <p>Most of what's below is built and running, used daily on the Forge platform and SFDC dev workflows &mdash; but not all of it. Rows still in active build are marked <span class="badge planned">Planned</span>. The goal is to employ it as a real use case, iterate, and prove out the architecture before any broader rollout.</p>
 
     <h3 class="sub">Memory &amp; Learning Core</h3>
     <table>
@@ -602,13 +602,13 @@
         </tr>
         <tr>
           <td>Digestive pipeline</td>
-          <td><span class="badge built">Built</span></td>
-          <td>Reduce, Reflect, Reweave, Verify, Archive. Runs asynchronously post-session via worker pool.</td>
+          <td><span class="badge planned">Partial</span></td>
+          <td>Reduce, Reflect, and Archive run asynchronously post-session via worker pool today. Reweave and Verify &mdash; the compounding step that integrates and reconciles knowledge &mdash; are in active build, not yet live.</td>
         </tr>
         <tr>
           <td>Forgetting by design</td>
-          <td><span class="badge built">Built</span></td>
-          <td>Pruning, supersession, condensation, stale detection, demand-driven processing.</td>
+          <td><span class="badge planned">Planned</span></td>
+          <td>Pruning, supersession, condensation, stale detection, demand-driven processing &mdash; designed, and part of the current build. Not yet live.</td>
         </tr>
         <tr>
           <td>Multi-workflow support</td>
@@ -738,7 +738,7 @@
     </table>
 
     <div class="callout success">
-      <p><strong>Cross-platform validation:</strong> The M/L/P architecture has now been validated on two entirely different platforms. On Forge (an agentic project-orchestration platform on TypeScript / Node / SQLite), agents coordinate through a shared backlog with living memory. On Strata (Python / FastAPI / PostgreSQL + pgvector), eight governed agents collaborate through scoped repositories with decision traces. The same architectural principles &mdash; governed writes, learning loops, cost-conscious inference &mdash; apply naturally to both. This gives us confidence the patterns are transferable, not framework-specific.</p>
+      <p><strong>Cross-platform validation:</strong> The M/L/P architecture is being proven on two entirely different platforms. On Forge (an agentic project-orchestration platform on TypeScript / Node / SQLite), agents coordinate through a shared backlog with living memory. On Strata (Python / FastAPI / PostgreSQL + pgvector), eight governed agents collaborate through scoped repositories with decision traces. The same architectural principles &mdash; governed writes, learning loops, cost-conscious inference &mdash; apply naturally to both. This gives us confidence the patterns are transferable, not framework-specific.</p>
     </div>
   </section>
 
@@ -1097,7 +1097,7 @@ flowchart LR
     <h2>Architecture Vision</h2>
     <div class="rule"></div>
 
-    <p>The substrate, lenses, and frames are operational. The vision is what comes next: the architectural shape carrying forward to additional consumer classes (enterprise, customer-facing), additional input sources (interaction memory beyond the local agent loop), and longitudinal compounding measured against the right metrics &mdash; not against retrieval-speed benchmarks borrowed from RAG.</p>
+    <p>The substrate, lenses, and frames are real and running; the compounding-learning loop is the current build. The vision is what comes next: the architectural shape carrying forward to additional consumer classes (enterprise, customer-facing), additional input sources (interaction memory beyond the local agent loop), and longitudinal compounding measured against the right metrics &mdash; not against retrieval-speed benchmarks borrowed from RAG.</p>
 
     <div class="diagram">
       <div class="diagram-label">From operational to extended</div>
