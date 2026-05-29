@@ -399,6 +399,7 @@
         <a href="#approach">Approach</a>
         <a href="#thinking">Thinking</a>
         <a href="#writing">Writing</a>
+        <a href="spa/">SPA / SLF</a>
         <a href="https://github.com/andrewcrenshaw?tab=repositories" class="src" target="_blank" rel="noopener">Source ↗</a>
       </div>
       <div class="nav-contact">
@@ -472,15 +473,15 @@
           <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
         </div>
         <h3>Living Memory &amp; Knowledge System</h3>
-        <p>I designed and built a shared memory substrate for agents, humans, and subsystems, in production across two systems. The hard part is not storing knowledge, it is deciding what to keep: the system reconciles contradictions, forgets what has gone stale, and turns each session's experience into knowledge the next agent inherits, so the fleet compounds instead of starting cold.</p>
+        <p>I designed and built an agent-memory substrate — a lens-projected, provenance-tracked knowledge store where each session captures decisions and lessons that surface to the next — running on my own development fleet. Cross-session retrieval went live this week. The hard part is not storing knowledge, it is deciding what to keep, so the compounding-quality layer — forgetting, reweaving, and conflict resolution — is the current build focus.</p>
         <details open>
           <summary><span class="chev">›</span> Model &amp; mechanics</summary>
           <div class="det-body">
-            In production on Forge (TypeScript / Node / SQLite) and Strata (Python / FastAPI / Postgres + pgvector)<br />
-            Decision traces: a durable, queryable record of what was decided, why, and what was rejected<br />
-            Token-budgeted, entity-anchored retrieval, so the right knowledge reaches the right agent at the right moment<br />
-            A digestive pipeline (reduce, reflect, reweave, verify, archive) that runs after every session<br />
-            Forgetting by design: pruning, supersession, condensation, and stale-detection
+            Running on my own fleet — Forge (TypeScript / Node / SQLite) and Strata (Python / FastAPI / Postgres + pgvector)<br />
+            Decision traces: a durable, queryable record of what was decided, why, and what was rejected — 2,200+ lessons and traces captured<br />
+            Token-budgeted, lens-filtered retrieval, so the right knowledge reaches the right agent at the right moment — cross-session retrieval live this week<br />
+            A session digest (reduce, reflect, archive) runs after each session<br />
+            In active delivery: the compounding loop — reweaving, conflict resolution, and forgetting (pruning, supersession, stale-detection)
           </div>
         </details>
       </div>
@@ -493,30 +494,36 @@
           <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
         </div>
         <h3>autogenous-synthesis Forge</h3>
-        <p>I built a development operating system where twelve specialized agents plan, build, review, and ship code, with the human reserved for direction and cross-ticket judgment. The backlog is a live state machine, not a task list: agents claim work, hand off across phases without losing context, and nothing reaches "done" without clearing an automated review gate.</p>
+        <p>I built a development operating system where twelve specialized agents plan, build, review, and ship code against a live backlog state machine, not a task list. Agents claim work, hand off across phases without losing context, and nothing clears a phase without passing a mechanically-enforced review gate. It runs end to end on its own — I keep a single human-in-the-loop surface, deciding which work dispatches in what sequence, by design.</p>
         <details open>
           <summary><span class="chev">›</span> Stack &amp; mechanics</summary>
           <div class="det-body">
             12 specialized agents, auto-routed and skill-aware, with collision detection and bounded authority<br />
             TDD enforced mechanically (RED &rarr; GREEN &rarr; REFACTOR) against machine-verifiable acceptance criteria<br />
-            Review gate: lint + 700-test suite + Eval + code review + pre-commit, auto-closing on pass or relaunching a fix on fail<br />
+            Review gate: lint + 700-test suite + Eval + code review + pre-commit, run on every ticket before it can close<br />
             Persistent scratchpads and session memory survive context limits; phase handoffs run without a restart<br />
             TypeScript / Node.js &nbsp;·&nbsp; SQLite
           </div>
         </details>
-        <a href="https://andrewcrenshaw.dev/autogenous-synthesis/" target="_blank" rel="noopener" style="display:inline-block;margin-top:1rem;font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Documentation ↗</a>
+        <div style="display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:1rem;">
+          <a href="https://autogenous-synthesis.com" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">autogenous-synthesis.com ↗</a>
+          <a href="https://andrewcrenshaw.dev/autogenous-synthesis/" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Documentation ↗</a>
+        </div>
       </div>
 
       <!-- Secondary grid -->
       <div class="grid-2">
         <div class="card reveal">
           <h4>Strata</h4>
-          <p>An autonomous job-search system, built in the open: eight agents, three-layer deduplication, fully local inference.</p>
+          <p>An autonomous job-search system, built in the open and running in alpha on my own infrastructure: eight agents, three-layer deduplication, fully local inference.</p>
           <details>
             <summary><span class="chev">›</span> Details</summary>
-            <div class="det-body">8 agents · 3-layer dedup · local inference (Qwen via oMLX) · PostgreSQL + pgvector · ARQ + Redis · open-source PyPI libraries. Active build, shared as an engineering reference.</div>
+            <div class="det-body">8 agents · 3-layer dedup · local inference (Qwen via oMLX) · PostgreSQL + pgvector · ARQ + Redis · open-source PyPI libraries. Running in alpha on local infrastructure (incl. local LLMs); shared as an engineering reference.</div>
           </details>
-          <a href="https://andrewcrenshaw.dev/strata/" target="_blank" rel="noopener" style="display:inline-block;margin-top:0.8rem;font-family:var(--mono);font-size:0.7rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Documentation ↗</a>
+          <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:0.8rem;">
+            <a href="https://strata-work.com" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">strata-work.com ↗</a>
+            <a href="https://andrewcrenshaw.dev/strata/" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Documentation ↗</a>
+          </div>
         </div>
 
         <div class="card reveal">
