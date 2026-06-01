@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Composing with DAAP, AAT, ACAP, and actor-chain, SLF Deep-Dive, Andrew Crenshaw</title>
+<meta name="description" content="The OAuth-layer composition surface for the SLF protocol. SLF does not redefine agent identity, delegation, scope subsumption, or audit-chain construction; it specifies what travels with the token's referenced substrate. Pressure-test-ready briefing." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/page.css" />
+<style>
+  body.cat-spa article { max-width: 880px; }
+  body.cat-spa .lede { padding-left: 1.4rem; }
+  body.cat-spa .status-tag {
+    display: inline-block; font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600;
+    padding: 0.2rem 0.55rem; border: 1px solid var(--accent); border-radius: 2px;
+    margin-bottom: 1.2rem;
+  }
+  body.cat-spa .four-way { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1.4rem 0; }
+  body.cat-spa .four-way th, body.cat-spa .four-way td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  body.cat-spa .four-way thead th { font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; border-bottom: 1px solid var(--accent); }
+  body.cat-spa .four-way .draft { font-family: var(--serif); font-weight: 600; color: var(--ink); white-space: nowrap; }
+  body.cat-spa .four-way td { color: var(--ink-soft); }
+  body.cat-spa .four-way .slf-adds { color: var(--ink); }
+  body.cat-spa .compose-step {
+    display: grid; grid-template-columns: 2rem 1fr; gap: 0.8rem;
+    margin: 0.7rem 0; align-items: baseline;
+  }
+  body.cat-spa .compose-step .step-no {
+    font-family: var(--sans); font-size: 0.74rem; letter-spacing: 0.12em; font-weight: 600;
+    color: var(--accent); border: 1px solid var(--accent); border-radius: 2px;
+    padding: 0.15rem 0.4rem; text-align: center;
+  }
+  body.cat-spa .compose-step .step-body { font-size: 0.94rem; color: var(--ink-soft); line-height: 1.55; }
+  body.cat-spa .compose-step .step-body strong { color: var(--ink); }
+</style>
+</head>
+<body class="cat-spa">
+
+<header>
+  <div class="bar">
+    <a href="../index.html" class="back">&larr; Andrew Crenshaw</a>
+    <nav class="bar-contact">
+      <a href="https://www.linkedin.com/in/andrewcrenshaw/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="mailto:andrewcrenshaw123@gmail.com">Email</a>
+      <a href="https://github.com/andrewcrenshaw" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<article>
+
+  <span class="status-tag">Deep-dive · v0.4 draft · 2026</span>
+  <div class="eyebrow"><span class="rule"></span> SLF Deep-Dive &middot; 08 / OAuth composition</div>
+  <h1>Composing with DAAP,<br />AAT, ACAP, actor-chain.</h1>
+  <p class="lede">SLF specifies what travels with the token's referenced substrate, and composes above whichever of the four OAuth WG drafts (or their successor) ends up consolidating. It leaves agent identity, delegation, scope subsumption, and audit-chain construction to those drafts.</p>
+
+  <div class="draft-banner">
+    <strong>Pressure-test this draft</strong>
+    OAuth WG is actively negotiating consolidation across four overlapping agent-grant drafts. This page describes how SLF composes with each one as it stands today (draft-00 of <code>oauth-slf-substrate-grants</code>), where the composition adds value, and where the maintenance burden lives if consolidation does not happen. If a composition seam reads wrong, or the consolidation framing is over- or under-confident, flag it.
+  </div>
+
+  <p>The standardization of agent-mediated authorization accelerated through 2026, with four Internet Drafts addressing overlapping aspects of how human principals delegate authority to AI agents. SLF deliberately <strong>does not enter the agent-token-mechanics consolidation conversation</strong>. It addresses a distinct and orthogonal problem: how regulatory metadata, persistent personal-data references, per-context projection, and bilateral evidence of disclosure compose with <em>any</em> agent-token-mechanics construction. The four sections below work out the composition concretely with each named draft, as specified in &sect;&sect;&thinsp;5&ndash;8 of <code>draft-crenshaw-oauth-slf-substrate-grants-00</code>.</p>
+
+
+  <!-- ========== A, THE FOUR-WAY MAP ========== -->
+  <div class="spec-head">
+    <h2>The four-way map</h2>
+    <span class="sheet-no">A &middot; Layering</span>
+  </div>
+
+  <p>What each of the four drafts addresses, and what SLF adds <em>above</em> each:</p>
+
+  <table class="four-way">
+    <thead>
+      <tr><th>Draft</th><th>What it specifies</th><th>What SLF adds above it</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="draft">DAAP<br /><span style="font-weight:400; font-size:0.78rem; color:var(--ink-faint);">mishra-oauth-agent-grants</span></td>
+        <td>Persistent agent identifiers (<code>did:grantex:ag_&hellip;</code>), grant + revocation + audit program, multi-hop delegation chains with depth limits, cascade revocation.</td>
+        <td class="slf-adds">Substrate-bound regulatory gates that travel with the data the agent reads. Per-context lens projection. Frame-bounded outcome authorization. Bilateral Receipt&nbsp;SLFs.</td>
+      </tr>
+      <tr>
+        <td class="draft">AAT<br /><span style="font-weight:400; font-size:0.78rem; color:var(--ink-faint);">niyikiza-oauth-attenuating-agent-tokens</span></td>
+        <td>Capability tokens with typed-constraint subsumption rules, monotone attenuation, closed-world enforcement semantics.</td>
+        <td class="slf-adds">SLF Frame attached as an RFC&nbsp;9396 <code>authorization_details</code> type. Substrate-side closed-world for facts. Lens projection at retrieval.</td>
+      </tr>
+      <tr>
+        <td class="draft">ACAP<br /><span style="font-weight:400; font-size:0.78rem; color:var(--ink-faint);">yakung-oauth-agent-attestation</span></td>
+        <td>Cryptographic intent binding via hashed human instruction (<code>att_intent</code>), attestation-chain construction (<code>att_chain</code>), HITL signaling.</td>
+        <td class="slf-adds">Frame.<code>intent_hash</code> binds to ACAP <code>att_intent</code> byte-for-byte. Receipt SLF + ACAP audit log as complementary chains.</td>
+      </tr>
+      <tr>
+        <td class="draft">actor-chain<br /><span style="font-weight:400; font-size:0.78rem; color:var(--ink-faint);">mw-spice-actor-chain</span></td>
+        <td>Cross-domain actor-chain preservation under RFC&nbsp;8693 Token Exchange. Cumulative commitment chain math for hop audit.</td>
+        <td class="slf-adds">SLF Frame as a profile extension under <code>actor_chain_profile</code>. Two-field jurisdiction (subject + audience) preserved across hops.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>The composition surface for each is concrete: <code>draft-crenshaw-oauth-slf-substrate-grants</code> &sect;&sect;&thinsp;5&ndash;8 specify the binding rules, evaluation order, and audit-chain integration for each combination. What SLF is <em>not</em> trying to do is pick among them. The protocol is designed to compose with whichever one, or whichever successor the WG consolidation produces, ends up shipping.</p>
+
+
+  <!-- ========== B, DAAP ========== -->
+  <div class="spec-head">
+    <h2>Composition with DAAP</h2>
+    <span class="sheet-no">B &middot; Persistent agent grants</span>
+  </div>
+
+  <p>DAAP gives the agent a persistent identity (<code>did:grantex:ag_&hellip;</code>) and a grant program with cascade revocation. SLF wraps DAAP by binding the SLF Frame to the DAAP grant identifier via <code>frame.authorized_by_grant</code>, then enforcing substrate-side gates <em>before</em> DAAP's scope check fires:</p>
+
+<pre class="json-block"><span class="c">// SLF object wrapping a DAAP-issued grant</span>
+{
+  <span class="k">"slf_version"</span>: <span class="s">"1.0"</span>,
+  <span class="k">"type"</span>: <span class="s">"lens_query"</span>,
+  <span class="k">"substrate"</span>: {
+    <span class="k">"@type"</span>: <span class="s">"FactSet"</span>,
+    <span class="k">"ref"</span>:   <span class="s">"did:web:andrew.lex#health-substrate"</span>,
+    <span class="k">"gates"</span>: [
+      { <span class="k">"vocabulary"</span>: <span class="s">"https://vocab.slf.foundation/gates"</span>,
+        <span class="k">"term"</span>:       <span class="s">"core-gates:health-data"</span> },
+      { <span class="k">"vocabulary"</span>: <span class="s">"https://vocab.hhs.gov/hipaa-gates"</span>,
+        <span class="k">"term"</span>:       <span class="s">"hipaa-gates:phi"</span> }
+    ]
+  },
+  <span class="k">"lens"</span>: {
+    <span class="k">"role"</span>:                 <span class="s">"patient"</span>,
+    <span class="k">"subject_jurisdiction"</span>: <span class="s">"US-NY"</span>,
+    <span class="k">"audience_jurisdiction"</span>:<span class="s">"US-NY"</span>
+  },
+  <span class="k">"frame"</span>: {
+    <span class="k">"outcome"</span>:             <span class="s">"review-test-results"</span>,
+    <span class="k">"actor"</span>:               <span class="s">"did:grantex:ag_01HXZ8&hellip;"</span>,
+    <span class="k">"authorized_by_grant"</span>: <span class="s">"grnt_01HXZ7K9&hellip;   // DAAP grant id"</span>
+  }
+}</pre>
+
+  <p>The normative evaluation order is the key composition property:</p>
+
+  <div class="compose-step"><span class="step-no">1</span><div class="step-body"><strong>Substrate gates fire first.</strong> Each fact in the queried substrate carries its own intrinsic gates (HIPAA, GDPR, jurisdiction, no-further-disclosure). The query engine filters at this layer. Gate-excluded facts never reach the lens.</div></div>
+  <div class="compose-step"><span class="step-no">2</span><div class="step-body"><strong>Lens projection narrows.</strong> A patient lens sees patient-relevant fields; a payer lens sees claims fields. Lenses cannot bypass substrate gates, they can only narrow what the gates already allowed.</div></div>
+  <div class="compose-step"><span class="step-no">3</span><div class="step-body"><strong>DAAP scope check fires.</strong> The agent's <code>scp</code> and badge claims are validated against the requested operation.</div></div>
+  <div class="compose-step"><span class="step-no">4</span><div class="step-body"><strong>Frame check.</strong> Does the requested outcome fall within the frame's <code>allowed_frames</code>?</div></div>
+  <div class="compose-step"><span class="step-no">5</span><div class="step-body"><strong>HITL if required.</strong> Frame-bound human-in-the-loop signaling pauses for in-band signature.</div></div>
+
+  <p><strong>Who runs this engine, and what stops them skipping it.</strong> The gate chain is enforced by whoever holds the substrate. In the sovereign case that is the user's own vault, so the party with the incentive to honor the gates is the one running them. When the substrate sits behind a counterparty (the Bridge case over an enterprise fabric), SLF cannot force that party to evaluate honestly. What it can do is make dishonesty detectable: every disclosure emits a signed receipt naming the gates it claims to have evaluated, so a party that skips or fabricates gate evaluation produces receipts that do not reconcile with the substrate's signed gates, and the user can decline to disclose to a counterparty whose receipts do not verify. Enforcement is local; accountability is cryptographic.</p>
+
+  <p>Cascade revocation is delegated to DAAP. When a parent grant is revoked, DAAP's existing cascade semantics propagate; the SLF Frames bound to those grants become unauthorized at the next operation. SLF does not re-implement revocation.</p>
+
+
+  <!-- ========== C, AAT ========== -->
+  <div class="spec-head">
+    <h2>Composition with AAT</h2>
+    <span class="sheet-no">C &middot; Attenuating capability tokens</span>
+  </div>
+
+  <p>AAT specifies capability tokens with typed-constraint subsumption, derived tokens must be subsumed by their parent under closed-world rules. SLF attaches as an RFC&nbsp;9396 <code>authorization_details</code> type, riding inside the AAT token rather than alongside it:</p>
+
+<pre class="json-block"><span class="c">// AAT authorization_details carrying an SLF Frame</span>
+{
+  <span class="k">"authorization_details"</span>: [
+    {
+      <span class="k">"type"</span>:        <span class="s">"slf_frame"</span>,
+      <span class="k">"slf_version"</span>: <span class="s">"1.0"</span>,
+      <span class="k">"substrate"</span>: {
+        <span class="k">"ref"</span>:   <span class="s">"did:web:andrew.lex#career-substrate"</span>,
+        <span class="k">"gates"</span>: [
+          { <span class="k">"vocabulary"</span>: <span class="s">"https://vocab.slf.foundation/gates"</span>,
+            <span class="k">"term"</span>:       <span class="s">"core-gates:personal-data"</span> }
+        ]
+      },
+      <span class="k">"lens"</span>: {
+        <span class="k">"role"</span>:                  <span class="s">"job-seeker"</span>,
+        <span class="k">"subject_jurisdiction"</span>:  <span class="s">"US-NY"</span>,
+        <span class="k">"audience_jurisdiction"</span>: <span class="s">"US-CA"</span>
+      },
+      <span class="k">"frame"</span>: {
+        <span class="k">"outcome"</span>:        <span class="s">"present-qualification-credential"</span>,
+        <span class="k">"allowed_frames"</span>: <span class="s">[ "present-qualification-credential" ]</span>,
+        <span class="k">"audience"</span>:       <span class="s">"did:web:hiringcorp.example"</span>
+      }
+    }
+  ]
+}</pre>
+
+  <p>The composition rule is monotone attenuation: a derived AAT token's SLF entry <strong>must</strong> be a subset of its parent's. Concretely, the substrate <code>ref</code> must be the same DID or a strict descendant; <code>gates</code> must include every parent gate plus zero or more additional gates (more restrictive, never less); <code>lens.role</code> must be the same or a registered narrower role; <code>frame.allowed_frames</code> must be a subset of the parent's. SLF defers to AAT's typed-constraint subsumption algorithm for the actual check.</p>
+
+  <p>Substrate enforcement runs closed-world by default: a substrate fact without an explicit gate-allow does not satisfy a gate-required lens. This composes cleanly with AAT's closed-world scope semantics, the two layers agree on the default-deny stance.</p>
+
+
+  <!-- ========== D, ACAP ========== -->
+  <div class="spec-head">
+    <h2>Composition with ACAP</h2>
+    <span class="sheet-no">D &middot; Cryptographic intent binding</span>
+  </div>
+
+  <p>ACAP binds an agent operation to a hash of the original human instruction. SLF mirrors that binding into the Frame:</p>
+
+<pre class="json-block"><span class="c">// SLF Frame binding to ACAP intent</span>
+{
+  <span class="k">"slf_version"</span>: <span class="s">"1.0"</span>,
+  <span class="k">"frame"</span>: {
+    <span class="k">"outcome"</span>:     <span class="s">"schedule-specialist-appointment"</span>,
+    <span class="k">"intent_hash"</span>: <span class="s">"e3b0c44298fc1c149afbf4c8996fb92427ae41e4&hellip;"</span>,
+    <span class="k">"actor"</span>:       <span class="s">"did:web:health-agent.example"</span>,
+    <span class="k">"moment"</span>:      <span class="s">"2026-05-25T14:32:11Z"</span>,
+    <span class="k">"authorized_by_grant"</span>: <span class="s">"att_credential_jti_01HXZ&hellip;"</span>
+  }
+}</pre>
+
+  <p>The binding rule is byte-identical: <code>Frame.intent_hash</code> equals ACAP's <code>att_intent</code> claim (SHA-256 of the original human-issued instruction). The ACAP <code>att_uid</code> identifying the principal must match the Lens's <code>subject</code> field. Before honoring an operation, the audience walks the ACAP <code>att_chain</code> and verifies that no JTI in the chain has been revoked, cascade revocation is delegated to ACAP.</p>
+
+  <p>HITL signaling composes naturally. When a Frame's <code>allowed_frames</code> requires explicit user approval, ACAP's existing HITL signaling path carries the user signature; the SLF Receipt records that the HITL signal was received and which gates were evaluated against it. The two audit chains, ACAP's per-task-tree <code>att_chain</code> and the SLF Receipt chain, run concurrently rather than redundantly: ACAP audits <em>delegation</em>, SLF Receipts audit <em>substrate disclosure under regulatory gates</em>.</p>
+
+
+  <!-- ========== E, ACTOR-CHAIN ========== -->
+  <div class="spec-head">
+    <h2>Composition with actor-chain</h2>
+    <span class="sheet-no">E &middot; Cross-domain hops</span>
+  </div>
+
+  <p>Actor-chain preserves the delegation chain across cross-domain RFC&nbsp;8693 Token Exchange hops via a cumulative-commitment construction. SLF rides as a profile extension:</p>
+
+<pre class="json-block"><span class="c">// Actor-chain token-exchange step with SLF profile extension</span>
+{
+  <span class="k">"actor_chain_profile"</span>:    <span class="s">"slf-verified-full"</span>,
+  <span class="k">"actor_chain_step_proof"</span>: <span class="s">"&hellip;"</span>,
+  <span class="k">"target_context"</span>: {
+    <span class="k">"aud"</span>:      <span class="s">"did:web:pharmacy.example"</span>,
+    <span class="k">"resource"</span>: <span class="s">"https://pharmacy.example/dispense/12345"</span>,
+    <span class="k">"slf_substrate_ref"</span>:        <span class="s">"did:web:andrew.lex#health-substrate"</span>,
+    <span class="k">"slf_gates"</span>: [
+      <span class="s">"core-gates:health-data"</span>,
+      <span class="s">"hipaa-gates:phi"</span>,
+      <span class="s">"hipaa-gates:no-further-disclosure"</span>
+    ],
+    <span class="k">"slf_subject_jurisdiction"</span>:  <span class="s">"US-NY"</span>,
+    <span class="k">"slf_audience_jurisdiction"</span>: <span class="s">"US-NY"</span>
+  }
+}</pre>
+
+  <p>The Receipt SLF chain math binds into actor-chain's cumulative commitment. Each step's commitment incorporates the SLF Frame's substrate-gate evaluation, lens projection, and disclosed-vs-redacted field summary. This is normative for SLF Receipt chains composing with actor-chain, the cumulative commitment is the cross-domain integrity guarantee that the lens and frame at hop&nbsp;<em>N</em> are exactly the ones that reached hop&nbsp;<em>N&nbsp;&minus;&nbsp;1</em>.</p>
+
+  <p>Two-field jurisdiction is preserved across hops. At each step, <code>subject_jurisdiction</code> stays anchored to the principal; <code>audience_jurisdiction</code> updates to the receiving party. A US-NY patient's health record passing through a US-NY pharmacy to a US-VT provider carries the changing <code>audience_jurisdiction</code> while the <code>subject_jurisdiction</code> remains constant; gates can address either or both. Same-domain hops use a lighter SLF binding (the <code>slf-verified-subset</code> profile); cross-domain hops require <code>slf-verified-full</code>.</p>
+
+
+  <!-- ========== F, OPEN QUESTIONS ========== -->
+  <div class="spec-head">
+    <h2>Open questions and consolidation risk</h2>
+    <span class="sheet-no">F &middot; Friction surfaces</span>
+  </div>
+
+  <p>Five tensions sit inside the composition surface. Each one is worth pressure-testing before the draft moves toward formal submission.</p>
+
+  <div class="tension">
+    <span class="t-label">Tension &middot; consolidation fragility</span>
+    <p class="claim">"SLF composes with all four drafts, so SLF is consolidation-safe."</p>
+    <p class="counter">The four drafts overlap on multi-hop delegation, cascade revocation, structured scope, and hash-chained audit. OAuth WG is negotiating a consolidation now. SLF presumes the four ship as authored. If a consolidated agent-grants draft emerges instead, absorbing the best constructions from each, SLF has to recompose above the consolidated draft. The composition surface today is provisional; the long-term stability depends on a consolidation outcome SLF does not control.</p>
+  </div>
+
+  <div class="tension">
+    <span class="t-label">Tension &middot; subsumption correctness across grant types</span>
+    <p class="claim">"AAT's typed-constraint subsumption handles the SLF grant taxonomy."</p>
+    <p class="counter">SLF defines a seven-type action taxonomy (read, read-and-cache, copy, write-back, sync, action, compound, see the <a href="grants.html" style="color:var(--accent); border-bottom:1px solid var(--accent);">grant taxonomy deep-dive</a>). AAT's subsumption rules were specified for OAuth scope strings, not for substrate action types. Does "copy subsumed by read-and-cache" mean what AAT thinks it means? The composition assumes yes; the interaction across the two type systems is untested in the draft.</p>
+  </div>
+
+  <div class="tension">
+    <span class="t-label">Tension &middot; two audit chains, same operation</span>
+    <p class="claim">"ACAP's att_chain and SLF Receipts complement, they don't duplicate."</p>
+    <p class="counter">The draft frames them as orthogonal, ACAP audits delegation; SLF audits substrate disclosure under regulatory gates. In practice, a single agent operation produces a write to both chains, and a regulator inspecting "what happened" has to reconcile the two. Whether the two chains are clearly distinguished in protocol-level tooling, or simply double the audit-log volume, is an implementation question the spec defers.</p>
+  </div>
+
+  <div class="tension">
+    <span class="t-label">Tension &middot; conformance ambiguity</span>
+    <p class="claim">"A conformant SLF implementation must support at least one of the four compositions."</p>
+    <p class="counter">Which one? An agent grant issuer (say, a healthcare AS) may speak DAAP, ACAP, or both. The spec's &sect;&thinsp;9 (Conformance summary) defines four named profiles, <code>slf-daap</code>, <code>slf-aat</code>, <code>slf-acap</code>, <code>slf-actor-chain</code>, and says a conformant implementation supports <em>at least one</em>. Whether the conformance suite forces a deployment to pick a specific one, or accepts multi-profile implementations, is unspecified at draft-00.</p>
+  </div>
+
+  <div class="tension">
+    <span class="t-label">Tension &middot; maintenance burden under fragmentation</span>
+    <p class="claim">"SLF can maintain four composition surfaces indefinitely."</p>
+    <p class="counter">If consolidation never happens and all four drafts ship independently, the SLF draft must keep four normative composition sections current. Bug fixes in any of the four (DAAP changes revocation semantics, ACAP refines att_chain math) require an SLF errata. That is a maintenance load on a small project. The honest framing is that SLF wants consolidation as much as the WG does, not because SLF gets absorbed, but because four composition surfaces is more than the protocol stewardship can sustain through a multi-year ramp.</p>
+  </div>
+
+
+  <!-- ========== G, WHAT THIS PAGE DOES NOT CLAIM ========== -->
+  <div class="spec-head">
+    <h2>What this page does not claim</h2>
+    <span class="sheet-no">G &middot; Overclaims to avoid</span>
+  </div>
+
+  <ul>
+    <li><strong>SLF is not "on file" with the OAuth WG.</strong> The draft (<code>draft-crenshaw-oauth-slf-substrate-grants-00</code>) exists in the project specifications directory. WG submission is proposed direction, not done.</li>
+    <li><strong>The composition surfaces are not normative-final.</strong> Draft-00 is a first articulation. Consolidation conversations in the WG could reshape any or all four surfaces.</li>
+    <li><strong>SLF is not complementary to all four drafts at once.</strong> SLF is complementary to whichever consolidates, or to any one of the four if shipped standalone. The composition is concrete; the maintenance is conditional on consolidation outcomes.</li>
+    <li><strong>OAuth WG adoption is not assumed.</strong> Participating in the WG conversation and being adopted by the WG are different things. The page is honest about being in the first state, not the second.</li>
+    <li><strong>SLF does not claim substrate/lens/frame are unique to SLF.</strong> What is unique is the formulation as a unified protocol primitive with substrate-bound regulatory gates as first-class metadata. The individual concepts have prior art; the integration is the contribution.</li>
+  </ul>
+
+  <p>If you have read draft-crenshaw-oauth-slf-substrate-grants-00 or one of the four named drafts and see a composition mistake, an evaluation-order error, or a missing tension, the draft is at -00. Errors caught at -00 are cheap. Contact details are in the header above.</p>
+
+  <div class="end-rule"></div>
+  <a href="./" class="more">&larr; All SPA / SLF deep-dives</a>
+
+</article>
+
+<footer>
+  <div class="fbar">
+    <span>&copy; 2026 Andrew Crenshaw</span>
+    <span>Individual sovereignty &middot; built in the open</span>
+  </div>
+</footer>
+
+</body>
+</html>
