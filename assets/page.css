@@ -52,6 +52,196 @@ body.cat-career {
   background-image: linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
   background-size: 32px 32px;
 }
+body.cat-spa {
+  --page-tint: #DDE3E2; --accent: #2E5F5C;
+  /* "verifiable ledger": vertical column rules + faint hash-noise patina, the look of a long-lived audit register */
+  background-color: #D5DCDB;
+  background-image:
+    linear-gradient(90deg, rgba(46,95,92,0.10) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.18 0 0 0 0 0.37 0 0 0 0 0.36 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23v)'/%3E%3C/svg%3E"),
+    radial-gradient(120% 50% at 50% -10%, rgba(255,255,255,0.40), transparent 55%);
+  background-size: 64px 100%, 240px 240px, 100% 100%;
+  background-attachment: scroll, fixed, fixed;
+}
+
+/* ---- SPA/SLF spec-document elements (used only on cat-spa pages) ---- */
+.cat-spa .sheet-no {
+  font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.20em; font-weight: 600;
+  text-transform: uppercase; color: var(--accent); display: inline-flex; align-items: center; gap: 0.5rem;
+}
+.cat-spa .sheet-no::before { content: ""; width: 8px; height: 8px; border-radius: 1px; background: var(--accent); }
+
+/* sticky section header used on the SLF overview */
+.cat-spa .spec-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+  border-bottom: 1px solid var(--line); padding-bottom: 0.9rem; margin: 3.4rem 0 1.6rem;
+}
+.cat-spa .spec-head h2 { margin: 0; }
+.cat-spa .spec-head .sheet-no { margin-left: auto; }
+
+/* the substrate / lens / frame diagram plate (full-width on the article) */
+.cat-spa .diagram-plate {
+  position: relative; margin: 2rem 0 0.6rem; border: 1px solid var(--line); border-radius: 4px;
+  background: color-mix(in srgb, var(--page-tint) 30%, #fff);
+  padding: 1.6rem clamp(0.8rem, 3vw, 1.6rem); overflow: hidden;
+}
+.cat-spa .diagram-plate::after {
+  content: ""; position: absolute; inset: 0; opacity: 0.4; pointer-events: none;
+  background-image: linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.cat-spa .diagram-plate svg { position: relative; z-index: 1; width: 100%; height: auto; display: block; }
+.cat-spa .diagram-plate .tick { position: absolute; width: 13px; height: 13px; border: 1px solid var(--accent); z-index: 2; }
+.cat-spa .diagram-plate .tick.tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+.cat-spa .diagram-plate .tick.tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+.cat-spa .diagram-plate .tick.bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+.cat-spa .diagram-plate .tick.br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+
+/* primitive blocks under the diagram */
+.cat-spa .primitive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.6rem 0 2rem; }
+@media (max-width: 720px) { .cat-spa .primitive-grid { grid-template-columns: 1fr; } }
+.cat-spa .primitive {
+  border: 1px solid var(--line); border-radius: 4px; padding: 1rem 1.1rem;
+  background: color-mix(in srgb, var(--page-tint) 35%, #fff);
+}
+.cat-spa .primitive .ptag {
+  font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600; margin-bottom: 0.4rem; display: block;
+}
+.cat-spa .primitive .pname { font-family: var(--serif); font-size: 1.18rem; font-weight: 600; margin-bottom: 0.4rem; }
+.cat-spa .primitive .pdesc { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.55; }
+
+/* two-column scope grid (IN / OUT) */
+.cat-spa .scope-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin: 1.6rem 0 2rem; }
+@media (max-width: 640px) { .cat-spa .scope-grid { grid-template-columns: 1fr; } }
+.cat-spa .scope-col {
+  border: 1px solid var(--line); border-radius: 4px; padding: 1rem 1.2rem;
+  background: color-mix(in srgb, var(--page-tint) 28%, #fff);
+}
+.cat-spa .scope-col .scope-head {
+  font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600; margin-bottom: 0.7rem; padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.cat-spa .scope-col ul { margin: 0; padding-left: 1.1rem; }
+.cat-spa .scope-col li { font-size: 0.94rem; color: var(--ink-soft); margin-bottom: 0.4rem; line-height: 1.5; }
+
+/* compact landscape table */
+.cat-spa .landscape { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 1.4rem 0 1rem; }
+.cat-spa .landscape th, .cat-spa .landscape td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.cat-spa .landscape thead th { font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; border-bottom: 1px solid var(--accent); }
+.cat-spa .landscape td { color: var(--ink-soft); }
+.cat-spa .landscape .proto { font-family: var(--serif); color: var(--ink); font-weight: 600; }
+.cat-spa .landscape .stance { color: var(--ink); }
+
+/* "stack" composition figure (SLF sits above AATWG / AP2 / Entra / ERC-8004) */
+.cat-spa .compose-stack { margin: 1.4rem 0 2rem; max-width: 60ch; }
+.cat-spa .compose-stack .lyr {
+  border: 1px solid var(--line); border-radius: 3px; padding: 0.75rem 1rem; margin-bottom: 0.4rem;
+  background: color-mix(in srgb, var(--page-tint) 28%, #fff);
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+}
+.cat-spa .compose-stack .lyr.is-top { background: color-mix(in srgb, var(--accent) 14%, #fff); border-color: var(--accent); }
+.cat-spa .compose-stack .lyr-name { font-family: var(--serif); font-weight: 600; font-size: 1.04rem; }
+.cat-spa .compose-stack .lyr-tag { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+
+/* pressure-test elements used on deep-dive pages */
+.cat-spa .draft-banner {
+  font-family: var(--sans); font-size: 0.86rem; color: var(--ink);
+  background: color-mix(in srgb, var(--accent) 12%, #fff);
+  border: 1px solid var(--accent); border-radius: 3px;
+  padding: 0.8rem 1rem; margin: 0 0 2rem; max-width: 70ch;
+  line-height: 1.5;
+}
+.cat-spa .draft-banner strong { color: var(--accent); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.74rem; display: block; margin-bottom: 0.3rem; }
+
+.cat-spa .tension {
+  border-left: 3px dashed var(--rust);
+  background: color-mix(in srgb, var(--rust) 6%, #fff);
+  padding: 0.9rem 1.1rem; margin: 1.4rem 0; max-width: 66ch;
+  border-radius: 0 3px 3px 0;
+}
+.cat-spa .tension .t-label {
+  font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--rust); font-weight: 600;
+  margin-bottom: 0.3rem; display: block;
+}
+.cat-spa .tension p { margin: 0; font-size: 0.94rem; line-height: 1.55; }
+.cat-spa .tension p + p { margin-top: 0.5rem; }
+.cat-spa .tension .claim { font-style: italic; color: var(--ink); }
+.cat-spa .tension .counter { color: var(--ink-soft); }
+.cat-spa .tension .counter::before { content: "Counter: "; font-style: normal; color: var(--rust); font-weight: 600; }
+
+.cat-spa .verbatim {
+  font-family: var(--serif); font-style: italic; font-size: 1.02rem; line-height: 1.55;
+  color: var(--ink); border-left: 2px solid var(--accent);
+  padding: 0.5rem 0 0.5rem 1.2rem; margin: 1.4rem 0; max-width: 64ch;
+}
+.cat-spa .verbatim cite {
+  display: block; margin-top: 0.5rem; font-style: normal;
+  font-family: var(--sans); font-size: 0.78rem; letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.cat-spa .prob-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 1.4rem 0 1.4rem; }
+.cat-spa .prob-table th, .cat-spa .prob-table td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.cat-spa .prob-table thead th { font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; border-bottom: 1px solid var(--accent); }
+.cat-spa .prob-table td.prob-pct { font-family: var(--sans); font-weight: 600; color: var(--accent); white-space: nowrap; }
+.cat-spa .prob-table .outcome { font-family: var(--serif); font-weight: 600; color: var(--ink); white-space: nowrap; }
+
+.cat-spa pre.json-block {
+  font-family: ui-monospace, Menlo, "SF Mono", monospace; font-size: 0.82rem; line-height: 1.55;
+  background: color-mix(in srgb, var(--page-tint) 22%, #fff);
+  border: 1px solid var(--line); border-radius: 4px;
+  padding: 0.9rem 1.1rem; margin: 1.2rem 0;
+  overflow-x: auto; color: var(--ink);
+}
+.cat-spa pre.json-block .k { color: var(--accent); }
+.cat-spa pre.json-block .s { color: var(--ink-soft); }
+.cat-spa pre.json-block .c { color: var(--ink-faint); font-style: italic; }
+
+.cat-spa pre.org-tree {
+  font-family: ui-monospace, Menlo, "SF Mono", monospace; font-size: 0.86rem; line-height: 1.7;
+  background: color-mix(in srgb, var(--page-tint) 28%, #fff);
+  border: 1px solid var(--line); border-radius: 4px;
+  padding: 1rem 1.2rem; margin: 1.4rem 0;
+  overflow-x: auto; color: var(--ink); white-space: pre;
+}
+.cat-spa pre.org-tree .n { color: var(--accent); font-weight: 600; }
+.cat-spa pre.org-tree .leaf { color: var(--ink); font-weight: 600; }
+.cat-spa pre.org-tree .desc { color: var(--ink-soft); font-family: "IBM Plex Sans", system-ui, sans-serif; font-style: italic; }
+.cat-spa pre.org-tree .punc { color: var(--ink-faint); }
+
+/* deep-dive index (forthcoming pages) */
+.cat-spa .dd-index { margin: 1rem 0 1.4rem; border-top: 1px solid var(--line); }
+.cat-spa .dd-row {
+  display: grid; grid-template-columns: 2.4rem 1fr auto; align-items: baseline;
+  gap: 0.7rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line);
+  font-family: var(--sans);
+}
+.cat-spa .dd-row .dd-no { font-size: 0.74rem; letter-spacing: 0.14em; color: var(--accent); font-weight: 600; }
+.cat-spa .dd-row .dd-title { font-family: var(--serif); font-size: 1.04rem; color: var(--ink); }
+.cat-spa .dd-row .dd-tag { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; }
+.cat-spa .dd-row.is-soon .dd-title { color: var(--ink-faint); font-style: italic; }
+.cat-spa a.dd-row { color: inherit; transition: background 0.2s var(--ease); }
+.cat-spa a.dd-row:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.cat-spa a.dd-row .dd-tag { color: var(--accent); }
+
+/* SVG diagram theming hook — tokens used by the inline SVG so it inherits the page palette */
+.cat-spa .diagram-plate svg .layer { fill: color-mix(in srgb, var(--page-tint) 40%, #fff); stroke: var(--line); stroke-width: 1; }
+.cat-spa .diagram-plate svg .layer-frame { fill: color-mix(in srgb, var(--accent) 18%, #fff); stroke: var(--accent); stroke-width: 1.2; }
+.cat-spa .diagram-plate svg .layer-lens  { fill: color-mix(in srgb, var(--accent) 10%, #fff); stroke: var(--accent); stroke-width: 1.2; }
+.cat-spa .diagram-plate svg .layer-sub   { fill: color-mix(in srgb, var(--accent) 22%, #fff); stroke: var(--accent); stroke-width: 1.2; }
+.cat-spa .diagram-plate svg .lbl       { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; fill: var(--accent); font-weight: 600; }
+.cat-spa .diagram-plate svg .lbl-name  { font-family: "Fraunces", Georgia, serif; font-size: 22px; fill: var(--ink); font-weight: 600; }
+.cat-spa .diagram-plate svg .lbl-desc  { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 12px; fill: var(--ink-soft); }
+.cat-spa .diagram-plate svg .lbl-side  { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; fill: var(--ink-faint); font-weight: 600; }
+.cat-spa .diagram-plate svg .arrow     { stroke: var(--accent); stroke-width: 1.5; fill: none; }
+.cat-spa .diagram-plate svg .arrow-receipt { stroke: var(--rust); stroke-width: 1.5; fill: none; stroke-dasharray: 4 3; }
+.cat-spa .diagram-plate svg .arrow-receipt-head { fill: var(--rust); }
+.cat-spa .diagram-plate svg .arrow-head { fill: var(--accent); }
+.cat-spa .diagram-plate svg .receipt-pill { fill: color-mix(in srgb, var(--rust) 18%, #fff); stroke: var(--rust); stroke-width: 1; }
+.cat-spa .diagram-plate svg .receipt-pill-lbl { fill: var(--rust); font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; }
 
 /* ---- career timeline ---- */
 .timeline { position: relative; padding-left: 1.9rem; margin-top: 1rem; }
