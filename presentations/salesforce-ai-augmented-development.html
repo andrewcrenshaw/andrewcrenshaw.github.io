@@ -29,7 +29,7 @@
 
     html {
       scroll-behavior: smooth;
-      scroll-snap-type: y mandatory;
+      scroll-snap-type: y proximity;
     }
 
     body {
@@ -574,7 +574,7 @@
             else { reveals.forEach((el) => el.classList.remove('visible')); }
           });
         },
-        { threshold: 0.35 }
+        { threshold: 0.05 }
       );
 
       slides.forEach((s) => observer.observe(s));
