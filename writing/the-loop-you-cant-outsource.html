@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Loop You Can't Outsource — Andrew Crenshaw</title>
+<meta name="description" content="Microsoft's Frontier Firm is right that the model is the commodity. The open question is who ends up owning the loop the agents run on." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/page.css" />
+</head>
+<body class="cat-writing">
+<header>
+  <div class="bar">
+    <a href="../index.html#writing" class="back">&larr; Andrew Crenshaw</a>
+    <nav class="bar-contact">
+      <a href="https://www.linkedin.com/in/andrewcrenshaw/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="mailto:andrewcrenshaw123@gmail.com">Email</a>
+      <a href="https://github.com/andrewcrenshaw" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+<article>
+  <div class="eyebrow"><span class="rule"></span> Essay &middot; July 2026</div>
+  <h1>The Loop You Can't Outsource</h1>
+  <p class="lede">Microsoft's Frontier Firm gets the shape of the next decade right. It stays quiet about who ends up owning the part that compounds.</p>
+
+  <p>Microsoft's 2025 Work Trend Index gave the moment a name: the Frontier Firm, an organization built around hybrid teams of people and AI agents, where whole business functions are handed to software that acts, decides, and learns from what it did. The framing is good and the direction is right. Companies are rebuilding around agents, not just bolting them on the side.</p>
+
+  <p>Start with the part worth agreeing on. In an AI economy the model is the commodity. Everyone rents the same frontier models from the same handful of labs, and the gap between the best model and the second-best keeps shrinking. If the model is the thing you compete on, you don't have a moat. You have a subscription that your competitor can sign up for on the same afternoon.</p>
+
+  <p>So where does the advantage actually go? It moves into the loop the agents run on: the accumulated decisions, the corrections, the context about why your company does things the way it does. Call it institutional knowledge, or the compounded judgment of a thousand sessions. That is the asset. An agent is only as useful as the loop feeding it, and the loop is the one thing a competitor renting the same model can't copy.</p>
+
+  <div class="callout">An agent is only as useful as the loop feeding it. The loop is the one thing a competitor renting the same model can't copy.</div>
+
+  <p>The trap in the Frontier Firm is quieter than it looks. When you delegate a business function to an agent, the loop that agent builds, every decision it records and every lesson it learns, tends to accumulate inside whichever vendor's tooling you delegated to. You get the productivity now. The vendor gets the compounding asset. Wire the institutional judgment of your company into one platform's stack and you have rebuilt the firm on a foundation you rent and can't leave with.</p>
+
+  <p>Keeping the loop is an architecture choice, and it is mostly the easy half. With the right design it is closer to a configuration decision than a rewrite. Three properties decide whether the loop is yours:</p>
+
+  <div class="stack">
+    <div class="stack-item">
+      <div><div class="stack-name">Local by default</div><div class="stack-desc">The corpus lives on infrastructure you control, in your jurisdiction, and never has to leave to be useful. If using your own memory requires shipping it to someone else first, it was never fully yours.</div></div>
+    </div>
+    <div class="stack-item">
+      <div><div class="stack-name">Portable formats</div><div class="stack-desc">The knowledge can be lifted and run somewhere else. Open, inspectable files beat a proprietary index. The plain test: if you can't export it and stand it up under a different vendor next quarter, you don't own it.</div></div>
+    </div>
+    <div class="stack-item">
+      <div><div class="stack-name">Provenance on every entry</div><div class="stack-desc">Each answer can prove where it came from and when. A loop you can't audit is a loop you can't trust with a decision that matters, and it quietly rots as the world changes underneath it.</div></div>
+    </div>
+  </div>
+
+  <p>This is no longer a fringe position, which is the part I find most telling. In June 2026 Google Cloud published the Open Knowledge Format (OKF), a vendor-neutral way to represent the curated knowledge that agents read: plain Markdown files with structured front matter, sitting in your own git, on your own infrastructure, tied to no cloud, no database, no model, and no agent framework. A hyperscaler shipped a specification whose entire premise is that your knowledge never leaves your control. When the platforms themselves start standardizing on portability, owning the loop stops reading as idealism and starts reading as table stakes.</p>
+
+  <p>This is the problem I've been building against for the past year. <a href="https://remember.lexenne.com" target="_blank" rel="noopener"><em>remember</em></a> is the memory layer, capture then retrieve then curate, built so an organization can own the loop rather than rent it: local by default, open formats, and a signed receipt on every read and write. <a href="https://create.lexenne.com" target="_blank" rel="noopener"><em>create</em></a> is the delivery side that produces the work and the record of exactly how it was made. Both run on SLF (Substrate, Lens, Frame), the interface that hands an agent the scoped slice of memory it needs instead of the whole store. It runs today. Parts are still rough, and I am deliberately careful about what gets to run unattended.</p>
+
+  <p>The Frontier Firm is coming either way. The open question is not whether your company runs on agents, because it will, but whether the loop those agents build is still yours when the contract ends. That is the new word for the company moat, and it is worth deciding on purpose before the default decides for you.</p>
+
+  <div class="end-rule"></div>
+  <a href="../index.html#writing" class="more">&larr; All writing</a>
+</article>
+<footer><div class="fbar"><span>&copy; 2026 Andrew Crenshaw</span><span>Enterprise AI &middot; Built, not theorized</span></div></footer>
+</body>
+</html>
