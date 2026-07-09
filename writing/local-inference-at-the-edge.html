@@ -40,8 +40,8 @@
     <table class="data-table">
       <thead><tr><th>Machine</th><th>Spec</th><th>Primary Role</th></tr></thead>
       <tbody>
-        <tr><td>mac-studio1</td><td>M3 Ultra, 96GB RAM, 28 cores</td><td>Primary oMLX host: all production inference (Strata + Alexandria); OWC storage hub (22TB SMB exports)</td></tr>
-        <tr><td>mac-mini3</td><td>M4 Pro, 64GB RAM, 4TB internal</td><td>Secondary oMLX host: Alexandria librarian + overnight synthesis; Strata failover</td></tr>
+        <tr><td>mac-studio1</td><td>M3 Ultra, 96GB RAM, 28 cores</td><td>Primary oMLX host: all production inference (Strata + <em>remember</em>); OWC storage hub (22TB SMB exports)</td></tr>
+        <tr><td>mac-mini3</td><td>M4 Pro, 64GB RAM, 4TB internal</td><td>Secondary oMLX host: <em>remember</em> librarian + overnight synthesis; Strata failover</td></tr>
         <tr><td>mac-mini1</td><td>M4, 16GB RAM, 228GB internal</td><td>Edge oMLX: <code>extract-fast</code> + <code>embed-fast</code>, always-on</td></tr>
         <tr><td>mac-mini2</td><td>M4, 16GB RAM, 228GB internal</td><td>Edge oMLX mirror: round-robin load balance + failover for mini1</td></tr>
       </tbody>
@@ -71,9 +71,9 @@
     </table>
   </div>
 
-  <p>With DFlash enabled on the 35B MoE, interactive throughput reaches 245&ndash;326 tok/s for single requests. The 27B Dense model runs with thinking enabled for synthesis work, it hits 91.9% TruthfulQA, which matters when generating interview coaching content or Alexandria knowledge bootstraps where accuracy is the constraint, not speed.</p>
+  <p>With DFlash enabled on the 35B MoE, interactive throughput reaches 245&ndash;326 tok/s for single requests. The 27B Dense model runs with thinking enabled for synthesis work, it hits 91.9% TruthfulQA, which matters when generating interview coaching content or <em>remember</em> knowledge bootstraps where accuracy is the constraint, not speed.</p>
 
-  <p><strong>Medium tier, mac-mini3</strong> (M4 Pro, 64GB, 4TB internal) is the dedicated Alexandria worker. One model loaded permanently:</p>
+  <p><strong>Medium tier, mac-mini3</strong> (M4 Pro, 64GB, 4TB internal) is the dedicated <em>remember</em> worker. One model loaded permanently:</p>
 
   <div class="table-wrap">
     <table class="data-table">
@@ -84,7 +84,7 @@
     </table>
   </div>
 
-  <p>mini3 runs the nightly Alexandria schedule, synthesis-detector, wiki-lint, link-builder, dedup, on its own hardware so it never competes with studio1's live traffic. With 64GB and a 4TB local drive for model storage, it handles librarian-curate passes that take an hour without impacting anything else on the fleet.</p>
+  <p>mini3 runs the nightly <em>remember</em> schedule, synthesis-detector, wiki-lint, link-builder, dedup, on its own hardware so it never competes with studio1's live traffic. With 64GB and a 4TB local drive for model storage, it handles librarian-curate passes that take an hour without impacting anything else on the fleet.</p>
 
   <p><strong>Edge tier, mac-mini1 + mac-mini2</strong> (M4, 16GB each, mirrored config) serve Living Memory's near-real-time slots. Two models co-loaded per machine (~2.5 GB total):</p>
 
@@ -113,7 +113,7 @@
         <tr><td><code>score-fast</code></td><td>studio1</td><td>35B MoE + DFlash + continuous batching</td><td>Strata Stage 2A: fast scoring, ~290 tok/s aggregate</td></tr>
         <tr><td><code>score-deep</code></td><td>studio1</td><td>35B MoE, no DFlash</td><td>Strata Stage 2B: deep evaluation</td></tr>
         <tr><td><code>chat-interactive</code></td><td>studio1</td><td>35B MoE + DFlash</td><td>Interactive agent turns, 245&ndash;326 tok/s</td></tr>
-        <tr><td><code>synth-deep</code></td><td>studio1 / mini3</td><td>27B Dense, thinking ON</td><td>Coach synthesis, Alexandria knowledge bootstrap</td></tr>
+        <tr><td><code>synth-deep</code></td><td>studio1 / mini3</td><td>27B Dense, thinking ON</td><td>Coach synthesis, <em>remember</em> knowledge bootstrap</td></tr>
         <tr><td><code>librarian-curate</code></td><td>mini3 (nightly)</td><td>27B Dense, thinking ON, 65K ctx</td><td>Wiki lint, link-builder, dedup, staleness detection</td></tr>
       </tbody>
     </table>
@@ -121,7 +121,7 @@
 
   <p>One oMLX quirk worth knowing: 0.3.8 supports one profile per loaded model name. To run the same base model under two different profiles (e.g., 27B Dense with thinking ON for synthesis vs. thinking OFF for fast scoring), you load it under two distinct names using symlinks. Same weights on disk, two registered model IDs, two independent profile configs. It doesn't double memory usage as long as only one is active at a time.</p>
 
-  <p>Alexandria's knowledge operations, session priming, daily digests, knowledge queries, route to mini3 and studio1 via the same slot abstraction. When mini3 is running a long librarian pass, studio1's live-traffic capacity is untouched. Retrieval happens locally against SQLite/LanceDB on the calling machine; the LLM only runs for synthesis steps that actually need it.</p>
+  <p><em>remember</em>'s knowledge operations, session priming, daily digests, knowledge queries, route to mini3 and studio1 via the same slot abstraction. When mini3 is running a long librarian pass, studio1's live-traffic capacity is untouched. Retrieval happens locally against SQLite/LanceDB on the calling machine; the LLM only runs for synthesis steps that actually need it.</p>
 
   <h3>Shadow-mode calibration</h3>
 

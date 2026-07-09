@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>autogenous-synthesis Forge — Harness Engineering for Agent-First Development</title>
+  <title>create — Harness Engineering for Agent-First Development</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -508,8 +508,8 @@
 
 <nav id="nav">
   <div class="nav-brand">
-    <strong>autogenous-synthesis</strong>
-    <span>/ forge deep dive</span>
+    <strong>create</strong>
+    <span>/ deep dive</span>
   </div>
   <ul class="nav-links">
     <li><a href="#what-it-is">What It Is</a></li>
@@ -532,7 +532,7 @@
     <div class="hero-eyebrow reveal">Technical Deep Dive · 2026</div>
 
     <div class="rule reveal"></div>
-    <h1 class="reveal rd1">autogenous-<br>synthesis Forge</h1>
+    <h1 class="reveal rd1">Lexenne <em>create</em></h1>
 
     <p class="hero-subtitle reveal rd2">
       A harness engineering framework for agent-first software development.
@@ -558,12 +558,12 @@
         <div class="stat-label">Lifecycle stages with<br>automated transitions</div>
       </div>
       <div class="stat">
-        <div class="stat-num">2,400+</div>
-        <div class="stat-label">Test cases (700+ suites)<br>enforced on every submission</div>
+        <div class="stat-num">2,000+</div>
+        <div class="stat-label">Tests on every submission<br>Jest · Cargo · Ruff across the fleet</div>
       </div>
       <div class="stat">
-        <div class="stat-num">5-stage</div>
-        <div class="stat-label">Review gate: Lint · Tests<br>· Eval · Quinn · Stewart</div>
+        <div class="stat-num">6-stage</div>
+        <div class="stat-label">Review gate: Lint · Tests · Quinn<br>· Sentinel · Evelyn · Stewart</div>
       </div>
     </div>
   </div>
@@ -582,14 +582,14 @@
 
     <p class="reveal">Fair question. Most "agent frameworks" are exactly that: a UI layer over a task list, where a human reads the ticket, constructs a prompt, pastes it into an AI tool, copies the result back, and manually updates a status field. The AI is accelerating individual steps. The process is still human-driven.</p>
 
-    <p class="reveal">Forge is architecturally different. The backlog is a <em>live state machine</em> with transactional guarantees. Stewart promotes intake to ready and auto-generates agent-scoped prompts. Each agent registers its session, claims work, executes under a structured SOP, runs RED→GREEN→REFACTOR, and submits for review through a single HTTP API. The human stays at cross-ticket decision boundaries — picking what to dispatch, ratifying handoffs, owning architectural calls — while the framework removes the friction inside each ticket: shared scratchpads carry context across sessions, ISC tables make "done" binary, and structured reflection captures what the next agent needs.</p>
+    <p class="reveal"><em>create</em> is architecturally different. The backlog is a <em>live state machine</em> with transactional guarantees. Stewart promotes intake to ready and auto-generates agent-scoped prompts. Each agent registers its session, claims work, executes under a structured SOP, runs RED→GREEN→REFACTOR, and submits for review through a single HTTP API. The human stays at cross-ticket decision boundaries — picking what to dispatch, ratifying handoffs, owning architectural calls — while the framework removes the friction inside each ticket: shared scratchpads carry context across sessions, ISC tables make "done" binary, and structured reflection captures what the next agent needs.</p>
 
-    <p class="reveal">The human's role is: set direction, define acceptance criteria, and review output. Everything between is Forge — protocol, lifecycle, context, and gates.</p>
+    <p class="reveal">The human's role is: set direction, define acceptance criteria, and review output. Everything between is <em>create</em> — protocol, lifecycle, context, and gates.</p>
 
     <div class="callout reveal" style="margin-top: 2.5rem;">
       <span class="callout-label">The core distinction</span>
       <p><strong>AI-assisted:</strong> You use AI tools inside your existing process. Efficiency improves 10–20%. The loop is still human-driven, the context is rebuilt every prompt, and "done" is subjective.<br><br>
-      <strong>Forge / AI-first:</strong> You redesign the process around agents as the primary builders. The framework handles dispatch prep, context continuity, structured handoffs between specialists, and machine-verifiable quality gates. Humans provide direction and architectural judgment. The difference is multiplicative, not additive — and it compounds because the system, scratchpads, and memory get better over time.</p>
+      <strong><em>create</em> / AI-first:</strong> You redesign the process around agents as the primary builders. The framework handles dispatch prep, context continuity, structured handoffs between specialists, and machine-verifiable quality gates. Humans provide direction and architectural judgment. The difference is multiplicative, not additive — and it compounds because the system, scratchpads, and memory get better over time.</p>
     </div>
   </div>
 </section>
@@ -601,7 +601,7 @@
 ═══════════════════════════════════════════════════════ -->
 <section id="what-it-is" class="section">
   <div class="section-inner">
-    <div class="section-label reveal">What Forge Is</div>
+    <div class="section-label reveal">What create Is</div>
     <h2 class="reveal">Four properties that define agent-first development</h2>
     <div class="rule reveal"></div>
 
@@ -609,7 +609,7 @@
       <div class="card">
         <span class="card-icon"><i class="ph ph-lightning"></i></span>
         <h3>Agent-First</h3>
-        <p>Agents don't assist the developer — they are the primary builders. Forge is designed from the ground up to make agents' work legible, bounded, and enforceable. Every component — the session protocol, the backlog schema, the SOP library, the work packages — exists to maximize what agents can reliably do, with the human reserved for direction-setting and cross-ticket judgment.</p>
+        <p>Agents don't assist the developer — they are the primary builders. <em>create</em> is designed from the ground up to make agents' work legible, bounded, and enforceable. Every component — the session protocol, the backlog schema, the SOP library, the work packages — exists to maximize what agents can reliably do, with the human reserved for direction-setting and cross-ticket judgment.</p>
         <div class="tags">
           <span class="tag">harness engineering</span>
           <span class="tag">agent SOPs</span>
@@ -639,13 +639,35 @@
       <div class="card">
         <span class="card-icon"><i class="ph ph-brain"></i></span>
         <h3>Continuous Learning</h3>
-        <p>Agent sessions generate structured scratchpads that persist across context limits. The living memory system — agentic memory with digestive pipeline, auto-promotion gates, and decay — means agents start sessions knowing what the fleet has already learned. Knowledge compounds across every session, every agent, every project.</p>
+        <p>Agent sessions generate structured scratchpads that persist across context limits. The <em>remember</em> substrate — the agent-memory store agents read at session start, with <em>reflect</em> (reduce, reweave, forget) as the compounding layer, in build — means agents start sessions knowing what the fleet has already learned. Knowledge compounds across every session, every agent, every project.</p>
         <div class="tags">
           <span class="tag">session continuity</span>
-          <span class="tag purple">living memory</span>
+          <span class="tag purple">remember</span>
           <span class="tag">compound knowledge</span>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     WHERE CREATE SITS — THE SEAM
+═══════════════════════════════════════════════════════ -->
+<section id="seam" class="section">
+  <div class="section-inner narrow">
+    <div class="section-label reveal">Where create sits</div>
+    <h2 class="reveal">One protocol, two products.</h2>
+    <div class="rule reveal"></div>
+
+    <p class="reveal"><em>create</em> is one half of a pair of products that share a single seam. <em>create</em> is where the work happens; <em>remember</em> is the memory that persists across it. They speak one protocol — <strong>SLF (Substrate · Lens · Frame)</strong> — over a single interface: <em>create</em> reads context and writes captures to <em>remember</em> through <code>render(substrate, lens, frame) → receipt</code>, and every access leaves a signed receipt you can audit. The two are being split into separate codebases whose only shared code is SLF.</p>
+
+    <p class="reveal" style="color: var(--text-faint); font-size: 0.95rem;">The receipt-and-grant enforcement across that seam is designed and in build; the memory it runs on is live today.</p>
+
+    <div style="display:flex;gap:1.25rem;flex-wrap:wrap;margin-top:1.75rem;" class="reveal">
+      <a href="remember-technical-overview.html" style="font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.8rem 2rem;border-radius:6px;border:1px solid var(--border-accent);color:var(--accent);">remember: Technical Overview →</a>
+      <a href="https://lexenne.com/slf" target="_blank" rel="noopener" style="font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.8rem 2rem;border-radius:6px;border:1px solid var(--border-accent);color:var(--accent);">The SLF protocol ↗</a>
     </div>
   </div>
 </section>
@@ -663,41 +685,9 @@
 
     <p class="reveal">Every backlog item moves through five stages with automated transitions. Agents claim work, the system tracks conflicts, and the human sees a real-time view of what every agent is doing and why.</p>
 
-    <div class="lifecycle reveal" style="margin-top: 2rem;">
-      <div class="stage">
-        <div class="stage-name">Intake</div>
-        <div class="stage-count">15</div>
-        <div class="stage-desc">Needs acceptance criteria</div>
-      </div>
-      <div class="stage-arrow">→</div>
-      <div class="stage">
-        <div class="stage-name">Ready</div>
-        <div class="stage-count">8</div>
-        <div class="stage-desc">AC verified, work package generated</div>
-      </div>
-      <div class="stage-arrow">→</div>
-      <div class="stage">
-        <div class="stage-name">In Progress</div>
-        <div class="stage-count">1</div>
-        <div class="stage-desc">Agent claimed, executing</div>
-      </div>
-      <div class="stage-arrow">→</div>
-      <div class="stage">
-        <div class="stage-name">Review</div>
-        <div class="stage-count">2</div>
-        <div class="stage-desc">Eval runs first, human only if ambiguous</div>
-      </div>
-      <div class="stage-arrow">→</div>
-      <div class="stage" style="border-color: rgba(107,171,115,0.3);">
-        <div class="stage-name" style="color: var(--green);">Done</div>
-        <div class="stage-count" style="color: var(--green);">8</div>
-        <div class="stage-desc">Validated, merged, session archived</div>
-      </div>
-    </div>
-
     <div class="screenshot-wrap reveal" style="margin-top: 2rem;">
-      <img src="../images/forge-dashboard.png" alt="autogenous-synthesis Forge — live backlog dashboard showing 35 items across 5 lifecycle stages">
-      <div class="screenshot-cap">FORGE DASHBOARD · LIVE BACKLOG · 35 ITEMS · http://localhost:5175</div>
+      <img src="../images/create.png" alt="Lexenne create — daily ledger dashboard showing a live backlog of 263 items">
+      <div class="screenshot-cap">LEXENNE CREATE · DAILY LEDGER · 263 ITEMS</div>
     </div>
 
     <div class="two-col reveal" style="margin-top: 3rem;">
@@ -741,7 +731,7 @@
     <h2 class="reveal">From plan to done — without restarts.</h2>
     <div class="rule reveal"></div>
 
-    <p class="reveal">This is the loop every Forge ticket runs through. The orchestration is structured by the PDT (Project Definition Toolkit) and its dashboard, not by a single autonomous agent: tickets carry their own AC, prompt templates, and agent assignments; the dashboard auto-generates an agent-scoped prompt on status transitions; Launch and Relaunch buttons stage the prompt for one-click clipboard copy. PCC-2327 — a 5-phase DB migration that ran Remy → Alex (ADR) → Remy → Stewart → Remy — shipped through this loop without restarts or context loss. <strong>Autonomous fan-out — where a single orchestrator agent runs the whole loop unattended — is Phase 2, calendar-gated ~6 weeks out behind measured-data review of how often the operator actually wishes the system would take more action.</strong></p>
+    <p class="reveal">This is the loop every <em>create</em> ticket runs through. The orchestration is structured by the <em>create</em> backbone and its dashboard, not by a single autonomous agent: tickets carry their own AC, prompt templates, and agent assignments; the dashboard auto-generates an agent-scoped prompt on status transitions; Launch and Relaunch buttons stage the prompt for one-click clipboard copy. PCC-2327 — a 5-phase DB migration that ran Remy → Alex (ADR) → Remy → Stewart → Remy — shipped through this loop without restarts or context loss. <strong>Autonomous fan-out — where a single orchestrator agent runs the whole loop unattended — is Phase 2, calendar-gated ~6 weeks out behind measured-data review of how often the operator actually wishes the system would take more action.</strong></p>
 
     <div class="big-quote reveal">"You build the system. The prompts are disposable."</div>
 
@@ -753,7 +743,7 @@
         <div class="phase-num">P1</div>
         <div class="phase-content">
           <h4>Plan & Decompose</h4>
-          <p>A planning agent (Alex for architecture, Bea for product requirements) reads the goal and produces a structured plan. The plan is filed as one or more PDT tickets via the API — each with a scoped AC table, an agent assignment (Bob, Tessa, Sherry, Remy, etc.), and the prompt template appropriate to that specialist's SOP.</p>
+          <p>A planning agent (Alex for architecture, Bea for product requirements) reads the goal and produces a structured plan. The plan is filed as one or more <em>create</em> tickets via the API — each with a scoped AC table, an agent assignment (Bob, Tessa, Sherry, Remy, etc.), and the prompt template appropriate to that specialist's SOP.</p>
         </div>
       </div>
       <div class="phase">
@@ -767,11 +757,11 @@
         <div class="phase-num">P3</div>
         <div class="phase-content">
           <h4>Dispatch — the Launch button</h4>
-          <p>The operator moves a <code>ready</code> ticket to <code>in_progress</code> in the PDT dashboard. The status transition triggers prompt generation: the dashboard composes an agent-scoped prompt from the ticket's AC, file references, prompt template, and constraints — and stages it for the Launch button. <strong>One click on Launch copies the prompt to the clipboard.</strong> The operator pastes it into a fresh Claude session.</p>
+          <p>The operator moves a <code>ready</code> ticket to <code>in_progress</code> in the <em>create</em> dashboard. The status transition triggers prompt generation: the dashboard composes an agent-scoped prompt from the ticket's AC, file references, prompt template, and constraints — and stages it for the Launch button. <strong>One click on Launch copies the prompt to the clipboard.</strong> The operator pastes it into a fresh Claude session.</p>
           <div class="code-block" style="margin-top: 0.75rem;">
             <span class="code-label">Auto-staged prompt (excerpt — what Launch copies)</span>
 <pre><span class="hl-key">Agent:</span>    <span class="hl-str">bob</span>
-<span class="hl-key">Ticket:</span>   <span class="hl-val">PCC-2327 — Migrate PDT to better-sqlite3</span>
+<span class="hl-key">Ticket:</span>   <span class="hl-val">PCC-2327 — Migrate create to better-sqlite3</span>
 <span class="hl-key">Context:</span>  <span class="hl-comment">[Files, prior scratchpad, related ADR]</span>
 <span class="hl-key">AC:</span>       <span class="hl-str">ISC table — binary pass/fail rows</span>
 <span class="hl-key">Constraints:</span> <span class="hl-comment">TDD required, do not touch migration 028</span>
@@ -790,7 +780,7 @@
         <div class="phase-num">P5</div>
         <div class="phase-content">
           <h4>Automated Review Gates</h4>
-          <p>Submission to <code>review</code> triggers a multi-stage gate that runs without operator intervention: ESLint (TypeScript), Ruff (Python), 700+ Jest suites / 2,400+ test cases, Eval (machine-verifiable AC check), Quinn (code review SOP), Stewart's pre-commit gate, and Sentinel (security review where applicable). Every gate is binary and audit-logged.</p>
+          <p>Submission to <code>review</code> triggers a multi-stage gate that runs without operator intervention: ESLint (TypeScript), Ruff (Python), Cargo (Rust), 1,000+ Jest suites, Evelyn's eval (machine-verifiable AC check, validated end to end), Quinn (code review SOP), Sentinel (security review where applicable), and Stewart's pre-commit gate. Every gate is binary and audit-logged.</p>
         </div>
       </div>
       <div class="phase">
@@ -804,7 +794,7 @@
 
     <div class="callout success reveal" style="margin-top: 2rem;">
       <span class="callout-label">The Recovery Loop — What makes this not copy-paste</span>
-      <p>When a review gate fails, the answer is never "try rephrasing the prompt." The PDT dashboard composes a structured Relaunch prompt that names the failed gate (which ISC row, which lint rule, which test, which review note), states the specific correction needed, and re-attaches the original context. One click copies it to the clipboard; the operator pastes it into the same agent session to continue. This is structured error correction — a rule-based recovery loop with an ISC-anchored bar, not vibes — and it is what makes the framework converge instead of spin.</p>
+      <p>When a review gate fails, the answer is never "try rephrasing the prompt." The <em>create</em> dashboard composes a structured Relaunch prompt that names the failed gate (which ISC row, which lint rule, which test, which review note), states the specific correction needed, and re-attaches the original context. One click copies it to the clipboard; the operator pastes it into the same agent session to continue. This is structured error correction — a rule-based recovery loop with an ISC-anchored bar, not vibes — and it is what makes the framework converge instead of spin.</p>
     </div>
   </div>
 </section>
@@ -820,7 +810,7 @@
     <h2 class="reveal">12 specialists. Auto-routed. Skill-aware.</h2>
     <div class="rule reveal"></div>
 
-    <p class="reveal">Forge doesn't have a single "AI assistant." It has a network of specialized agents, each with their own SKILL.md that defines triggers, guardrails, sub-skills, and output formats. Routing is automatic — the right agent activates based on context keywords, not manual selection.</p>
+    <p class="reveal"><em>create</em> doesn't have a single "AI assistant." It has a network of specialized agents, each with their own SKILL.md that defines triggers, guardrails, sub-skills, and output formats. Routing is automatic — the right agent activates based on context keywords, not manual selection.</p>
 
     <div class="agent-grid reveal">
       <div class="agent-card">
@@ -861,10 +851,10 @@
       <div class="agent-card">
         <div class="agent-name">Quinn</div>
         <div class="agent-role">Code Reviewer</div>
-        <div class="agent-desc">Structured severity-ranked code review. Separates architectural risks from style concerns. Feeds Eval's resolution decision.</div>
+        <div class="agent-desc">Structured severity-ranked code review. Separates architectural risks from style concerns. Feeds Evelyn's resolution decision.</div>
       </div>
       <div class="agent-card">
-        <div class="agent-name">Eval</div>
+        <div class="agent-name">Evelyn</div>
         <div class="agent-role">Evaluator</div>
         <div class="agent-desc">Automated work completion evaluation. Checks AC rows against output. Auto-approves routine completions; escalates ambiguous decisions with evidence.</div>
       </div>
@@ -881,7 +871,7 @@
       <div class="agent-card">
         <div class="agent-name">Jerry</div>
         <div class="agent-role">Jira Integration</div>
-        <div class="agent-desc">Bidirectional Jira sync — backlog tickets ↔ Jira issues, status round-trip, comment relay. Lets Forge participate in enterprise workflows without leaving the dashboard.</div>
+        <div class="agent-desc">Bidirectional Jira sync — backlog tickets ↔ Jira issues, status round-trip, comment relay. Lets <em>create</em> participate in enterprise workflows without leaving the dashboard.</div>
       </div>
     </div>
 
@@ -903,13 +893,13 @@
     <h2 class="reveal">Speed with bounded authority.</h2>
     <div class="rule reveal"></div>
 
-    <p class="reveal">Governance in Forge is automation-first, not approval-first. Requiring human sign-off on every agent action would create the exact bottleneck Forge is designed to eliminate. Instead, the system evaluates completed work automatically against objective criteria — and only escalates when it genuinely can't make the call.</p>
+    <p class="reveal">Governance in <em>create</em> is automation-first, not approval-first. Requiring human sign-off on every agent action would create the exact bottleneck <em>create</em> is designed to eliminate. Instead, the system evaluates completed work automatically against objective criteria — and only escalates when it genuinely can't make the call.</p>
 
     <div class="approval-flow reveal">
       <div class="flow-step">
         <span class="flow-step-num">STEP 01</span>
         <h4>Automated Evaluation</h4>
-        <p>When an agent submits work, Eval runs immediately: acceptance criteria (ISC table), linting, regression tests. All checks are binary pass/fail — no subjective scoring. The full audit trail is persisted in SQLite and visible in the dashboard.</p>
+        <p>When an agent submits work, Evelyn runs immediately: acceptance criteria (ISC table), linting, regression tests. All checks are binary pass/fail — no subjective scoring. The full audit trail is persisted in SQLite and visible in the dashboard.</p>
       </div>
       <div class="flow-step">
         <span class="flow-step-num">STEP 02</span>
@@ -919,7 +909,7 @@
       <div class="flow-step" style="border-right: none;">
         <span class="flow-step-num">STEP 03</span>
         <h4>Escalate Only When Uncertain</h4>
-        <p>When Eval can't determine pass/fail with confidence — genuinely ambiguous architectural decisions, novel failure patterns, out-of-bounds behavior — it escalates to the human with a structured evidence package. Human judgment is reserved for decisions that actually require it.</p>
+        <p>When Evelyn can't determine pass/fail with confidence — genuinely ambiguous architectural decisions, novel failure patterns, out-of-bounds behavior — she escalates to the human with a structured evidence package. Human judgment is reserved for decisions that actually require it.</p>
       </div>
     </div>
 
@@ -927,11 +917,11 @@
       <div>
         <h3>Guardrails Are Enforced, Not Suggested</h3>
         <p>Global guardrails in <code>.agent-data/guardrails/global.md</code> define mechanical rules: never write to <code>.env*</code>, never run <code>rm -rf</code>, never push <code>--force</code> to main, never commit secrets. These aren't reminders. They're validated by automated test suites that run on every change. An agent that violates a guardrail rule fails the verification gate.</p>
-        <p style="margin-top: 1rem;">Three architectural constraints govern every component of Forge: cross-platform (Windows, Mac, Linux), IDE-agnostic (Cursor, VS Code, CLI, any tool), and model-agnostic (Claude, GPT, Gemini, future models). These are not design preferences — they are enforced by architecture boundary tests.</p>
+        <p style="margin-top: 1rem;">Three architectural constraints govern every component of <em>create</em>: cross-platform (Windows, Mac, Linux), IDE-agnostic (Cursor, VS Code, CLI, any tool), and model-agnostic (Claude, GPT, Gemini, future models). These are not design preferences — they are enforced by architecture boundary tests.</p>
       </div>
       <div>
-        <h3>The Eval Agent Closes the Loop</h3>
-        <p>When an agent submits work for review, the Eval agent runs independently against the objective acceptance criteria. For work that clearly meets every AC row with test evidence: Eval auto-approves. For ambiguous cases: Eval escalates to human with a structured evidence package — what passed, what's uncertain, why it's being escalated. This reduces review load by 80%+ without sacrificing oversight.</p>
+        <h3>Evelyn Closes the Loop</h3>
+        <p>When an agent submits work for review, Evelyn runs independently against the objective acceptance criteria. For work that clearly meets every AC row with test evidence: Evelyn auto-approves. For ambiguous cases: Evelyn escalates to human with a structured evidence package — what passed, what's uncertain, why it's being escalated. This reduces review load by 80%+ without sacrificing oversight.</p>
         <p style="margin-top: 1rem;">The goal is not to remove humans from decisions — it's to ensure humans only make decisions that genuinely require judgment. Routine completions don't need human attention. Architectural risks do.</p>
       </div>
     </div>
@@ -971,7 +961,7 @@
       </div>
       <div>
         <h3>Auto-Generated Work Packages</h3>
-        <p>When Stewart promotes a backlog item to <code>ready</code>, Forge auto-generates a Work Package — a curated handoff document that contains everything an agent needs to start immediately. Not a pointer to the ticket. A self-contained brief with the problem statement, acceptance criteria, file references, and quick-start commands. No "can you explain this?" back-and-forth.</p>
+        <p>When Stewart promotes a backlog item to <code>ready</code>, <em>create</em> auto-generates a Work Package — a curated handoff document that contains everything an agent needs to start immediately. Not a pointer to the ticket. A self-contained brief with the problem statement, acceptance criteria, file references, and quick-start commands. No "can you explain this?" back-and-forth.</p>
         <div class="code-block" style="margin-top: 1rem;">
           <span class="code-label">Work Package contents</span>
 <pre><span class="hl-key">Problem Statement:</span>   <span class="hl-str">Clear description of what and why</span>
@@ -1003,7 +993,7 @@
 
 <span class="hl-comment"># ... work happens ... scratchpad updated every 3-5 actions ...</span>
 
-<span class="hl-comment"># 4. Submit — triggers Eval; never ask the human first</span>
+<span class="hl-comment"># 4. Submit — triggers Evelyn; never ask the human first</span>
 <span class="hl-fn">curl</span> <span class="hl-val">-X PATCH</span> localhost:5176/api/backlog/PCC-1846
   <span class="hl-val">-d</span> <span class="hl-str">'{"status":"review"}'</span>
 
@@ -1026,7 +1016,7 @@
 
     <div class="two-col reveal">
       <div>
-        <p>All implementation work in Forge is test-driven. This is not a coding convention. It is a mechanical constraint enforced by the verification gate. Any PR or session submission that lacks a RED→GREEN→REFACTOR trace fails automatically before it reaches human review.</p>
+        <p>All implementation work in <em>create</em> is test-driven. This is not a coding convention. It is a mechanical constraint enforced by the verification gate. Any PR or session submission that lacks a RED→GREEN→REFACTOR trace fails automatically before it reaches human review.</p>
         <p style="margin-top: 1rem;">Tessa generates failing tests before Bob writes a line of implementation. Bob implements only enough to pass. Remy reviews the clean implementation for refactoring opportunities. The cycle is the process — not something bolted onto it afterwards.</p>
       </div>
       <div>
@@ -1063,7 +1053,7 @@
     <h2 class="reveal">The system knows what it's doing.</h2>
     <div class="rule reveal"></div>
 
-    <p class="reveal">Forge generates structured observability artifacts automatically. Not after-the-fact documentation — live signals produced as work happens.</p>
+    <p class="reveal"><em>create</em> generates structured observability artifacts automatically. Not after-the-fact documentation — live signals produced as work happens.</p>
 
     <div class="card-grid two reveal">
       <div class="card">
@@ -1078,8 +1068,8 @@
       </div>
       <div class="card">
         <span class="card-icon"><i class="ph ph-magnifying-glass"></i></span>
-        <h3>Eval Results</h3>
-        <p>Every review decision generates a structured eval result: what was checked, which AC rows passed, what evidence was cited, whether the decision was auto-resolved or escalated and why.</p>
+        <h3>Evaluation Results</h3>
+        <p>Every review decision generates a structured evaluation result: what was checked, which AC rows passed, what evidence was cited, whether the decision was auto-resolved or escalated and why.</p>
       </div>
       <div class="card">
         <span class="card-icon"><i class="ph ph-archive"></i></span>
@@ -1105,14 +1095,14 @@
       <div class="compare-header">
         <div class="compare-header-cell" style="color: var(--text-faint);">Capability</div>
         <div class="compare-header-cell traditional">AI Tools + Kanban</div>
-        <div class="compare-header-cell forge">autogenous-synthesis Forge</div>
+        <div class="compare-header-cell forge"><em>create</em></div>
       </div>
       <table class="compare-table">
         <tbody>
           <tr>
             <td>Task Orchestration</td>
             <td class="dim">Human reads ticket, constructs prompt, pastes into AI tool, copies output back. Human is the message bus.</td>
-            <td class="bright">Stewart auto-generates agent-scoped prompts with binary AC. The operator dispatches across parallel sessions; structured handoff signatures let specialists pick up mid-ticket without restart. Eval runs at submission against the ISC table.</td>
+            <td class="bright">Stewart auto-generates agent-scoped prompts with binary AC. The operator dispatches across parallel sessions; structured handoff signatures let specialists pick up mid-ticket without restart. Evelyn runs at submission against the ISC table.</td>
           </tr>
           <tr>
             <td>State Management</td>
@@ -1132,7 +1122,7 @@
           <tr>
             <td>Quality Gates</td>
             <td class="dim">Subjective review. "Does this look right?" Human checks everything.</td>
-            <td class="bright">ISC acceptance criteria (binary pass/fail). Verification gate runs 150+ test suites. Eval auto-approves routine completions. Human reviews only genuinely ambiguous decisions.</td>
+            <td class="bright">ISC acceptance criteria (binary pass/fail). Verification gate runs 150+ test suites. Evelyn auto-approves routine completions. Human reviews only genuinely ambiguous decisions.</td>
           </tr>
           <tr>
             <td>Context Continuity</td>
@@ -1176,22 +1166,22 @@
     <h2 class="reveal">The developer's role, redefined.</h2>
     <div class="rule reveal"></div>
 
-    <p class="reveal">Forge doesn't make you a faster developer. It makes you an <em>architect of systems that develop</em>. The shift is categorical, not incremental.</p>
+    <p class="reveal"><em>create</em> doesn't make you a faster developer. It makes you an <em>architect of systems that develop</em>. The shift is categorical, not incremental.</p>
 
     <div class="big-quote reveal">The ability to write code fast is worth less every month. The ability to define what good looks like, evaluate what agents produce, and design the system that makes agents reliable — that compounds.</div>
 
     <div class="card-grid two reveal" style="margin-top: 2.5rem;">
       <div class="card" style="border-color: rgba(201,149,78,0.2); background: rgba(201,149,78,0.03);">
-        <h4 style="color: var(--orange); text-transform: none; letter-spacing: 0; font-size: 0.8rem; margin-bottom: 0.8rem;">Without Forge</h4>
+        <h4 style="color: var(--orange); text-transform: none; letter-spacing: 0; font-size: 0.8rem; margin-bottom: 0.8rem;">Without <em>create</em></h4>
         <p>A solo engineer works sequentially. One task at a time. Context switches are expensive. Writing tests is deferred. Documentation follows (never). State lives in the engineer's head. When they're not working, nothing is.</p>
       </div>
       <div class="card" style="border-color: rgba(107,171,115,0.2); background: rgba(107,171,115,0.03);">
-        <h4 style="color: var(--green); text-transform: none; letter-spacing: 0; font-size: 0.8rem; margin-bottom: 0.8rem;">With Forge</h4>
+        <h4 style="color: var(--green); text-transform: none; letter-spacing: 0; font-size: 0.8rem; margin-bottom: 0.8rem;">With <em>create</em></h4>
         <p>Multiple parallel agent sessions execute concurrently across unrelated concerns. Tests are generated before implementation. Documentation is produced alongside code. State is persistent and auditable. The system works whether or not the engineer is at the keyboard.</p>
       </div>
     </div>
 
-    <p class="reveal" style="margin-top: 2rem;">The key capability Forge creates isn't "AI writes my code." It's <em>institutional execution capacity</em> — the ability to run more work, in parallel, with higher confidence, than any individual developer could sustain. And to get measurably better at it over time, because the memory system compounds what the agent network learns.</p>
+    <p class="reveal" style="margin-top: 2rem;">The key capability <em>create</em> unlocks isn't "AI writes my code." It's <em>institutional execution capacity</em> — the ability to run more work, in parallel, with higher confidence, than any individual developer could sustain. And to get measurably better at it over time, because <em>remember</em> compounds what the agent network learns.</p>
   </div>
 </section>
 
@@ -1205,17 +1195,17 @@
     <div class="rule center reveal"></div>
     <h2 class="reveal">The harness is the product.</h2>
     <p class="reveal" style="margin: 0 auto 2rem; text-align: center;">
-      Forge is not a collection of prompts and a kanban board. It is a purpose-built engineering system designed to make agent-first development reliable, auditable, and continuously improving. Every component — the session protocol, the approval queue, the work packages, the Launch / Relaunch dispatch loop, the TDD enforcement, the scratchpad continuity — exists to answer one question: <em>what capability is missing, and how do we make it legible to the agent?</em>
+      <em>create</em> is not a collection of prompts and a kanban board. It is a purpose-built engineering system designed to make agent-first development reliable, auditable, and continuously improving. Every component — the session protocol, the approval queue, the work packages, the Launch / Relaunch dispatch loop, the TDD enforcement, the scratchpad continuity — exists to answer one question: <em>what capability is missing, and how do we make it legible to the agent?</em>
     </p>
     <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-top: 2rem;" class="reveal">
       <a href="../index.html#work" style="font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.8rem 2rem;border-radius:6px;background:var(--accent);color:var(--bg);transition:all 0.3s var(--ease);">Back to Portfolio</a>
-      <a href="agentic-memory-architecture.html" style="font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.8rem 2rem;border-radius:6px;border:1px solid var(--border-accent);color:var(--accent);transition:all 0.3s var(--ease);">Memory Architecture →</a>
+      <a href="remember-technical-overview.html" style="font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.8rem 2rem;border-radius:6px;border:1px solid var(--border-accent);color:var(--accent);transition:all 0.3s var(--ease);">remember: Technical Overview →</a>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>autogenous-synthesis Forge · <a href="../index.html">andrewcrenshaw.dev</a> · 2026</p>
+  <p><em>create</em> · <a href="../index.html">andrewcrenshaw.dev</a> · 2026</p>
 </footer>
 
 <script>

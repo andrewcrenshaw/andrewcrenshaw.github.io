@@ -400,7 +400,6 @@
         <a href="#thinking">Thinking</a>
         <a href="#slf">SLF</a>
         <a href="#writing">Writing</a>
-        <a href="https://genarch.dev/architecture.html" target="_blank" rel="noopener">Architecture</a>
         <a href="https://github.com/andrewcrenshaw?tab=repositories" class="src" target="_blank" rel="noopener">Source ↗</a>
       </div>
       <div class="nav-contact">
@@ -440,7 +439,7 @@
         <canvas class="substrate" id="substrate-canvas"></canvas>
         <span class="tick tl"></span><span class="tick tr"></span>
         <span class="tick bl"></span><span class="tick br"></span>
-        <div class="plate-label">fig. 01 &middot; living memory substrate</div>
+        <div class="plate-label">fig. 01 &middot; <em>remember</em> substrate</div>
       </div>
     </div>
 
@@ -473,12 +472,12 @@
           <canvas id="plate-memory"></canvas>
           <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
         </div>
-        <h3>Living Memory &amp; Knowledge System</h3>
+        <h3>Lexenne <em>remember</em></h3>
         <p>I designed and built an agent-memory substrate: a lens-projected, provenance-tracked knowledge store where each session captures decisions and lessons that surface to the next, running on my own development fleet. Cross-session retrieval is live. The hard part is deciding what to keep, so the compounding-quality layer (forgetting, reweaving, and conflict resolution) is in active build.</p>
         <details open>
           <summary><span class="chev">›</span> Model &amp; mechanics</summary>
           <div class="det-body">
-            Running on my own fleet: Forge (TypeScript / Node / SQLite) and Strata (Python / FastAPI / Postgres + pgvector)<br />
+            Running on my own fleet: <em>create</em> (TypeScript / Node / SQLite) and Strata (Python / FastAPI / Postgres + pgvector)<br />
             Decision traces: a durable, queryable record of what was decided, why, and what was rejected (2,200+ lessons and traces captured)<br />
             Token-budgeted, lens-filtered retrieval, so the right knowledge reaches the right agent at the right moment; cross-session retrieval is live<br />
             A session digest (reduce, reflect, archive) runs after each session<br />
@@ -486,7 +485,7 @@
           </div>
         </details>
         <div style="display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:1rem;">
-          <a href="presentations/agentic-memory-architecture.html" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Deep dive: Living Memory &amp; Alexandria →</a>
+          <a href="presentations/remember-technical-overview.html" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Deep dive: <em>remember</em> →</a>
         </div>
       </div>
 
@@ -497,7 +496,7 @@
           <canvas id="plate-forge"></canvas>
           <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
         </div>
-        <h3>autogenous-synthesis Forge</h3>
+        <h3>Lexenne <em>create</em></h3>
         <p>I built a development operating system where twelve specialized agents plan, build, review, and ship code against a live backlog state machine. Agents claim work, hand off across phases without losing context, and nothing clears a phase without passing a mechanically-enforced review gate. It runs end to end on its own; I keep a single human-in-the-loop surface, deciding which work dispatches in what sequence, by design.</p>
         <details open>
           <summary><span class="chev">›</span> Stack &amp; mechanics</summary>
@@ -510,9 +509,9 @@
           </div>
         </details>
         <div style="display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:1rem;">
-          <a href="https://autogenous-synthesis.com" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">autogenous-synthesis.com ↗</a>
-          <a href="https://andrewcrenshaw.dev/autogenous-synthesis/" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Documentation ↗</a>
-          <a href="presentations/autogenous-synthesis-forge.html" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Deep dive: Forge architecture →</a>
+          <a href="https://create.lexenne.com" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">create.lexenne.com ↗</a>
+          <a href="https://lexenne.com/create" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Documentation ↗</a>
+          <a href="presentations/create-harness-engineering.html" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Deep dive: <em>create</em> architecture →</a>
         </div>
       </div>
 
@@ -669,7 +668,7 @@
         <strong style="color:var(--ink);">SPA</strong> (Sovereign Personal Agent) and <strong style="color:var(--ink);">SLF</strong> (the Substrate / Lens / Frame protocol) take the memory model behind those systems and ask who it should answer to. A person owns the substrate. Organizations and regulators read it only through the lenses they are granted. An agent acts on the person's behalf, not in place of them, and every access leaves a receipt you can audit later.
       </p>
       <p class="reveal" style="font-size:1.08rem;color:var(--ink-soft);max-width:64ch;margin-bottom:1.4rem;">
-        The substrate is built and running, as Living Memory and Alexandria. SLF and SPA are the protocol I'm proposing on top of it: the grant semantics, the audit receipts, and the recovery path are designed and written up, not yet shipped. The position paper sets out the gap and the approach, and I'd welcome the people best placed to pressure-test it.
+        The substrate is built and running, as <em>remember</em>. SLF and SPA are the protocol I'm proposing on top of it: the grant semantics, the audit receipts, and the recovery path are designed and written up, not yet shipped. The position paper sets out the gap and the approach, and I'd welcome the people best placed to pressure-test it.
       </p>
       <p class="reveal" style="font-family:ui-monospace,Menlo,monospace; font-size:0.85rem; color:var(--blue); margin-bottom:1.8rem; letter-spacing:0.01em;">render(substrate, lens, frame) &rarr; receipt</p>
 
@@ -690,14 +689,15 @@
           <span class="sheet-no">05</span>
         </div>
         <div class="index-list">
-          <a href="writing/the-loop-you-cant-outsource.html" class="index-row reveal"><span class="ix-no">01</span><span class="ix-title">The Loop You Can't Outsource</span><span class="ix-tag">Essay</span></a>
-          <a href="writing/the-memory-problem-in-multi-agent-systems.html" class="index-row reveal"><span class="ix-no">02</span><span class="ix-title">The Memory Problem in Multi-Agent Systems</span><span class="ix-tag">Essay</span></a>
-          <a href="writing/agent-memory-vs-agentic-memory.html" class="index-row reveal"><span class="ix-no">03</span><span class="ix-title">Agent Memory vs. Agentic Memory</span><span class="ix-tag">Essay</span></a>
-          <a href="writing/five-governance-patterns-for-enterprise-ai-agents.html" class="index-row reveal"><span class="ix-no">04</span><span class="ix-title">Five Governance Patterns for Enterprise AI Agents</span><span class="ix-tag">Patterns</span></a>
-          <a href="writing/rag-is-not-a-knowledge-strategy.html" class="index-row reveal"><span class="ix-no">05</span><span class="ix-title">RAG Is Not a Knowledge Strategy</span><span class="ix-tag">Essay</span></a>
-          <a href="writing/enterprise-experience-is-the-missing-ingredient.html" class="index-row reveal"><span class="ix-no">06</span><span class="ix-title">Enterprise Experience Is the Missing Ingredient</span><span class="ix-tag">Essay</span></a>
-          <a href="writing/building-an-ai-job-search-os.html" class="index-row reveal"><span class="ix-no">07</span><span class="ix-title">Building an AI Job Search OS from Scratch</span><span class="ix-tag">Build log</span></a>
-          <a href="writing/local-inference-at-the-edge.html" class="index-row reveal"><span class="ix-no">08</span><span class="ix-title">Local Inference at the Edge: A Four-Machine Fleet</span><span class="ix-tag">Build log</span></a>
+          <a href="writing/the-colleague-test.html" class="index-row reveal"><span class="ix-no">01</span><span class="ix-title">The Colleague Test</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/the-loop-you-cant-outsource.html" class="index-row reveal"><span class="ix-no">02</span><span class="ix-title">The Loop You Can't Outsource</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/the-memory-problem-in-multi-agent-systems.html" class="index-row reveal"><span class="ix-no">03</span><span class="ix-title">The Memory Problem in Multi-Agent Systems</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/agent-memory-vs-agentic-memory.html" class="index-row reveal"><span class="ix-no">04</span><span class="ix-title">Agent Memory vs. Agentic Memory</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/five-governance-patterns-for-enterprise-ai-agents.html" class="index-row reveal"><span class="ix-no">05</span><span class="ix-title">Five Governance Patterns for Enterprise AI Agents</span><span class="ix-tag">Patterns</span></a>
+          <a href="writing/rag-is-not-a-knowledge-strategy.html" class="index-row reveal"><span class="ix-no">06</span><span class="ix-title">RAG Is Not a Knowledge Strategy</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/enterprise-experience-is-the-missing-ingredient.html" class="index-row reveal"><span class="ix-no">07</span><span class="ix-title">Enterprise Experience Is the Missing Ingredient</span><span class="ix-tag">Essay</span></a>
+          <a href="writing/building-an-ai-job-search-os.html" class="index-row reveal"><span class="ix-no">08</span><span class="ix-title">Building an AI Job Search OS from Scratch</span><span class="ix-tag">Build log</span></a>
+          <a href="writing/local-inference-at-the-edge.html" class="index-row reveal"><span class="ix-no">09</span><span class="ix-title">Local Inference at the Edge: A Four-Machine Fleet</span><span class="ix-tag">Build log</span></a>
         </div>
       </div>
       <div class="tint-deepdives" id="deep-dives" style="scroll-margin-top:80px;">
@@ -706,12 +706,12 @@
           <span class="sheet-no">06</span>
         </div>
         <div class="index-list">
-          <a href="presentations/knowledge-framework-pitch.html" class="index-row reveal"><span class="ix-no">01</span><span class="ix-title">Alexandria: Compounding Knowledge Across People and Agents</span><span class="ix-tag">Strategy</span></a>
+          <a href="presentations/remember-compounding-knowledge.html" class="index-row reveal"><span class="ix-no">01</span><span class="ix-title"><em>remember</em>: Compounding Knowledge Across People and Agents</span><span class="ix-tag">Strategy</span></a>
           <a href="presentations/salesforce-ai-augmented-development.html" class="index-row reveal"><span class="ix-no">02</span><span class="ix-title">Salesforce AI-Augmented Development</span><span class="ix-tag">Strategy</span></a>
-          <a href="presentations/agentic-memory-architecture.html" class="index-row reveal"><span class="ix-no">03</span><span class="ix-title">Living Memory &amp; Alexandria: Technical Overview</span><span class="ix-tag">Architecture</span></a>
+          <a href="presentations/remember-technical-overview.html" class="index-row reveal"><span class="ix-no">03</span><span class="ix-title"><em>remember</em>: Technical Overview</span><span class="ix-tag">Architecture</span></a>
           <a href="presentations/customer-contextualization-framework.html" class="index-row reveal"><span class="ix-no">04</span><span class="ix-title">Customer Contextualization Framework</span><span class="ix-tag">Strategy</span></a>
           <a href="presentations/memory-landscape-2026.html" class="index-row reveal"><span class="ix-no">05</span><span class="ix-title">Memory, Context &amp; Graphs: The 2026 Landscape</span><span class="ix-tag">Research</span></a>
-          <a href="presentations/autogenous-synthesis-forge.html" class="index-row reveal"><span class="ix-no">06</span><span class="ix-title">autogenous-synthesis Forge: Harness Engineering for Agent-First Development</span><span class="ix-tag">Architecture</span></a>
+          <a href="presentations/create-harness-engineering.html" class="index-row reveal"><span class="ix-no">06</span><span class="ix-title"><em>create</em>: Harness Engineering for Agent-First Development</span><span class="ix-tag">Architecture</span></a>
         </div>
       </div>
     </div>
