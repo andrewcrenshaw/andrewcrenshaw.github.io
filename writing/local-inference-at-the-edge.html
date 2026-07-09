@@ -86,7 +86,7 @@
 
   <p>mini3 runs the nightly <em>remember</em> schedule, synthesis-detector, wiki-lint, link-builder, dedup, on its own hardware so it never competes with studio1's live traffic. With 64GB and a 4TB local drive for model storage, it handles librarian-curate passes that take an hour without impacting anything else on the fleet.</p>
 
-  <p><strong>Edge tier, mac-mini1 + mac-mini2</strong> (M4, 16GB each, mirrored config) serve Living Memory's near-real-time slots. Two models co-loaded per machine (~2.5 GB total):</p>
+  <p><strong>Edge tier, mac-mini1 + mac-mini2</strong> (M4, 16GB each, mirrored config) serve <em>remember</em>'s near-real-time slots. Two models co-loaded per machine (~2.5 GB total):</p>
 
   <div class="table-wrap">
     <table class="data-table">
@@ -108,7 +108,7 @@
     <table class="data-table">
       <thead><tr><th>Slot</th><th>Host</th><th>Model</th><th>Used For</th></tr></thead>
       <tbody>
-        <tr><td><code>embed-fast</code></td><td>mini1/2</td><td>snowflake-arctic-embed-l</td><td>Embeddings for Living Memory retrieval</td></tr>
+        <tr><td><code>embed-fast</code></td><td>mini1/2</td><td>snowflake-arctic-embed-l</td><td>Embeddings for <em>remember</em> retrieval</td></tr>
         <tr><td><code>extract-fast</code></td><td>mini1/2 &rarr; studio1</td><td>2B MLX-4bit &rarr; 35B MoE</td><td>Dup-check, chunk summarize, quick extraction</td></tr>
         <tr><td><code>score-fast</code></td><td>studio1</td><td>35B MoE + DFlash + continuous batching</td><td>Strata Stage 2A: fast scoring, ~290 tok/s aggregate</td></tr>
         <tr><td><code>score-deep</code></td><td>studio1</td><td>35B MoE, no DFlash</td><td>Strata Stage 2B: deep evaluation</td></tr>

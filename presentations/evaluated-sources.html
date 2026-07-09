@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Living Memory &amp; Alexandria: Evaluated Sources Supplement</title>
+  <title>remember: Evaluated Sources Supplement</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -308,7 +308,7 @@
   <h1>Evaluated Sources &amp; References</h1>
   <div class="rule"></div>
   <div class="meta">
-    <strong>Companion to:</strong> Living Memory &amp; Alexandria Technical Overview<br>
+    <strong>Companion to:</strong> <em>remember</em>: Technical Overview<br>
     <strong>Evaluation period:</strong> February 2026 &ndash; May 2026 (12+ sessions, 35+ sources)<br>
     <strong>Date:</strong> 2026-05-07 &mdash; <em>added Sentra Company Brain series, internal architectural sources, and Macmillan prior-art (UXF / ASO26 / EDR)</em>
   </div>
@@ -324,11 +324,11 @@
 
     <p>The technical overview makes claims about the state of the field, validated strengths, and gaps. This supplement provides the sources behind those claims so readers can evaluate them independently.</p>
 
-    <p>Between February and May 2026, we conducted a structured pressure-test of the Living Memory and Alexandria architecture against <strong>35+ external sources</strong> spanning academic papers, open-source projects, industry articles, and commercial products. Each source was evaluated in a dedicated document that compares its approach to ours, identifies what we should adopt, and notes where our design diverges.</p>
+    <p>Between February and May 2026, we conducted a structured pressure-test of the <em>remember</em> architecture against <strong>35+ external sources</strong> spanning academic papers, open-source projects, industry articles, and commercial products. Each source was evaluated in a dedicated document that compares its approach to ours, identifies what we should adopt, and notes where our design diverges.</p>
 
     <p>Not all original source materials are preserved (some were live demos, videos, or paywalled content). Where external links exist, they are included below so you can evaluate each source directly.</p>
 
-    <p>The May 2026 update adds three categories the earlier supplement omitted: (a) Sentra's <em>Company Brain</em> series, which crystallized substrate-vs-lens vocabulary; (b) internal architectural decision records (ADRs) and planning documents that drive the current architecture; (c) prior-art from Andrew's tenure at Macmillan Learning (UXF, ASO26 / IA-EA, EDR Decision Support), where the substrate-lens pattern shipped in production before Alexandria existed.</p>
+    <p>The May 2026 update adds three categories the earlier supplement omitted: (a) Sentra's <em>Company Brain</em> series, which crystallized substrate-vs-lens vocabulary; (b) internal architectural decision records (ADRs) and planning documents that drive the current architecture; (c) prior-art from Andrew's tenure at Macmillan Learning (UXF, ASO26 / IA-EA, EDR Decision Support), where the substrate-lens pattern shipped in production before <em>remember</em> existed.</p>
   </section>
 
   <!-- KEY CLAIMS -->
@@ -458,7 +458,7 @@
       </div>
       <div class="source-author">Cornelius (@molt_cornelius)</div>
       <div class="source-summary">24-article series on knowledge management. Article 24 ("What Search Cannot Find") crystallized the graph-vs-search distinction: search retrieves what you ask for; graph traversal discovers what you didn't know to ask. Foundation for our knowledge graph architecture.</div>
-      <div class="source-contribution">Contributed: Graph-vs-search framing, metabolism metaphor, Alexandria naming inspiration</div>
+      <div class="source-contribution">Contributed: Graph-vs-search framing, metabolism metaphor, <em>remember</em> naming inspiration</div>
     </div>
 
     <div class="source">
@@ -838,10 +838,10 @@
 
     <div class="source">
       <div class="source-header">
-        <span class="source-title">ADR &mdash; Alexandria MVP Retrieval Contract</span>
+        <span class="source-title">ADR &mdash; <em>remember</em> MVP Retrieval Contract</span>
         <span class="source-type type-internal">Internal ADR</span>
       </div>
-      <div class="source-summary">BM25 + Jaccard + session-diversity retrieval contract for Alexandria. Defines the substrate's read interface that the lens layer reads through.</div>
+      <div class="source-summary">BM25 + Jaccard + session-diversity retrieval contract for <em>remember</em>. Defines the substrate's read interface that the lens layer reads through.</div>
       <div class="source-contribution">Contributed: retrieval contract; lens layer reads through this</div>
     </div>
 
@@ -850,7 +850,7 @@
         <span class="source-title">ADR &mdash; Bi-Temporal Validity</span>
         <span class="source-type type-internal">Internal ADR</span>
       </div>
-      <div class="source-summary">Bi-temporal validity columns (valid_at, invalid_at) on Alexandria claims. Adopted from Graphiti's bi-temporal schema. Enables point-in-time queries and supersession chains. The substrate's existing state-change semantics; the typed state-change projection surfaces it as named events.</div>
+      <div class="source-summary">Bi-temporal validity columns (valid_at, invalid_at) on <em>remember</em> claims. Adopted from Graphiti's bi-temporal schema. Enables point-in-time queries and supersession chains. The substrate's existing state-change semantics; the typed state-change projection surfaces it as named events.</div>
       <div class="source-contribution">Contributed: bi-temporal validity primitive, supersession chain semantics</div>
     </div>
 
@@ -877,7 +877,7 @@
         <span class="source-title">ADR &mdash; Karpathy AgentMemory Evaluation</span>
         <span class="source-type type-internal">Internal ADR</span>
       </div>
-      <div class="source-summary">Evaluation of Karpathy's LLM Wiki / agentmemory.org against the Alexandria architecture. Source of the compounding-vs-rediscovery framing for episodic recall and the filesystem-as-LLM-OS analogy. Confirmed the substrate posture; refined the episodic-continuity tier naming.</div>
+      <div class="source-summary">Evaluation of Karpathy's LLM Wiki / agentmemory.org against the <em>remember</em> architecture. Source of the compounding-vs-rediscovery framing for episodic recall and the filesystem-as-LLM-OS analogy. Confirmed the substrate posture; refined the episodic-continuity tier naming.</div>
       <div class="source-contribution">Contributed: compounding-vs-rediscovery framing, episodic-tier validation</div>
     </div>
 
@@ -886,7 +886,7 @@
         <span class="source-title">ADR &mdash; Knowledge Ratchet Pipeline</span>
         <span class="source-type type-internal">Internal ADR</span>
       </div>
-      <div class="source-summary">The pipeline that promotes raw lessons &rarr; claims &rarr; wiki facts. The substrate's write-side discipline; complements the digestive pipeline.</div>
+      <div class="source-summary">The pipeline that promotes raw lessons &rarr; claims &rarr; wiki facts. The substrate's write-side discipline; complements the <em>reflect</em> pipeline.</div>
       <div class="source-contribution">Contributed: knowledge-ratchet promotion semantics</div>
     </div>
 
@@ -910,10 +910,10 @@
 
     <div class="source">
       <div class="source-header">
-        <span class="source-title">ADR &mdash; Alexandria Spike (April 2026)</span>
+        <span class="source-title">ADR &mdash; <em>remember</em> Spike (April 2026)</span>
         <span class="source-type type-internal">Internal ADR</span>
       </div>
-      <div class="source-summary">Alexandria architecture spike findings. Cited Graphiti's bi-temporal schema as the gold standard. Source of the storage decisions that grounded later ADRs.</div>
+      <div class="source-summary"><em>remember</em> architecture spike findings. Cited Graphiti's bi-temporal schema as the gold standard. Source of the storage decisions that grounded later ADRs.</div>
       <div class="source-contribution">Contributed: Graphiti adoption rationale, storage-shape decisions</div>
     </div>
 
@@ -946,10 +946,10 @@
 
     <div class="source">
       <div class="source-header">
-        <span class="source-title">Alexandria Document Fabric (May 2026)</span>
+        <span class="source-title"><em>remember</em> Document Fabric (May 2026)</span>
         <span class="source-type type-internal">Planning</span>
       </div>
-      <div class="source-summary">Parallel design indexing reference documents (ADRs, planning docs, design catalogs) into Alexandria. Coordinates with the substrate-lens plan on read-budget allocation.</div>
+      <div class="source-summary">Parallel design indexing reference documents (ADRs, planning docs, design catalogs) into <em>remember</em>. Coordinates with the substrate-lens plan on read-budget allocation.</div>
       <div class="source-contribution">Contributed: document-fabric retrieval strategy</div>
     </div>
   </section>
@@ -978,7 +978,7 @@
         <span class="source-type type-internal">Prior art</span>
       </div>
       <div class="source-author">Andrew Crenshaw &mdash; Macmillan Learning</div>
-      <div class="source-summary">Per-course persistent record (course + institution + time) as substrate. SFDC decision-trace objects with as-is vs as-was fields as state-change primitive in microcosm &mdash; exactly the typed event consolidation the current substrate ships in Alexandria. Sales / support / leadership dashboards as role-conditioned lenses over the same memory. The credibility artifact for substrate-lens-frame at production scale.</div>
+      <div class="source-summary">Per-course persistent record (course + institution + time) as substrate. SFDC decision-trace objects with as-is vs as-was fields as state-change primitive in microcosm &mdash; exactly the typed event consolidation the current substrate ships in <em>remember</em>. Sales / support / leadership dashboards as role-conditioned lenses over the same memory. The credibility artifact for substrate-lens-frame at production scale.</div>
       <div class="source-contribution">Contributed: state-change as first-class primitive (proven), bounded entity timeline, role-conditioned lens proof</div>
     </div>
 
@@ -988,7 +988,7 @@
         <span class="source-type type-internal">Prior art</span>
       </div>
       <div class="source-author">Andrew Crenshaw &mdash; Macmillan Learning</div>
-      <div class="source-summary">Role-conditioned decision-support surfaces (CEO vs sales vs support) over a shared memory layer. Validated that lenses don't compound restriction &mdash; wearing more lenses widens scope. The pattern that Alexandria's multi-lens UNION rule formalizes.</div>
+      <div class="source-summary">Role-conditioned decision-support surfaces (CEO vs sales vs support) over a shared memory layer. Validated that lenses don't compound restriction &mdash; wearing more lenses widens scope. The pattern that <em>remember</em>'s multi-lens UNION rule formalizes.</div>
       <div class="source-contribution">Contributed: role-conditioned-surface proof; multi-lens scope semantics</div>
     </div>
   </section>
@@ -1004,7 +1004,7 @@
         <span class="source-title">Memory Poisoning Threat Model</span>
         <span class="source-type type-internal">Internal</span>
       </div>
-      <div class="source-summary">Internal threat analysis identifying three attack vectors (direct injection, reflection poisoning, digestive pipeline injection) and the blast radius amplification from propositional framing. Led to the Memory Integrity and Trust Model ADR and Phase 1 safety roadmap.</div>
+      <div class="source-summary">Internal threat analysis identifying three attack vectors (direct injection, reflection poisoning, <em>reflect</em> pipeline injection) and the blast radius amplification from propositional framing. Led to the Memory Integrity and Trust Model ADR and Phase 1 safety roadmap.</div>
       <div class="source-contribution">Contributed: Trust tiers design, audit log requirements, security gap identification</div>
     </div>
 
