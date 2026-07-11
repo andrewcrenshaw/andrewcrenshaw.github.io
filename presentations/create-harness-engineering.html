@@ -518,6 +518,7 @@
     <li><a href="#agents">Agents</a></li>
     <li><a href="#governance">Governance</a></li>
     <li><a href="#sessions">Sessions</a></li>
+    <li><a href="#by-the-numbers">By the Numbers</a></li>
     <li><a href="#differentiators">Differentiators</a></li>
     <li><a href="../index.html#presentations" class="back-link" style="color: var(--text-faint);">Portfolio</a></li>
   </ul>
@@ -562,8 +563,8 @@
         <div class="stat-label">Tests on every submission<br>Jest · Cargo · Ruff across the fleet</div>
       </div>
       <div class="stat">
-        <div class="stat-num">6-stage</div>
-        <div class="stat-label">Review gate: Lint · Tests · Quinn<br>· Sentinel · Evelyn · Stewart</div>
+        <div class="stat-num">7-gate</div>
+        <div class="stat-label">Independent review: Lint · Tests ·<br>Security · CodeReview · Runtime · FileScope · Acceptance</div>
       </div>
     </div>
   </div>
@@ -580,16 +581,18 @@
     <h2 class="reveal">"Isn't this just a kanban board you copy-paste from?"</h2>
     <div class="rule reveal"></div>
 
-    <p class="reveal">Fair question. Most "agent frameworks" are exactly that: a UI layer over a task list, where a human reads the ticket, constructs a prompt, pastes it into an AI tool, copies the result back, and manually updates a status field. The AI is accelerating individual steps. The process is still human-driven.</p>
+    <p class="reveal">Fair question — and until earlier this week, the honest answer was "basically, yes, for the dispatch step." Reading the ticket, building the prompt, pasting it into a session, copying the result back — that was still a manual loop, same as everyone else's. That step is now fully automated. Zero copy-paste. That's the shift that actually matters: not another AI feature, but removing the human from a loop where the AI was never the bottleneck.</p>
 
-    <p class="reveal"><em>create</em> is architecturally different. The backlog is a <em>live state machine</em> with transactional guarantees. Stewart promotes intake to ready and auto-generates agent-scoped prompts. Each agent registers its session, claims work, executes under a structured SOP, runs RED→GREEN→REFACTOR, and submits for review through a single HTTP API. The human stays at cross-ticket decision boundaries — picking what to dispatch, ratifying handoffs, owning architectural calls — while the framework removes the friction inside each ticket: shared scratchpads carry context across sessions, ISC tables make "done" binary, and structured reflection captures what the next agent needs.</p>
+    <p class="reveal">Most "agent frameworks" never make that shift: a UI layer over a task list, where a human reads the ticket, constructs a prompt, pastes it into an AI tool, copies the result back, and manually updates a status field. The AI accelerates individual steps. The process is still human-driven.</p>
+
+    <p class="reveal"><em>create</em> is architecturally different. The backlog is a <em>live state machine</em> with transactional guarantees. Stewart promotes intake to ready and auto-generates agent-scoped prompts; the dispatcher launches the session directly — no clipboard, no paste. Each agent registers its session, claims work, executes under a structured SOP, runs RED→GREEN→REFACTOR, and submits for review through a single HTTP API. The human stays at cross-ticket decision boundaries — sequencing the backlog, ratifying handoffs, owning architectural calls — while the framework removes the friction inside each ticket: shared scratchpads carry context across sessions, ISC tables make "done" binary, and structured reflection captures what the next agent needs.</p>
 
     <p class="reveal">The human's role is: set direction, define acceptance criteria, and review output. Everything between is <em>create</em> — protocol, lifecycle, context, and gates.</p>
 
     <div class="callout reveal" style="margin-top: 2.5rem;">
       <span class="callout-label">The core distinction</span>
       <p><strong>AI-assisted:</strong> You use AI tools inside your existing process. Efficiency improves 10–20%. The loop is still human-driven, the context is rebuilt every prompt, and "done" is subjective.<br><br>
-      <strong><em>create</em> / AI-first:</strong> You redesign the process around agents as the primary builders. The framework handles dispatch prep, context continuity, structured handoffs between specialists, and machine-verifiable quality gates. Humans provide direction and architectural judgment. The difference is multiplicative, not additive — and it compounds because the system, scratchpads, and memory get better over time.</p>
+      <strong><em>create</em> / AI-first:</strong> You redesign the process around agents as the primary builders. The framework handles dispatch, context continuity, structured handoffs between specialists, and machine-verifiable quality gates — end to end, with zero manual copy-paste. Humans provide direction and architectural judgment. The difference is multiplicative, not additive — and it compounds because the system, scratchpads, and memory get better over time.</p>
     </div>
   </div>
 </section>
@@ -686,8 +689,8 @@
     <p class="reveal">Every backlog item moves through five stages with automated transitions. Agents claim work, the system tracks conflicts, and the human sees a real-time view of what every agent is doing and why.</p>
 
     <div class="screenshot-wrap reveal" style="margin-top: 2rem;">
-      <img src="../images/create.png" alt="Lexenne create — daily ledger dashboard showing a live backlog of 263 items">
-      <div class="screenshot-cap">LEXENNE CREATE · DAILY LEDGER · 263 ITEMS</div>
+      <img src="../images/create.png" alt="Lexenne create — daily ledger dashboard showing a live backlog of 239 items: 62 ready, 8 in progress, 115 done, 0 stuck in review">
+      <div class="screenshot-cap">LEXENNE CREATE · DAILY LEDGER · 239 ITEMS · 115 DONE · 0 IN REVIEW</div>
     </div>
 
     <div class="two-col reveal" style="margin-top: 3rem;">
@@ -731,12 +734,12 @@
     <h2 class="reveal">From plan to done — without restarts.</h2>
     <div class="rule reveal"></div>
 
-    <p class="reveal">This is the loop every <em>create</em> ticket runs through. The orchestration is structured by the <em>create</em> backbone and its dashboard, not by a single autonomous agent: tickets carry their own AC, prompt templates, and agent assignments; the dashboard auto-generates an agent-scoped prompt on status transitions; Launch and Relaunch buttons stage the prompt for one-click clipboard copy. PCC-2327 — a 5-phase DB migration that ran Remy → Alex (ADR) → Remy → Stewart → Remy — shipped through this loop without restarts or context loss. <strong>Autonomous fan-out — where a single orchestrator agent runs the whole loop unattended — is Phase 2, calendar-gated ~6 weeks out behind measured-data review of how often the operator actually wishes the system would take more action.</strong></p>
+    <p class="reveal">This is the loop every <em>create</em> ticket runs through. The orchestration is structured by the <em>create</em> backbone and its dashboard, not by a single autonomous agent: tickets carry their own AC, prompt templates, and agent assignments; the dashboard auto-generates an agent-scoped prompt on status transitions and launches the session directly — no clipboard, no manual paste. PCC-2327 — a 5-phase DB migration that ran Remy → Alex (ADR) → Remy → Stewart → Remy — shipped through this loop without restarts or context loss. <strong>Autonomous fan-out — where a single orchestrator agent runs the whole loop unattended — is landing incrementally: delegated promotion already removed the manual intake→ready→dispatch handoff, and more of Stewart's remaining load is automating out as this is written.</strong></p>
 
     <div class="big-quote reveal">"You build the system. The prompts are disposable."</div>
 
     <h3 class="reveal" style="margin-top: 2rem;">The Six Phases of the Loop</h3>
-    <p class="reveal">Every ticket runs the same six phases — from a planning agent's decomposition all the way to an automated review gate's auto-close. The dashboard owns dispatch and gating; specialists own execution; the operator clicks Launch or Relaunch.</p>
+    <p class="reveal">Every ticket runs the same six phases — from a planning agent's decomposition all the way to an automated review gate's auto-close. The dashboard owns dispatch and gating; specialists own execution; the operator sequences the backlog and reviews at decision points.</p>
 
     <div class="phase-list reveal">
       <div class="phase">
@@ -756,8 +759,8 @@
       <div class="phase">
         <div class="phase-num">P3</div>
         <div class="phase-content">
-          <h4>Dispatch — the Launch button</h4>
-          <p>The operator moves a <code>ready</code> ticket to <code>in_progress</code> in the <em>create</em> dashboard. The status transition triggers prompt generation: the dashboard composes an agent-scoped prompt from the ticket's AC, file references, prompt template, and constraints — and stages it for the Launch button. <strong>One click on Launch copies the prompt to the clipboard.</strong> The operator pastes it into a fresh Claude session.</p>
+          <h4>Dispatch — Automatic, Zero Copy-Paste</h4>
+          <p>Delegated promotion moves a <code>ready</code> ticket to <code>in_progress</code> automatically. The transition triggers prompt generation: the dashboard composes an agent-scoped prompt from the ticket's AC, file references, prompt template, and constraints — and launches the session directly. Until earlier this week this was a manual step: click Launch, copy the prompt, paste it into a fresh session. <strong>That hand-off is now fully automated. Zero copy-paste.</strong></p>
           <div class="code-block" style="margin-top: 0.75rem;">
             <span class="code-label">Auto-staged prompt (excerpt — what Launch copies)</span>
 <pre><span class="hl-key">Agent:</span>    <span class="hl-str">bob</span>
@@ -780,21 +783,21 @@
         <div class="phase-num">P5</div>
         <div class="phase-content">
           <h4>Automated Review Gates</h4>
-          <p>Submission to <code>review</code> triggers a multi-stage gate that runs without operator intervention: ESLint (TypeScript), Ruff (Python), Cargo (Rust), 1,000+ Jest suites, Evelyn's eval (machine-verifiable AC check, validated end to end), Quinn (code review SOP), Sentinel (security review where applicable), and Stewart's pre-commit gate. Every gate is binary and audit-logged.</p>
+          <p>Submission to <code>review</code> triggers a multi-stage gate that runs without operator intervention: ESLint (TypeScript), Ruff (Python), Cargo (Rust), 2,000+ Jest/Cargo/Ruff tests across the fleet, Evelyn's eval (machine-verifiable AC check, validated end to end), Quinn (code review SOP), Sentinel (security review where applicable), and Stewart's pre-commit gate — seven independent gates in all. Every gate is binary and audit-logged.</p>
         </div>
       </div>
       <div class="phase">
         <div class="phase-num">P6</div>
         <div class="phase-content">
-          <h4>Done — or Relaunch</h4>
-          <p><strong>Pass:</strong> the ticket auto-closes to <code>done</code>. The operator is notified but does not click anything. <strong>Fail:</strong> the ticket flips back to <code>in_progress</code> and a Relaunch button appears, staging a "fix it" prompt that names the failed gate (which ISC row, which lint rule, which test) and the specific correction needed. <strong>One click on Relaunch copies it to the clipboard.</strong> The operator pastes it into the existing agent session — work continues, no restart.</p>
+          <h4>Done — or Auto-Relaunch</h4>
+          <p><strong>Pass:</strong> the ticket auto-closes to <code>done</code>. The operator is notified but does not click anything. <strong>Fail:</strong> the ticket flips back to <code>in_progress</code> and the dispatcher automatically relaunches the same agent session with a structured fix-it prompt that names the failed gate (which ISC row, which lint rule, which test) and the specific correction needed — up to a capped number of retries before it escalates to a human. No restart, no manual paste.</p>
         </div>
       </div>
     </div>
 
     <div class="callout success reveal" style="margin-top: 2rem;">
-      <span class="callout-label">The Recovery Loop — What makes this not copy-paste</span>
-      <p>When a review gate fails, the answer is never "try rephrasing the prompt." The <em>create</em> dashboard composes a structured Relaunch prompt that names the failed gate (which ISC row, which lint rule, which test, which review note), states the specific correction needed, and re-attaches the original context. One click copies it to the clipboard; the operator pastes it into the same agent session to continue. This is structured error correction — a rule-based recovery loop with an ISC-anchored bar, not vibes — and it is what makes the framework converge instead of spin.</p>
+      <span class="callout-label">The Recovery Loop — Why this isn't copy-paste</span>
+      <p>When a review gate fails, the answer is never "try rephrasing the prompt." The <em>create</em> dashboard composes a structured Relaunch prompt that names the failed gate (which ISC row, which lint rule, which test, which review note), states the specific correction needed, re-attaches the original context, and relaunches the same agent session automatically — no click, no clipboard, no manual paste. This is structured error correction — a rule-based recovery loop with an ISC-anchored bar, not vibes — and it is what makes the framework converge instead of spin.</p>
     </div>
   </div>
 </section>
@@ -1031,7 +1034,8 @@
 
 <span class="hl-comment"># Covers: core API unit tests, hook validation,
 # steward guardrails, approval queue, skill triggers,
-# architecture boundary checks — 150+ suites</span></pre>
+# architecture boundary checks — 150+ suites in this
+# fast gate (2,000+ across the full fleet suite)</span></pre>
         </div>
         <div class="callout" style="margin-top: 1rem;">
           <span class="callout-label">No stubs in production code</span>
@@ -1083,6 +1087,70 @@
 <div class="divider"></div>
 
 <!-- ═══════════════════════════════════════════════════════
+     PROVEN AT SCALE — GTM GRADING DATA
+═══════════════════════════════════════════════════════ -->
+<section id="by-the-numbers" class="section">
+  <div class="section-inner wide">
+    <div class="section-label reveal">Proven at Scale</div>
+    <h2 class="reveal">100 days of production data, not a demo.</h2>
+    <div class="rule reveal"></div>
+
+    <p class="reveal">Every number below comes from the live ticket archive and git history — 1,604 accepted changes across 8 repositories, April 1 through July 11, 2026 — graded against <a href="https://addyo.substack.com/p/agentic-autonomy-levels" target="_blank" rel="noopener" style="color: var(--accent);">Addy Osmani's agentic-autonomy framework</a>. <em>create</em> lands as a real Level 5 system: managed by exception, not managed by hand.</p>
+
+    <div class="stat-strip reveal" style="margin-top: 2rem;">
+      <div class="stat">
+        <div class="stat-num">1,604+</div>
+        <div class="stat-label">Production changes accepted<br>across 8 repos, first 100 days</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">96.6%</div>
+        <div class="stat-label">Autonomous close rate<br>June steady state, zero human touch</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">27.7</div>
+        <div class="stat-label">Accepted changes per<br>human intervention</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">77.9%</div>
+        <div class="stat-label">First-pass acceptance<br>loops bounded, always converge</div>
+      </div>
+    </div>
+
+    <div class="card-grid reveal" style="margin-top: 1.5rem;">
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-gauge"></i></span>
+        <h3>Median 25h, Ticket to Merged</h3>
+        <p>Median lead time from filed to verified-merged is 25 hours (queue time included by design — the backlog is a prioritized buffer). Median agent-active cycle time is 5.2 hours.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-recycle"></i></span>
+        <h3>The Factory Fixes Itself</h3>
+        <p>10% of all throughput is defect-repair on the system's own output — filed, dispatched, and verified by the same pipeline that shipped the original change. Most agentic tooling can't claim this.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-arrow-counter-clockwise"></i></span>
+        <h3>Reversibility Is Drilled</h3>
+        <p>28 reverts executed in 60 days against 352 merges — zero lost work. Every agent works in an isolated, detached worktree; nothing lands on main without integration.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon"><i class="ph ph-shield-check"></i></span>
+        <h3>A Third of Work Self-Corrects</h3>
+        <p>33% of all tickets receive automated review feedback and get caught and corrected before a human would ever have seen them — across 7 independent gates run by a separate grading process, not agent self-report.</p>
+      </div>
+    </div>
+
+    <div class="callout success reveal" style="margin-top: 2rem;">
+      <span class="callout-label">Already moving past this snapshot</span>
+      <p>These numbers are already conservative: <em>create</em> is more automated today than when this data was captured. Early July stacked a lot of concurrent work — hardening the security gates, delegating more of Stewart's promotion and dispatch load, and separating <em>create</em> from <em>remember</em> into standalone repos — and threading that many initiatives at once took a deliberate slow-walk rather than a rush. We're re-grading in about a week, once the current wave lands and the new numbers stabilize under continued use.</p>
+    </div>
+
+    <p class="reveal" style="margin-top: 1.5rem; font-size: 0.78rem; color: var(--text-faint);">Source: internal GTM grading report, 2026-07-11 — 1,604-item ticket archive, live backlog API, 60-day git history. Re-grading in ~1 week as delegated dispatch and other in-flight automation stabilize; cost-per-change and defect-escape metrics are in build.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
      DIFFERENTIATORS
 ═══════════════════════════════════════════════════════ -->
 <section id="differentiators" class="section">
@@ -1102,7 +1170,7 @@
           <tr>
             <td>Task Orchestration</td>
             <td class="dim">Human reads ticket, constructs prompt, pastes into AI tool, copies output back. Human is the message bus.</td>
-            <td class="bright">Stewart auto-generates agent-scoped prompts with binary AC. The operator dispatches across parallel sessions; structured handoff signatures let specialists pick up mid-ticket without restart. Evelyn runs at submission against the ISC table.</td>
+            <td class="bright">Stewart auto-generates agent-scoped prompts with binary AC and dispatches them automatically across parallel sessions — zero manual copy-paste. Structured handoff signatures let specialists pick up mid-ticket without restart. Evelyn runs at submission against the ISC table.</td>
           </tr>
           <tr>
             <td>State Management</td>
@@ -1122,7 +1190,7 @@
           <tr>
             <td>Quality Gates</td>
             <td class="dim">Subjective review. "Does this look right?" Human checks everything.</td>
-            <td class="bright">ISC acceptance criteria (binary pass/fail). Verification gate runs 150+ test suites. Evelyn auto-approves routine completions. Human reviews only genuinely ambiguous decisions.</td>
+            <td class="bright">ISC acceptance criteria (binary pass/fail). Fast verification gate runs 150+ suites (2,000+ across the full fleet). Evelyn auto-approves routine completions. Human reviews only genuinely ambiguous decisions.</td>
           </tr>
           <tr>
             <td>Context Continuity</td>
@@ -1147,7 +1215,7 @@
           <tr>
             <td>Skill Routing</td>
             <td class="dim">Human decides which AI tool to use for each task. Manual prompt-engineering every time.</td>
-            <td class="bright">12 specialist agents with keyword-triggered SKILL.md activation. Stewart assigns the right specialist when promoting a ticket to ready; the dashboard auto-generates an agent-scoped prompt at the ready→in-progress transition; one click on Launch copies it to the clipboard. No manual prompt engineering.</td>
+            <td class="bright">12 specialist agents with keyword-triggered SKILL.md activation. Stewart assigns the right specialist when promoting a ticket to ready; the dashboard auto-generates an agent-scoped prompt and launches the session automatically at the ready→in-progress transition. No manual prompt engineering, no copy-paste.</td>
           </tr>
         </tbody>
       </table>
@@ -1195,7 +1263,7 @@
     <div class="rule center reveal"></div>
     <h2 class="reveal">The harness is the product.</h2>
     <p class="reveal" style="margin: 0 auto 2rem; text-align: center;">
-      <em>create</em> is not a collection of prompts and a kanban board. It is a purpose-built engineering system designed to make agent-first development reliable, auditable, and continuously improving. Every component — the session protocol, the approval queue, the work packages, the Launch / Relaunch dispatch loop, the TDD enforcement, the scratchpad continuity — exists to answer one question: <em>what capability is missing, and how do we make it legible to the agent?</em>
+      <em>create</em> is not a collection of prompts and a kanban board. It is a purpose-built engineering system designed to make agent-first development reliable, auditable, and continuously improving. Every component — the session protocol, the approval queue, the work packages, the automated Launch / Relaunch dispatch loop, the TDD enforcement, the scratchpad continuity — exists to answer one question: <em>what capability is missing, and how do we make it legible to the agent?</em>
     </p>
     <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-top: 2rem;" class="reveal">
       <a href="../index.html#work" style="font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:0.8rem 2rem;border-radius:6px;background:var(--accent);color:var(--bg);transition:all 0.3s var(--ease);">Back to Portfolio</a>
