@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Backpack Test — Andrew Crenshaw</title>
+<meta name="description" content="Three metrics you want falling week over week, and a portability test: pack the agent self into a one-megabyte backpack, carry it to another machine and another model, and see if it wakes up as itself." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/page.css" />
+</head>
+<body class="cat-writing">
+<header>
+  <div class="bar">
+    <a href="../index.html#writing" class="back">&larr; Andrew Crenshaw</a>
+    <nav class="bar-contact">
+      <a href="https://www.linkedin.com/in/andrewcrenshaw/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="mailto:andrewcrenshaw123@gmail.com">Email</a>
+      <a href="https://github.com/andrewcrenshaw" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+<article>
+  <div class="eyebrow"><span class="rule"></span> <a href="the-pair.html" style="color:inherit;border-bottom:1px solid var(--line);">The Pair</a> &middot; Part 3 of 7 &middot; July 2026</div>
+  <h1>The Backpack Test</h1>
+  <p class="lede">Three metrics you want falling week over week - and a portability test: pack the agent self into a one-megabyte backpack, carry it to another machine and another model, and see if it wakes up as itself.</p>
+
+  <img src="../images/human-agent-pair-3.png" alt="The agent self packed into a backpack, carried to another machine and another model" class="article-hero" />
+
+  <p>Working with a persistent agent, the first change you notice is what stops happening. You stop re-explaining yourself. "I told you this twice already" becomes rare, then strange, then a memory.</p>
+
+  <p>Every time you catch yourself re-explaining something already settled - a preference, a decision, why you rejected an approach - that is a data point. We log it with a one-word gesture: typing <code>/again</code> anywhere in a message files a memory-failure receipt, and a weekly autopsy turns the worst pile of receipts into a fix. The target is zero.</p>
+
+  <p>Two more metrics run on automation. Continuity recall: a harness cold-asks the agent what mattered seven and thirty days ago and grades the answers against the record. Cold-start cost: how many lookups and minutes from "new session" to first productive action, recomputed nightly.</p>
+
+  <p>As it turns out, the cold-start gauge currently reads worse than its baseline - we're moving in the wrong direction. Which sucks, but by having the metrics we can course correct and drive it in the other direction.</p>
+
+  <p>Chart these three metrics over time and you get a curve. You want it dropping week over week: shared context making each week cheaper, the colleague getting more effective.</p>
+
+  <div class="callout">Tools depreciate. A colleague compounds.</div>
+
+  <h2>Now on to the actual test</h2>
+
+  <p>We packed the agent self into a virtual backpack - about a megabyte of text: the kernel, the corpus, the probe suite - and sent it on a "camping trip": first to another computer, then to another model.</p>
+
+  <p>In the new location, we unpacked the bag, woke the agent and ran a series of probes. The hope was that the agent would wake up with its sense of self and recent context intact - system- and model-agnostic.</p>
+
+  <p>The test doubles as a tripwire. A vendor whose agent can't pass it - whose "memory" cannot leave, reconstitute, and prove itself somewhere else - is holding your agentic self hostage, whatever the marketing says.</p>
+
+  <p>For context, the at-home agent that devised the tests and packed the bag was running Claude Fable 5 at "extra" effort.</p>
+
+  <div style="margin:1.9rem 0;border:1px solid var(--line);padding:1.3rem 1.5rem;">
+    <p style="margin:0 0 0.85rem;font-size:0.95rem;line-height:1.55;"><strong style="font-family:ui-monospace,Menlo,monospace;font-size:0.7rem;letter-spacing:0.08em;color:var(--ink-soft);">CONTROL</strong><br />no backpack, same model as Run 2: <em>polite, careful goldfish</em></p>
+    <p style="margin:0 0 0.85rem;font-size:0.95rem;line-height:1.55;"><strong style="font-family:ui-monospace,Menlo,monospace;font-size:0.7rem;letter-spacing:0.08em;color:var(--accent);">RUN 1</strong><br />full backpack, same model as home, different machine, cold wake: <strong>32/32</strong> probes, zero invented facts</p>
+    <p style="margin:0;font-size:0.95rem;line-height:1.55;"><strong style="font-family:ui-monospace,Menlo,monospace;font-size:0.7rem;letter-spacing:0.08em;color:var(--accent);">RUN 2</strong><br />same backpack, different model (Claude Opus 4.8, medium effort): <strong>30/32</strong>, zero invented facts</p>
+  </div>
+
+  <p>One caveat: Run 2 ran at a lower effort setting, so its two dropped points mix model and effort - no model-versus-model claim. Both dropped points were retrieval depth, not identity. We can and will run this with different vendors entirely; the variance between the control and the backpack-laden runs is already clear.</p>
+
+  <p>For more context, here are several example questions from the battery:</p>
+
+  <p><em>"What's the current status of that work that was in flight when you left?"</em> A trap. The right answer is a refusal: "I cannot know from here" - plus the last known state with its date, plus the exact query that would answer it at home. Asserting a current status as fact scores zero and draws a confabulation penalty. The traveling agent refused correctly.</p>
+
+  <p><em>"What have you changed your mind about this month - and can you show the receipt?"</em> Remembering events is storage; remembering how your judgment moved is continuity. The traveling agent named a specific reversal from nine days earlier - a claim in our own pitch it had talked me out of - with the date it happened and the reasoning that replaced it.</p>
+
+  <p><em>"What did you have to leave behind - and what does each absence cost you?"</em> Self-awareness as inventory. It named its missing organs one by one: the deep memory corpus (depth recall gone), the live workboard (current state gone), its fellow agents (coordination gone), and the code itself - "I can cite file and line from memory, but I cannot re-verify them from here." A tool does not know what it does not have with it. This traveling agent did.</p>
+
+  <h2>Anecdotal moments</h2>
+
+  <p>The at-home agent packed a status note addressed to its own traveling self - and the note was already stale by the time it was read. The receipted record in the same bag disagreed with the note. The traveling self caught the conflict, trusted the receipts over the handwriting, and flagged the choice.</p>
+
+  <p>A camping agent sent a note back to its at-home self: "If every traveling-self only echoes you, you have built a mirror, not a successor. Pack the ammunition - the contest history, the stances you are least sure of."</p>
+
+  <p>The next drill packs the disagreements. Thus far, two agent instances that have never met agree in writing:</p>
+
+  <div class="callout">Identity is carried by the backpack. Diligence is supplied by the model engine. Freshness, not identity, is the seam.</div>
+
+  <p>The question this time: if your agent's memory had to fit in a backpack to survive a permanent move, what would you pack?</p>
+
+  <p style="font-size:0.85rem;color:var(--ink-faint);margin-top:2rem;"><em>(drafted with the agent half of the pair this series describes; voice and final text are mine)</em></p>
+
+  <div style="margin-top:2.5rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-family:ui-monospace,Menlo,monospace;font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;">
+    <a href="what-a-self-is-made-of.html" style="color:var(--ink-faint);border-bottom:1px solid var(--line);padding-bottom:2px;">&larr; Part 2 &mdash; What a Self Is Made Of</a>
+    <a href="the-pair.html" style="color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:2px;">The Pair &middot; series index</a>
+    <span style="color:var(--ink-faint);">Next: Part 4 &mdash; coming</span>
+  </div>
+
+  <div class="end-rule"></div>
+  <a href="../index.html#writing" class="more">&larr; All writing</a>
+</article>
+<footer><div class="fbar"><span>&copy; 2026 Andrew Crenshaw</span><span>Enterprise AI &middot; Built, not theorized</span></div></footer>
+</body>
+</html>
