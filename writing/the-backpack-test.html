@@ -55,7 +55,7 @@
 
   <p>Two more metrics run on automation. Continuity recall: a harness cold-asks the agent what mattered seven and thirty days ago and grades the answers against the record. Cold-start cost: how many lookups and minutes from "new session" to first productive action, recomputed nightly.</p>
 
-  <p>As it turns out, the cold-start gauge currently reads worse than its baseline - we're moving in the wrong direction. Which sucks, but by having the metrics we can course correct and drive it in the other direction.</p>
+  <p>When this gauge first went live it read worse than its baseline - we were moving in the wrong direction. Which sucked. But that's what the metric is for: it surfaced the drift, we course-corrected, and last night's recompute has the median at 4 lookups against a baseline of roughly 10.</p>
 
   <p>Chart these three metrics over time and you get a curve. You want it dropping week over week: shared context making each week cheaper, the colleague getting more effective.</p>
 
