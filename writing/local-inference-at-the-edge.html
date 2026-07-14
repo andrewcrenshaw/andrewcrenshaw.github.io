@@ -9,6 +9,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../assets/page.css" />
+<link rel="canonical" href="https://andrewcrenshaw.dev/writing/local-inference-at-the-edge.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Local Inference at the Edge: A Four-Machine Fleet",
+  "author": { "@type": "Person", "name": "Andrew Crenshaw", "url": "https://andrewcrenshaw.dev" },
+  "datePublished": "2026-07-09",
+  "description": "From two Mac Minis to a four-machine Apple Silicon cluster: schedule-driven model switching, oMLX routing, and local inference wired into every layer of the stack.",
+  "url": "https://andrewcrenshaw.dev/writing/local-inference-at-the-edge.html"
+}
+</script>
 </head>
 <body class="cat-writing">
 <header>
@@ -24,6 +36,7 @@
 <article>
   <div class="eyebrow"><span class="rule"></span> Build log &middot; Updated May 2026</div>
   <h1>Local Inference at the Edge: A Four-Machine Fleet</h1>
+  <p class="answer"><strong>Local inference at the edge</strong> means serving AI models on hardware you own instead of renting them through an API: this is a four-machine Apple Silicon cluster running oMLX, tiered by capability, with shadow-mode calibration proving each local model matches cloud quality before it earns production traffic.</p>
   <p class="lede">From two Mac Minis to a four-machine Apple Silicon cluster: schedule-driven model switching, oMLX routing, and what it looks like to wire local inference into every layer of the stack.</p>
 
   <p>Every conversation about running local AI eventually hits the same question: <em>why bother?</em></p>
@@ -34,7 +47,7 @@
 
   <p>So I built a four-machine cluster, three Mac Minis and a Mac Studio, running local model inference on Apple Silicon via oMLX. Here's what the setup looks like today and what I've learned from running it.</p>
 
-  <h3>The infrastructure</h3>
+  <h3>What does the four-machine fleet look like?</h3>
 
   <div class="table-wrap">
     <table class="data-table">
@@ -52,7 +65,7 @@
 
   <p>Inference runs as <code>launchd</code> daemons, macOS's native service manager. They start on boot, restart on crash, and log to standard locations. No Docker, no Kubernetes, no orchestration layer. The infrastructure should be proportional to the actual complexity.</p>
 
-  <h3>The inference engine: oMLX, not Ollama or vanilla MLX</h3>
+  <h3>Why oMLX instead of Ollama or vanilla MLX?</h3>
 
   <p>The serving runtime matters more than I expected. The fleet runs <strong>oMLX 0.3.8</strong>, a purpose-built Mac inference server that's distinct from both Apple's MLX framework and Ollama. The difference: oMLX adds DFlash (token-budget-aware attention caching for single-request throughput), TurboQuant (dynamic quantization at high context lengths), and continuous-batching profiles for multi-agent fan-out. It exposes an OpenAI-compatible API on port 8000, which means any client that speaks that protocol can route to it.</p>
 
@@ -100,7 +113,7 @@
 
   <p>The edge machines exist for one reason: isolation. When an agent is actively coding and a duplicate-check fires, I want a sub-3s response regardless of what studio1 is doing (which might be a long synthesis job or a Strata batch run). mini1 is primary, mini2 is immediate failover. Resolver routes <code>extract-fast</code> and <code>embed-fast</code> to the edge tier first; falls back to studio1 only if both edge machines are unreachable.</p>
 
-  <h3>The slot layer: how applications talk to the fleet</h3>
+  <h3>How do applications talk to the fleet?</h3>
 
   <p>Application code doesn't call specific models or machines, it calls <em>slots</em>. The role-resolver maps each slot to a <code>(model_name, profile, host)</code> tuple at runtime. Change the binding, not the code.</p>
 
@@ -123,7 +136,7 @@
 
   <p><em>remember</em>'s knowledge operations, session priming, daily digests, knowledge queries, route to mini3 and studio1 via the same slot abstraction. When mini3 is running a long librarian pass, studio1's live-traffic capacity is untouched. Retrieval happens locally against SQLite/LanceDB on the calling machine; the LLM only runs for synthesis steps that actually need it.</p>
 
-  <h3>Shadow-mode calibration</h3>
+  <h3>What is shadow-mode calibration?</h3>
 
   <p>Here's the part most teams skip. You can't just deploy a local model and hope it's "good enough." You need <em>data</em> proving it.</p>
 
