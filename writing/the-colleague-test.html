@@ -9,6 +9,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../assets/page.css" />
+<link rel="canonical" href="https://andrewcrenshaw.dev/writing/the-colleague-test.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The Colleague Test",
+  "author": { "@type": "Person", "name": "Andrew Crenshaw", "url": "https://andrewcrenshaw.dev" },
+  "datePublished": "2026-07-08",
+  "description": "The colleague test: whether an AI agent can resume a week-old conversation without re-explanation, and why the human-agent pair is the shape that passes it.",
+  "articleSection": "The Pair (Part 1 of 7)",
+  "url": "https://andrewcrenshaw.dev/writing/the-colleague-test.html",
+  "mainEntity": {
+    "@type": "DefinedTerm",
+    "name": "The Colleague Test",
+    "description": "A simple bar for any AI agent: pick up a week-old conversation mid-thought and see whether it still holds the shared context, what you decided, what you rejected, what you were worried about, without making you re-explain. Almost nothing passes it."
+  }
+}
+</script>
 </head>
 <body class="cat-writing">
 <header>
@@ -24,6 +42,7 @@
 <article>
   <div class="eyebrow"><span class="rule"></span> <a href="the-pair.html" style="color:inherit;border-bottom:1px solid var(--line);">The Pair</a> &middot; Part 1 of 7 &middot; July 2026</div>
   <h1>The Colleague Test</h1>
+  <p class="answer">The <strong>colleague test</strong> is a simple bar for any AI agent: pick up a week-old conversation mid-thought and see whether it still holds the shared context (what you decided, what you rejected, what you were worried about) without making you re-explain. Almost nothing passes it.</p>
   <p class="lede">Memory is the most crowded corner of the agent world, and almost none of it can do the one thing a colleague does: hold the running state of a shared history, so you never have to re-explain yourself.</p>
 
   <img src="../images/human-agent-pair.png" alt="A human and a persistent AI agent, paired for the long term" class="article-hero" />
@@ -33,6 +52,8 @@
   <p>The bar is higher than "can it search the transcript." The question is whether it holds the context the way a colleague holds it - what we decided, what we rejected, what I was worried about, what has changed since.</p>
 
   <p>Nearly everything fails this test. Which is strange, because memory is one of the most crowded corners of the agent world right now.</p>
+
+  <h2>Why doesn't better memory tooling pass the colleague test?</h2>
 
   <p>If you work with agents you have been following along as the ladder is climbed: bigger context windows, RAG over your notes, vector stores, memory plugins, scratchpads, and at the enterprise end the company brain - one shared knowledge base every agent in the org can read. Each rung is a step up. I use most of them daily.</p>
 
@@ -58,7 +79,7 @@
 
   <p>A two-hundred-dollar-a-month AI model is a useful subscription. An always-on colleague - as Mastercard reminds us - is priceless.</p>
 
-  <h2>The Pair</h2>
+  <h2>What is a human-agent pair?</h2>
 
   <p>This is the coalescing shape, and the thread that will run through this series: a pair is one human plus one persistent agent, aligned, partnered, paired long-term. The agent brings parallelism, total recall, and a receipt for everything it believes. The human brings judgment, legal standing, and the why.</p>
 

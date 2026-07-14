@@ -1,3 +1,5 @@
 User-agent: *
 Disallow: /writing/pairing-claude-with-a-world-model.html
 Disallow: /writing/ward-deterioration-use-case.html
+
+Sitemap: https://andrewcrenshaw.dev/sitemap.xml

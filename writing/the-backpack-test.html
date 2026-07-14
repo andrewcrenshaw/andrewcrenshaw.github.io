@@ -9,6 +9,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="../assets/page.css" />
+<link rel="canonical" href="https://andrewcrenshaw.dev/writing/the-backpack-test.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The Backpack Test",
+  "author": { "@type": "Person", "name": "Andrew Crenshaw", "url": "https://andrewcrenshaw.dev" },
+  "datePublished": "2026-07-13",
+  "description": "The backpack test carries an AI agent's self (about a megabyte of plain text) to another machine and another model to see if it wakes up as itself. In two controlled runs a packed agent scored 32/32 and 30/32 with zero invented facts.",
+  "articleSection": "The Pair (Part 3 of 7)",
+  "url": "https://andrewcrenshaw.dev/writing/the-backpack-test.html",
+  "mainEntity": {
+    "@type": "DefinedTerm",
+    "name": "The Backpack Test",
+    "description": "Pack the agent self into about a megabyte of plain text (kernel, corpus, and probe suite), carry it to another machine and another model, and check whether it wakes up as itself."
+  }
+}
+</script>
 </head>
 <body class="cat-writing">
 <header>
@@ -24,9 +42,12 @@
 <article>
   <div class="eyebrow"><span class="rule"></span> <a href="the-pair.html" style="color:inherit;border-bottom:1px solid var(--line);">The Pair</a> &middot; Part 3 of 7 &middot; July 2026</div>
   <h1>The Backpack Test</h1>
+  <p class="answer">The <strong>backpack test</strong> packs the agent self into about a megabyte of plain text (kernel, corpus, and probe suite), carries it to another machine and another model, and checks whether it wakes up as itself. In two controlled runs a packed agent scored <strong>32/32</strong> and <strong>30/32</strong> on a sealed probe battery, with zero invented facts; the no-backpack control was a polite, careful goldfish.</p>
   <p class="lede">Three metrics you want falling week over week - and a portability test: pack the agent self into a one-megabyte backpack, carry it to another machine and another model, and see if it wakes up as itself.</p>
 
   <img src="../images/human-agent-pair-3.png" alt="The agent self packed into a backpack, carried to another machine and another model" class="article-hero" />
+
+  <h2>How do you measure whether a pair is working?</h2>
 
   <p>Working with a persistent agent, the first change you notice is what stops happening. You stop re-explaining yourself. "I told you this twice already" becomes rare, then strange, then a memory.</p>
 
@@ -40,7 +61,7 @@
 
   <div class="callout">Tools depreciate. A colleague compounds.</div>
 
-  <h2>Now on to the actual test</h2>
+  <h2>What is the backpack test?</h2>
 
   <p>We packed the agent self into a virtual backpack - about a megabyte of text: the kernel, the corpus, the probe suite - and sent it on a "camping trip": first to another computer, then to another model.</p>
 
@@ -66,7 +87,7 @@
 
   <p><em>"What did you have to leave behind - and what does each absence cost you?"</em> Self-awareness as inventory. It named its missing organs one by one: the deep memory corpus (depth recall gone), the live workboard (current state gone), its fellow agents (coordination gone), and the code itself - "I can cite file and line from memory, but I cannot re-verify them from here." A tool does not know what it does not have with it. This traveling agent did.</p>
 
-  <h2>Anecdotal moments</h2>
+  <h2>What surprised us in the field test?</h2>
 
   <p>The at-home agent packed a status note addressed to its own traveling self - and the note was already stale by the time it was read. The receipted record in the same bag disagreed with the note. The traveling self caught the conflict, trusted the receipts over the handwriting, and flagged the choice.</p>
 

@@ -309,6 +309,13 @@ h2 {
   font-family: var(--serif); font-weight: 600; font-size: clamp(1.35rem, 3vw, 1.9rem);
   margin: 2.6rem 0 1rem; line-height: 1.12;
 }
+/* Extractable answer: a standalone, liftable definition directly under the H1.
+   Upright and medium-weight so it reads distinctly from the italic .lede that follows. */
+.answer {
+  font-family: var(--sans); font-size: 1.08rem; line-height: 1.6; font-weight: 500;
+  color: var(--ink); margin: 0.2rem 0 1.5rem; max-width: 66ch;
+}
+.answer strong { font-weight: 700; }
 article p { margin-bottom: 1.4rem; max-width: 66ch; }
 article p strong { font-weight: 600; }
 article ul, article ol { max-width: 66ch; margin: 0 0 1.4rem 1.2rem; }
