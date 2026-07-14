@@ -551,7 +551,7 @@
 
     <div class="stat-strip reveal rd4">
       <div class="stat">
-        <div class="stat-num">9</div>
+        <div class="stat-num">10</div>
         <div class="stat-label">Specialized<br>agent skills</div>
       </div>
       <div class="stat">
@@ -748,7 +748,7 @@
         <div class="phase-num">P1</div>
         <div class="phase-content">
           <h4>Plan & Decompose</h4>
-          <p>Alex, the architect, reads the goal and produces a structured plan covering architecture and requirements. The plan is filed as one or more <em>create</em> tickets via the API — each with a scoped AC table, an agent assignment (Bob, Tessa, Remy, etc.), and the prompt template appropriate to that specialist's SOP.</p>
+          <p>A planning agent (Alex for architecture, Bea for product requirements) reads the goal and produces a structured plan. The plan is filed as one or more <em>create</em> tickets via the API — each with a scoped AC table, an agent assignment (Bob, Tessa, Bea, Remy, etc.), and the prompt template appropriate to that specialist's SOP.</p>
         </div>
       </div>
       <div class="phase">
@@ -812,7 +812,7 @@
 <section id="agents" class="section">
   <div class="section-inner">
     <div class="section-label reveal">The Agent Network</div>
-    <h2 class="reveal">9 specialists. Auto-routed. Skill-aware.</h2>
+    <h2 class="reveal">10 specialists. Auto-routed. Skill-aware.</h2>
     <div class="rule reveal"></div>
 
     <p class="reveal"><em>create</em> doesn't have a single "AI assistant." It has a network of specialized agents, each with their own SKILL.md that defines triggers, guardrails, sub-skills, and output formats. Routing is automatic — the right agent activates based on context keywords, not manual selection. And the skills aren't frozen: each one is continually evaluated and refined as the fleet learns what works, so the agents get sharper over time rather than drifting stale.</p>
@@ -824,9 +824,14 @@
         <div class="agent-desc">Backlog prioritization, sprint planning, collision detection, dependency tracking. Promotes intake to ready with verified AC.</div>
       </div>
       <div class="agent-card">
+        <div class="agent-name">Bea</div>
+        <div class="agent-role">Business Analyst</div>
+        <div class="agent-desc">Requirements framing, PRDs, stakeholder analysis, fit-gap. Owns documentation and keeps the record legible to the next agent.</div>
+      </div>
+      <div class="agent-card">
         <div class="agent-name">Alex</div>
         <div class="agent-role">Architect</div>
-        <div class="agent-desc">Requirements framing, solution design, ADRs, integration architecture. Turns intent into scoped, implementation-ready tickets with risk assessment.</div>
+        <div class="agent-desc">Solution design, ADRs, integration architecture, trade-off analysis. Produces implementation-ready designs with risk assessment.</div>
       </div>
       <div class="agent-card">
         <div class="agent-name">Bob</div>
@@ -867,7 +872,7 @@
 
     <div class="callout reveal" style="margin-top: 2rem;">
       <span class="callout-label">Auto-Routing — How skills activate</span>
-      <p>Skills don't require manual selection. Keywords in context trigger the right agent automatically: "architecture" / "ADR" / "requirements" → Alex · "debug" / "error" → Doug · "test" / "coverage" → Tessa · "security" / "audit" → Sentinel · "review" → Quinn. Each SKILL.md defines its trigger set, output format, and what it must not do — the three components that make routing reliable rather than hopeful.</p>
+      <p>Skills don't require manual selection. Keywords in context trigger the right agent automatically: "requirements" → Bea · "architecture" / "ADR" → Alex · "debug" / "error" → Doug · "test" / "coverage" → Tessa · "security" / "audit" → Sentinel · "review" → Quinn. Each SKILL.md defines its trigger set, output format, and what it must not do — the three components that make routing reliable rather than hopeful.</p>
     </div>
   </div>
 </section>
@@ -1203,7 +1208,7 @@
           <tr>
             <td>Skill Routing</td>
             <td class="dim">Human decides which AI tool to use for each task. Manual prompt-engineering every time.</td>
-            <td class="bright">9 specialist agents with keyword-triggered SKILL.md activation. Stewart assigns the right specialist when promoting a ticket to ready; the dashboard auto-generates an agent-scoped prompt and launches the session automatically at the ready→in-progress transition. No manual prompt engineering, no copy-paste.</td>
+            <td class="bright">10 specialist agents with keyword-triggered SKILL.md activation. Stewart assigns the right specialist when promoting a ticket to ready; the dashboard auto-generates an agent-scoped prompt and launches the session automatically at the ready→in-progress transition. No manual prompt engineering, no copy-paste.</td>
           </tr>
         </tbody>
       </table>
