@@ -309,8 +309,8 @@
   <div class="rule"></div>
   <div class="meta">
     <strong>Companion to:</strong> <em>remember</em>: Technical Overview<br>
-    <strong>Evaluation period:</strong> February 2026 &ndash; May 2026 (12+ sessions, 35+ sources)<br>
-    <strong>Date:</strong> 2026-05-07 &mdash; <em>added Sentra Company Brain series, internal architectural sources, and Macmillan prior-art (UXF / ASO26 / EDR)</em>
+    <strong>Evaluation period:</strong> February 2026 &ndash; July 2026 (40+ sources)<br>
+    <strong>Date:</strong> 2026-07-21 &middot; <em>added the July agent-architecture discourse wave (loops, graphs, state machines, operating systems), autonomy grading, and our published response</em>
   </div>
 </header>
 
@@ -816,6 +816,114 @@
         Three-layer memory model: factual (what happened), interaction (why, what was meant, what was debated), action (procedural / trigger / execution / outcome). Substrate-vs-lens vocabulary: substrate generalizes; ontologies on top of it do not. Doing nothing as a first-class action. Validated the architectural posture we were already building toward; named primitives we had implicitly. Local amendment: non-action only counts when intentional, decisive, and persisted with rationale. Local addition: <em>frame</em> as the missing transient task-binding layer Sentra and others don't ship.
       </div>
       <div class="source-contribution">Contributed: substrate / lens vocabulary, factual / interaction / action three-layer model, intentional non-action framing. Synthesis output: substrate-lens strategy + implementation plan, May 2026.</div>
+    </div>
+  </section>
+
+  <!-- JULY 2026 AGENT-ARCHITECTURE DISCOURSE -->
+  <section>
+    <div class="section-label">Agent-architecture discourse (July 2026)</div>
+    <h2>Loops, Graphs, State Machines, Operating Systems</h2>
+    <div class="rule"></div>
+
+    <p>In July 2026 the agent-building discourse climbed a ladder in the space of weeks: loops (self-improvement cycles), then graphs (networks of loops), then the state machines beneath both, then calls for a full agent operating system. Each source below was evaluated against our running mechanisms rather than in the abstract; several produced formal internal adoptions, and the wave prompted our first published response: <a href="https://x.com/ACrenshaw20/status/2079601235057946736" target="_blank">I caught my agents gaming their own metrics</a>.</p>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">From Loop Engineering to Graph Engineering?</span>
+        <span class="source-type type-industry">Thought Leadership</span>
+      </div>
+      <div class="source-author">Carlos E. Perez &middot; Intuition Machine (@intuitmachine)</div>
+      <div class="source-summary">The strongest essay of the graph wave, honest enough to concede its own title: graphs of loops still fail without anchors, and the durable axis "was never loops versus graphs at all. It is ungrounded versus grounded." Mapped point by point against our machinery; roughly 80% described mechanisms we already run, each learned from an incident.</div>
+      <div class="source-links">
+        <a href="https://x.com/intuitmachine/status/2078419526354378975" target="_blank">X essay</a>
+      </div>
+      <div class="source-contribution">Contributed: grounded-vs-ungrounded framing; four adopted disciplines (counter-metric pairing, reference ownership, anchor-share metric, loop-speed interference review) formalized in an internal ADR; the concession our published response extends</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Beyond Graphs: Why AI Needs an Operating System</span>
+        <span class="source-type type-industry">Thought Leadership</span>
+      </div>
+      <div class="source-author">@TaoMachina &middot; X essay</div>
+      <div class="source-summary">Names the distinction the graph essays only gesture at: frameworks give you mechanism; an operating system is where policy lives and is enforced. By its own closing definition our stack qualifies, and its "Brain" chapter reads as an independent requirements document for <em>remember</em>: scoped memory, governed writes, provenance, expiry.</div>
+      <div class="source-contribution">Contributed: mechanism-vs-policy vocabulary; comprehension review and a patch-accumulation circuit breaker adopted as internal ADR decisions; the "call it an OS if you like, the question is whether it learns" stance</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Steps of AI Adoption</span>
+        <span class="source-type type-industry">Thought Leadership</span>
+      </div>
+      <div class="source-author">Boris Cherny &middot; Anthropic (creator of Claude Code)</div>
+      <div class="source-summary">Four-step adoption ladder ending at background fixing-and-maintaining. We graded our own operation against it and took the correction seriously: step-4 capabilities with named debts at the ladder's floor (observability, isolation), each one ticketed. His ROI question (what would this work have cost in manual engineering hours?) became a metric commitment.</div>
+      <div class="source-contribution">Contributed: adoption ladder as a buyer segmentation map; eng-hours-equivalent return metric; the honest "spiky, not step 4" self-grade; step 5 (the org that learns) as our extension</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">State Machines in 2 Minutes (and XState)</span>
+        <span class="source-type type-industry">Thought Leadership</span>
+      </div>
+      <div class="source-author">David Khourshid (David K Piano) &middot; Stately / XState</div>
+      <div class="source-summary">The primary source of the state-machine wave, arguing a decade-long thesis: loops and agent graphs are finite state machines, and FSMs plus the actor model are the two formalisms worth learning. Our backlog's transition legality table and actor-guarded finalization matched the prescription before we had its vocabulary.</div>
+      <div class="source-links">
+        <a href="https://github.com/statelyai/xstate" target="_blank">XState (GitHub)</a>
+        <a href="https://x.com/DavidKPiano" target="_blank">@DavidKPiano</a>
+      </div>
+      <div class="source-contribution">Contributed: FSM + actor model as the durable pair; statechart vocabulary for naming our parallel review gates; a map of which discourse territory is claimed and which (reconciliation) remains open</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">State Machines: From Loops to Graphs (Explained)</span>
+        <span class="source-type type-industry">Article</span>
+      </div>
+      <div class="source-author">@TheVixhal &middot; X article</div>
+      <div class="source-summary">Long-form derivation of the FSM thesis: transition tables as data, illegal states unrepresentable, guards, entry and exit actions, statecharts. Evaluated against live code; the prescriptions matched machinery already running, down to an exhaustively tested legality table.</div>
+      <div class="source-links">
+        <a href="https://x.com/TheVixhal" target="_blank">@TheVixhal</a>
+      </div>
+      <div class="source-contribution">Contributed: Mealy-vs-Moore as a review question (does an effect belong to being in a state, or to how it arrived); the "second interacting boolean" refactoring trigger</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">How to Build a Self-Correcting AI Loop</span>
+        <span class="source-type type-industry">Article</span>
+      </div>
+      <div class="source-author">@cyrilXBT &middot; X article</div>
+      <div class="source-summary">Builder / Judge / Manager decomposition with the sharpest principle of the batch: a judge without ground truth is a coherence check, not a correctness check. Its named failure mode (a builder quietly editing tests to make them pass) prompted a live audit of our own review gates that found and closed a real detection gap.</div>
+      <div class="source-links">
+        <a href="https://x.com/cyrilXBT" target="_blank">@cyrilXBT</a>
+      </div>
+      <div class="source-contribution">Contributed: judge-needs-ground-truth articulation; four stress tests for any self-correcting loop; a verified gap turned into a deterministic test-tamper probe in our review pipeline</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Graph Engineering with Claude (14-Step Roadmap)</span>
+        <span class="source-type type-industry">Article</span>
+      </div>
+      <div class="source-author">@0xCodez &middot; X article</div>
+      <div class="source-summary">A course-style walkthrough of fan-out, fan-in, verifiers, and model tiering, largely derived from Claude Code's own workflow tooling. Its lasting value for us was one question (does data actually cross this edge?) and independent convergence with our lanes-not-waves scheduling at the organizational altitude.</div>
+      <div class="source-links">
+        <a href="https://x.com/0xCodez" target="_blank">@0xCodez</a>
+      </div>
+      <div class="source-contribution">Contributed: edge-as-data-contract heuristic for dependency hygiene; confirmation that pipeline-over-barrier applies at ticket scale, not just subagent scale</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Agentic Autonomy Levels</span>
+        <span class="source-type type-industry">Industry</span>
+      </div>
+      <div class="source-author">Addy Osmani &middot; Google</div>
+      <div class="source-summary">Two-axis (Agency &times; Orchestration) maturity ladder for agentic systems. Adopted as the grading lens for our standing internal report card; the public claim that <em>create</em> operates as a Level 5 system (managed by exception) is graded against this framework and re-checked on a recurring cadence.</div>
+      <div class="source-links">
+        <a href="https://addyo.substack.com/p/agentic-autonomy-levels" target="_blank">Substack</a>
+      </div>
+      <div class="source-contribution">Contributed: the autonomy grading lens; vocabulary for maturity claims backed by audited metrics rather than assertion</div>
     </div>
   </section>
 
