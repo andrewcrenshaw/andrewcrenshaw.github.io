@@ -310,7 +310,7 @@
   <div class="meta">
     <strong>Companion to:</strong> <em>remember</em>: Technical Overview<br>
     <strong>Evaluation period:</strong> February 2026 &ndash; July 2026 (40+ sources)<br>
-    <strong>Date:</strong> 2026-07-21 &middot; <em>added the July agent-architecture discourse wave (loops, graphs, state machines, operating systems), autonomy grading, and our published response</em>
+    <strong>Date:</strong> 2026-07-22 &middot; <em>added World Monitor (production-scale, agent-built intelligence dashboard) and the convergent failure-taxonomy evidence it contributes</em>
   </div>
 </header>
 
@@ -376,7 +376,12 @@
         <tr>
           <td>No one is building the full knowledge engineering discipline</td>
           <td>All evaluated sources</td>
-          <td>No evaluated system treats knowledge claims as installed capabilities requiring dependency tracking, impact analysis, capability testing, and deprecation management. This is an absence claim; future sources may disprove it.</td>
+          <td>No evaluated system treats knowledge claims as installed capabilities requiring dependency tracking, impact analysis, capability testing, and deprecation management. This is an absence claim; future sources may disprove it. World Monitor (July 2026) is a narrow partial counterexample: its claims registry pins roughly 90 documentation claims to code-derived values and re-verifies them in CI, which is capability testing for doc claims, though without dependency tracking or deprecation management.</td>
+        </tr>
+        <tr>
+          <td>Failure taxonomies converge across independently built agent systems</td>
+          <td>World Monitor, internal lessons corpus</td>
+          <td>Two agent-operated systems with no shared lineage arrived at the same lessons. Their merged-is-not-ran-long-cron-seeders matches our merged-is-not-live activation rule. Their health-must-not-grade-an-unconfigured-optional-source matches our rule against grading a disabled pipeline healthy. Their timeout-assumed-a-routing-pin-that-never-existed matches our verify-at-answer-time discipline. Independent convergence suggests these are structural failure modes of agent-operated systems, not local quirks.</td>
         </tr>
         <tr>
           <td>Memory poisoning amplifies blast radius via propositional framing</td>
@@ -588,6 +593,20 @@
         <a href="https://github.com/tobi/qmd" target="_blank">GitHub</a>
       </div>
       <div class="source-contribution">Contributed: Confirmed getContext retrieval boundary is correct</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">World Monitor</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">koala73</div>
+      <div class="source-summary">Real-time global intelligence dashboard (500+ feeds, 65+ providers) built at production scale by an agent fleet. Evaluated as an engineering-practice mirror, not a memory system. Three mechanisms stood out: a claims registry pinning every capability count quoted in docs, README, and blog posts to code-derived values, re-verified in CI; a symptom-keyed solutions corpus indexing post-mortems by what an agent observes rather than by topic; and per-source freshness grading where a fresh-but-empty feed grades stale. Its solution titles independently reproduce our lessons (their merged-is-not-ran is our merged-is-not-live).</div>
+      <div class="source-links">
+        <a href="https://github.com/koala73/worldmonitor" target="_blank">GitHub</a>
+        <a href="https://worldmonitor.app" target="_blank">Website</a>
+      </div>
+      <div class="source-contribution">Contributed: symptom-keyed corpus conventions (evaluation in progress for <em>remember</em>), doc-claims verification pattern, convergent failure-taxonomy evidence</div>
     </div>
   </section>
 
