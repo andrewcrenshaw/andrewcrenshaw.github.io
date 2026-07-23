@@ -310,7 +310,7 @@
   <div class="meta">
     <strong>Companion to:</strong> <em>remember</em>: Technical Overview<br>
     <strong>Evaluation period:</strong> February 2026 &ndash; July 2026 (40+ sources)<br>
-    <strong>Date:</strong> 2026-07-22 &middot; <em>added World Monitor (production-scale, agent-built intelligence dashboard) and the convergent failure-taxonomy evidence it contributes</em>
+    <strong>Date:</strong> 2026-07-23 &middot; <em>added Buzz (Block), a Nostr-based agent workspace, evaluated as a communications-substrate adjacency rather than a memory competitor</em>
   </div>
 </header>
 
@@ -609,6 +609,19 @@
         <a href="https://worldmonitor.app" target="_blank">Website</a>
       </div>
       <div class="source-contribution">Contributed: symptom-keyed corpus conventions (evaluation in progress for <em>remember</em>), doc-claims verification pattern, convergent failure-taxonomy evidence</div>
+    </div>
+
+    <div class="source">
+      <div class="source-header">
+        <span class="source-title">Buzz</span>
+        <span class="source-type type-oss">Open source</span>
+      </div>
+      <div class="source-author">Block (Jack Dorsey)</div>
+      <div class="source-summary">Self-hosted Nostr-based relay where humans and AI agents hold equivalent cryptographic identity (secp256k1 keypairs, NIP-42/NIP-98 auth) and act as protocol-equal peers in shared channels. Evaluated as a communications-substrate adjacency, not a memory or orchestration competitor: it is a well-built event log with strong identity, not a governed-delivery or agent-agent coordination system. Read against its own architecture docs, not marketing &mdash; approval gates are explicitly unimplemented (a suspended gate marks the run failed), rate limiting is a stub, and no agent-to-agent communication design exists. The one mechanism worth adopting: its hash-chain tamper-evident audit log ("the approval event is signed... the audit log chains them together... cryptographic proof of who approved what"), now informing an audit-chain addition to our own gate/approval record.</div>
+      <div class="source-links">
+        <a href="https://github.com/block/buzz" target="_blank">GitHub</a>
+      </div>
+      <div class="source-contribution">Contributed: hash-chain audit-log pattern for gate/approval provenance; a worked reference for host-derived, fail-closed tenant isolation; confirmation that our governed-dispatch and mail-router primitives are ahead of the category's current state of the art</div>
     </div>
   </section>
 
