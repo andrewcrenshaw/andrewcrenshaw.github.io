@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>Predictive Deterioration Detection on an Inpatient Ward — Andrew Crenshaw</title>
-  <meta name="description" content="A deployment-grounded companion to the synthesis notes on pairing Claude with a domain world model — what an on-premise Claude-plus-world-model early-warning system might actually look like on a hospital ward.">
+  <meta name="description" content="A deployment-grounded companion to the synthesis notes on pairing Claude with a domain world model: what an on-premise Claude-plus-world-model early-warning system might actually look like on a hospital ward.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -512,19 +512,19 @@
 <article class="article-wrapper">
   <div class="article-label fade-in">Use case · 2026-04-21</div>
   <h1 class="article-title fade-in fade-in-d1">Predictive Deterioration Detection on an Inpatient Ward</h1>
-  <p class="article-subtitle fade-in fade-in-d2">A deployment-grounded companion to the synthesis notes on pairing Claude with a domain world model — where the model runs, what it ingests, what a nurse's day looks like, what it costs, and what would cause me to shut it down.</p>
+  <p class="article-subtitle fade-in fade-in-d2">A deployment-grounded companion to the synthesis notes on pairing Claude with a domain world model: where the model runs, what it ingests, what a nurse's day looks like, what it costs, and what would cause me to shut it down.</p>
   <div class="rule fade-in fade-in-d2"></div>
 
   <div class="meta-block fade-in fade-in-d2">
     <div class="meta-row"><span class="meta-label">Author</span><span>Andrew Crenshaw</span></div>
     <div class="meta-row"><span class="meta-label">Date</span><span>2026-04-21</span></div>
-    <div class="meta-row"><span class="meta-label">Companion to</span><span><a href="./pairing-claude-with-a-world-model.html">On Pairing Claude with a Domain World Model</a> — the synthesis notes this use case grounds in operational reality.</span></div>
+    <div class="meta-row"><span class="meta-label">Companion to</span><span><a href="./pairing-claude-with-a-world-model.html">On Pairing Claude with a Domain World Model</a> - the synthesis notes this use case grounds in operational reality.</span></div>
     <div class="meta-row"><span class="meta-label">Length</span><span>~2,400 words · 11-minute read</span></div>
     <div class="meta-row"><span class="meta-label">Audience</span><span>Hospital CIOs, ministry-of-health leads, foundation program officers, and anyone asking "fine, but what does this actually <em>look</em> like on the floor."</span></div>
   </div>
 
   <p class="context-note fade-in fade-in-d3">
-    The <a href="./pairing-claude-with-a-world-model.html">companion notes</a> explore whether a compact, on-premise, domain-specific predictive model — paired with Claude as the reasoner and the nurse as the decider — could be a useful layer in mission-aligned AI deployment. That question is easy to ask at altitude. It is harder, and more useful, to work through on the ground. This document takes one of the notes' four domain examples — early-warning detection of deteriorating inpatients at a teaching hospital in a state-capacity-constrained setting — and makes the deployment concrete. If after reading this the deployment still sounds intangible, I have not done my job.
+    The <a href="./pairing-claude-with-a-world-model.html">companion notes</a> explore whether a compact, on-premise, domain-specific predictive model (paired with Claude as the reasoner and the nurse as the decider) could be a useful layer in mission-aligned AI deployment. That question is easy to ask at altitude. It is harder, and more useful, to work through on the ground. This document takes one of the notes' four domain examples (early-warning detection of deteriorating inpatients at a teaching hospital in a state-capacity-constrained setting) and makes the deployment concrete. If after reading this the deployment still sounds intangible, I have not done my job.
   </p>
 
   <div class="article-body fade-in fade-in-d3">
@@ -535,7 +535,7 @@
 
     <ul>
       <li>An NVIDIA RTX 4090 workstation (~$4,000 capex, one-time)</li>
-      <li>An NVIDIA Jetson Orin dev kit (~$2,000 capex, one-time, lower power draw — often the right choice in LMIC settings with unreliable grid)</li>
+      <li>An NVIDIA Jetson Orin dev kit (~$2,000 capex, one-time, lower power draw, often the right choice in LMIC settings with unreliable grid)</li>
     </ul>
 
     <p>LeWorldModel-class architectures are ~15M parameters end-to-end. The predictor component is ~10M. Inference on a single patient's latent trajectory runs in well under a second; batched inference across a full ward of 30–40 patients updates the entire attention queue in roughly the interval between two vital-sign samples. This is not cloud-scale compute; it is closer to the hardware budget of a modern ultrasound cart.</p>
@@ -558,7 +558,7 @@
                           │   • Optional Claude API call via a        │
                           │     signed, audit-logged, rate-limited    │
                           │     outbound gateway (NO patient data     │
-                          │     in the payload — only the latent      │
+                          │     in the payload, only the latent       │
                           │     summary + de-identified context)      │
                           └───────────────────┬───────────────────────┘
                                               │
@@ -570,7 +570,7 @@
     <p>Two architectural commitments in this topology are non-negotiable:</p>
 
     <ol>
-      <li><strong>Raw patient data never leaves hospital walls.</strong> The JEPA trains and runs on-prem. Inference is local. Outbound network traffic carries <em>only</em> the compressed latent-derived signals (surprise scalar, contribution attribution, coarse context) needed for Claude to generate nurse-facing language — and even that outbound call is optional, rate-limited, audit-logged, and replaceable with an on-prem small-model alternative if the hospital's policy requires full air-gap.</li>
+      <li><strong>Raw patient data never leaves hospital walls.</strong> The JEPA trains and runs on-prem. Inference is local. Outbound network traffic carries <em>only</em> the compressed latent-derived signals (surprise scalar, contribution attribution, coarse context) needed for Claude to generate nurse-facing language - and even that outbound call is optional, rate-limited, audit-logged, and replaceable with an on-prem small-model alternative if the hospital's policy requires full air-gap.</li>
       <li><strong>The system is not connected to the public internet for inference.</strong> The only external connection is a deliberate, batched, consented channel for (a) signed software updates and (b) federated weight-sharing with partner hospitals. Both can be turned off without degrading local operation.</li>
     </ol>
 
@@ -591,35 +591,35 @@
     <p><strong>Used, and already collected by the hospital today:</strong></p>
 
     <ul>
-      <li><strong>Continuous numerical vitals</strong> from bedside monitors — heart rate, SpO2, respiratory rate, non-invasive blood pressure, temperature, ECG-derived features. These already stream over HL7 or direct monitor integration in any hospital with central monitoring; the JEPA server taps the same stream.</li>
-      <li><strong>Structured intervention events</strong> from the EMR / nursing information system — medication administration records, fluid boluses, oxygen titration, pressor titration, repositioning events, line placements. Time-stamped event logs, not narrative free text.</li>
-      <li><strong>Lab values</strong> from the laboratory information system — lactate, white cell count, creatinine, hemoglobin, blood gas. Time-stamped.</li>
-      <li><strong>Coarse admission context</strong> — age band, admission reason, surgical versus medical, length-of-stay category. Deliberately low-resolution, no free text, nothing that would individuate a patient beyond what is operationally necessary.</li>
+      <li><strong>Continuous numerical vitals</strong> from bedside monitors: heart rate, SpO2, respiratory rate, non-invasive blood pressure, temperature, ECG-derived features. These already stream over HL7 or direct monitor integration in any hospital with central monitoring; the JEPA server taps the same stream.</li>
+      <li><strong>Structured intervention events</strong> from the EMR / nursing information system: medication administration records, fluid boluses, oxygen titration, pressor titration, repositioning events, line placements. Time-stamped event logs, not narrative free text.</li>
+      <li><strong>Lab values</strong> from the laboratory information system: lactate, white cell count, creatinine, hemoglobin, blood gas. Time-stamped.</li>
+      <li><strong>Coarse admission context</strong>: age band, admission reason, surgical versus medical, length-of-stay category. Deliberately low-resolution, no free text, nothing that would individuate a patient beyond what is operationally necessary.</li>
     </ul>
 
-    <p>The JEPA's latent is a compressed representation of <em>physiological trajectory and intervention response over time</em>. The reason this is meaningfully different from "surveillance" is that the signal it captures is already the signal the nurse is trying to read at the bedside — the shape of how this particular patient's physiology is responding to the care being given. The model is not watching the nurse, or the patient, or the room. It is reading the bedside chart, continuously, across the entire ward.</p>
+    <p>The JEPA's latent is a compressed representation of <em>physiological trajectory and intervention response over time</em>. The reason this is meaningfully different from "surveillance" is that the signal it captures is already the signal the nurse is trying to read at the bedside - the shape of how this particular patient's physiology is responding to the care being given. The model is not watching the nurse, or the patient, or the room. It is reading the bedside chart, continuously, across the entire ward.</p>
 
     <h2>3. The day on the floor</h2>
 
     <p><strong>Before the shift.</strong> The JEPA server has been running overnight. It has ingested every monitor sample and every EMR event for every patient on the ward for as long as it has been deployed. For each occupied bed, it maintains a 192-dimensional latent representation of "where this patient's trajectory currently is," a scalar prediction-error signal (how surprised the model is by the last several hours of data), and a short attribution vector naming which input signals are driving the divergence. Nothing about this is visible to the nurse overnight. It just runs.</p>
 
-    <p><strong>07:00 — shift start.</strong> The outgoing charge nurse and the incoming charge nurse sit at the nursing station. On the display is not an alarm panel. It is a <strong>ranked ward view</strong> — every occupied bed, ordered by an "attention score" that smooths and calibrates the JEPA surprise signal. The top of the list is the one or two patients whose trajectories have drifted into the low-probability tail of the learned recovery manifold. The rest of the list is quiet. The handoff conversation walks top-to-bottom.</p>
+    <p><strong>07:00 - shift start.</strong> The outgoing charge nurse and the incoming charge nurse sit at the nursing station. On the display is not an alarm panel. It is a <strong>ranked ward view</strong>: every occupied bed, ordered by an "attention score" that smooths and calibrates the JEPA surprise signal. The top of the list is the one or two patients whose trajectories have drifted into the low-probability tail of the learned recovery manifold. The rest of the list is quiet. The handoff conversation walks top-to-bottom.</p>
 
-    <p>This is the single most important UX design property of the entire deployment: <strong>the system ranks attention, it does not generate alerts.</strong> Every intensive care unit on earth has alarm fatigue because existing early-warning scores (NEWS, MEWS, SIRS) throw too many false positives, and staff learn to tune them out within a week. A ranking view produces a different cognitive response — a nurse can absorb a ranked list of 30 patients in five seconds, and can always start from the top. There is no blaring noise, no red flash, no signal to dismiss. The system earns its place on the nursing station or it gets removed.</p>
+    <p>This is the single most important UX design property of the entire deployment: <strong>the system ranks attention, it does not generate alerts.</strong> Every intensive care unit on earth has alarm fatigue because existing early-warning scores (NEWS, MEWS, SIRS) throw too many false positives, and staff learn to tune them out within a week. A ranking view produces a different cognitive response: a nurse can absorb a ranked list of 30 patients in five seconds, and can always start from the top. There is no blaring noise, no red flash, no signal to dismiss. The system earns its place on the nursing station or it gets removed.</p>
 
-    <p><strong>09:07 — Bed 12 ascends the queue.</strong> Patient A, post-op day 2, has climbed to the top of the attention score. The charge nurse clicks through. She sees:</p>
+    <p><strong>09:07 - Bed 12 ascends the queue.</strong> Patient A, post-op day 2, has climbed to the top of the attention score. The charge nurse clicks through. She sees:</p>
 
     <ul>
-      <li>A <strong>trajectory chart</strong> — prediction error has risen from baseline to 2.3 standard deviations over the last four hours. Stable before that.</li>
-      <li>A <strong>contribution attribution</strong> — the divergence is driven by rising respiratory rate, HR variability changes, and a pattern in which the last two fluid boluses produced less-than-expected MAP response.</li>
+      <li>A <strong>trajectory chart</strong>: prediction error has risen from baseline to 2.3 standard deviations over the last four hours. Stable before that.</li>
+      <li>A <strong>contribution attribution</strong>: the divergence is driven by rising respiratory rate, HR variability changes, and a pattern in which the last two fluid boluses produced less-than-expected MAP response.</li>
       <li>A <strong>plain-language interpretation</strong> generated by Claude, grounded in the attribution and in this ward's own historical case base: <em>"This trajectory pattern matches what preceded septic decompensation in N similar post-operative cases on this ward over the past 18 months, with a median lead time of 12 hours. The attenuated MAP response to fluid is what separates this from a benign post-op course."</em></li>
-      <li>An <strong>ordered candidate-actions list</strong>, each flagged as a suggestion for nursing judgment, not an order: <em>"(1) Reassess at bedside. (2) Consider blood cultures + lactate. (3) If lactate elevated, escalate per ward's sepsis protocol."</em> Each suggestion is accompanied by the evidence that grounds it — "the sepsis pathway is supported by the combination of features, not by any single vital alone."</li>
+      <li>An <strong>ordered candidate-actions list</strong>, each flagged as a suggestion for nursing judgment, not an order: <em>"(1) Reassess at bedside. (2) Consider blood cultures + lactate. (3) If lactate elevated, escalate per ward's sepsis protocol."</em> Each suggestion is accompanied by the evidence that grounds it: "the sepsis pathway is supported by the combination of features, not by any single vital alone."</li>
       <li>A <strong>hedge</strong>, always present, not boilerplate: <em>"This is an early-warning flag for human assessment, not a diagnosis. Physician evaluation is required before any protocol is initiated."</em></li>
     </ul>
 
     <p>The charge nurse goes to the bedside. She lays hands on the patient. She makes a human judgment. She may catch sepsis twelve hours early. She may mark the alert a false positive, which the system records and which feeds back into the ward's model recalibration. <strong>The decision is always the nurse's. The system focuses her attention; it does not replace her clinical reasoning.</strong></p>
 
-    <p><strong>Through the day.</strong> Most of the time — 70 to 80 percent, in pilot data from similar early-warning systems — the queue is quiet and the system is invisible. The remainder of the time, it surfaces the one or two patients on the ward who warrant a nurse's focused attention. End-of-shift, the outgoing charge nurse reviews the queue with the incoming one. The system supports the handoff. It does not replace it.</p>
+    <p><strong>Through the day.</strong> Most of the time (70 to 80 percent, in pilot data from similar early-warning systems), the queue is quiet and the system is invisible. The remainder of the time, it surfaces the one or two patients on the ward who warrant a nurse's focused attention. End-of-shift, the outgoing charge nurse reviews the queue with the incoming one. The system supports the handoff. It does not replace it.</p>
 
     <h2>4. The Claude / JEPA division of labor, stated plainly</h2>
 
@@ -654,7 +654,7 @@
 
     <p>Two concerns and how the architecture handles them:</p>
 
-    <p><strong>Concern: patient vital-sign streams at population scale.</strong> Handled by on-prem deployment. The JEPA is trained and runs on hospital infrastructure. Raw patient data never leaves the hospital for inference. The only outbound traffic is (a) compressed latent summaries to Claude for language generation, which contain no PHI and can be audited on every call, and (b) optional federated weight updates to a partner consortium — see below.</p>
+    <p><strong>Concern: patient vital-sign streams at population scale.</strong> Handled by on-prem deployment. The JEPA is trained and runs on hospital infrastructure. Raw patient data never leaves the hospital for inference. The only outbound traffic is (a) compressed latent summaries to Claude for language generation, which contain no PHI and can be audited on every call, and (b) optional federated weight updates to a partner consortium (see below).</p>
 
     <p><strong>Concern: cross-site learning without data pooling.</strong> Handled by federated learning. If the program wants patterns learned at Hospital A to help Hospital B, three options, in order of privacy strength:</p>
 
@@ -668,7 +668,7 @@
 
     <p><strong>Regulatory framing.</strong> In jurisdiction-specific terms, the on-prem architecture dramatically reduces the regulatory surface because there is no cross-border transfer, no secondary use, and no aggregation beyond the institution. De-identified clinical data used for quality improvement within the institution that generated it is typically covered under existing operational consent frameworks. The harder conversation is about cross-site learning, which needs its own consent architecture, written into the partner agreement from day one.</p>
 
-    <h2>6. What this costs — estimated ranges</h2>
+    <h2>6. What this costs: estimated ranges</h2>
 
     <p><em>All figures below are estimates intended to set expectations for an initial pilot, not a quoted budget. Costs assume skilled engineering labor paid at local rates in the partner country, not US rates. Actual costs will vary materially by country, by partner hospital's existing IT maturity, by ministry or IRB fee structure, and by the scope of clinical validation the program chooses to pursue. A detailed deployment estimate is a first-week exercise with each specific partner.</em></p>
 
@@ -709,7 +709,7 @@
             <td>Carried by the Beneficial Deployments program, not the hospital.</td>
           </tr>
           <tr>
-            <td>Clinical validation — see staged breakdown below</td>
+            <td>Clinical validation (see staged breakdown below)</td>
             <td>$5,000–$80,000+</td>
             <td>Scales with stage</td>
             <td>Lowest stages can be entry-level; highest stage is typically grant-funded separately.</td>
@@ -718,33 +718,33 @@
       </table>
     </div>
 
-    <p><strong>First-year realistic entry cost for a single pilot hospital, at local rates:</strong> roughly <strong>$15,000–$40,000</strong>, of which the GPU and the engineering labor are the meaningful line items and the rest is either in-kind or program-amortized. The headline point the memo makes — the model is cheap; the integration and change management is what costs — still holds, but the total number is materially smaller than a US-rate estimate would suggest.</p>
+    <p><strong>First-year realistic entry cost for a single pilot hospital, at local rates:</strong> roughly <strong>$15,000–$40,000</strong>, of which the GPU and the engineering labor are the meaningful line items and the rest is either in-kind or program-amortized. The headline point the memo makes (the model is cheap; the integration and change management is what costs) still holds, but the total number is materially smaller than a US-rate estimate would suggest.</p>
 
     <h3>What clinical validation actually entails, and why the cost range</h3>
 
     <p>A predictive early-warning system cannot be deployed in a clinical setting without evidence that it performs as claimed in the environment it is being deployed into. The validation has three standard stages, each of which answers a different question and carries a different cost. A well-designed program runs them in sequence, with each stage gating the next.</p>
 
-    <p><strong>Stage A — Retrospective validation.</strong> Estimated <strong>$3,000–$10,000</strong> at local rates. The model is applied to the hospital's own historical data (with IRB approval for secondary use of de-identified clinical records). The question answered is: <em>would the system have flagged known deterioration events in this hospital's own population, with what lead time, and at what false-positive rate?</em> Work involved: de-identified historical dataset extraction; biostatistician time (~40–80 hours at local rates); IRB submission and fees. Output: AUROC, sensitivity/specificity curves, lead-time analysis. This is the cheapest stage and is non-negotiable — no live deployment without it.</p>
+    <p><strong>Stage A: Retrospective validation.</strong> Estimated <strong>$3,000–$10,000</strong> at local rates. The model is applied to the hospital's own historical data (with IRB approval for secondary use of de-identified clinical records). The question answered is: <em>would the system have flagged known deterioration events in this hospital's own population, with what lead time, and at what false-positive rate?</em> Work involved: de-identified historical dataset extraction; biostatistician time (~40–80 hours at local rates); IRB submission and fees. Output: AUROC, sensitivity/specificity curves, lead-time analysis. This is the cheapest stage and is non-negotiable: no live deployment without it.</p>
 
-    <p><strong>Stage B — Prospective silent validation.</strong> Estimated <strong>$10,000–$30,000</strong> at local rates, over 3–6 months. The system runs live but its output is not shown to nursing staff. Predictions are logged alongside actual outcomes. The question answered is: <em>does the retrospective performance hold up under real operational conditions — live data pipelines, missing values, sensor dropouts, the full messiness of the ward?</em> Work involved: live IT integration; clinical research coordinator at 0.1–0.25 FTE for 3–6 months; biostatistician analysis; interim safety review. Output: confirmation (or refutation) of Stage A claims in live conditions. This is typically the last stage before staff see any output from the system.</p>
+    <p><strong>Stage B: Prospective silent validation.</strong> Estimated <strong>$10,000–$30,000</strong> at local rates, over 3–6 months. The system runs live but its output is not shown to nursing staff. Predictions are logged alongside actual outcomes. The question answered is: <em>does the retrospective performance hold up under real operational conditions: live data pipelines, missing values, sensor dropouts, the full messiness of the ward?</em> Work involved: live IT integration; clinical research coordinator at 0.1–0.25 FTE for 3–6 months; biostatistician analysis; interim safety review. Output: confirmation (or refutation) of Stage A claims in live conditions. This is typically the last stage before staff see any output from the system.</p>
 
-    <p><strong>Stage C — Prospective interventional study.</strong> Estimated <strong>$30,000–$80,000+</strong> at local rates, over 6–12 months, often more at multi-site scale. Nursing staff see the outputs; decisions are taken with the system's input; outcomes are measured against a control (often cluster-randomized by ward, or stepped-wedge). The question answered is the only one that actually matters in the end: <em>does the system improve clinical outcomes — time-to-intervention, adjusted mortality, length of stay — compared to standard of care?</em> Work involved: full clinical research infrastructure — IRB, clinical research coordinator (0.25–0.5 FTE), biostatistician, data safety monitoring board, pre-registered trial protocol, publication. Output: the clinical evidence base for continued use and for scale-out to additional sites.</p>
+    <p><strong>Stage C: Prospective interventional study.</strong> Estimated <strong>$30,000–$80,000+</strong> at local rates, over 6–12 months, often more at multi-site scale. Nursing staff see the outputs; decisions are taken with the system's input; outcomes are measured against a control (often cluster-randomized by ward, or stepped-wedge). The question answered is the only one that actually matters in the end: <em>does the system improve clinical outcomes (time-to-intervention, adjusted mortality, length of stay) compared to standard of care?</em> Work involved: full clinical research infrastructure: IRB, clinical research coordinator (0.25–0.5 FTE), biostatistician, data safety monitoring board, pre-registered trial protocol, publication. Output: the clinical evidence base for continued use and for scale-out to additional sites.</p>
 
-    <p><strong>Why the range on each stage</strong> is wide: IRB and ethics committee fees vary by country and institution; biostatistician and CRC rates vary by market; trial duration and multi-site design multiply costs. In many LMIC settings, Stage A and Stage B can together be done for <strong>$13,000–$40,000 at local rates</strong>. Stage C is typically an order of magnitude more — not because it is technically harder, but because it is a real clinical trial and demands real trial infrastructure.</p>
+    <p><strong>Why the range on each stage</strong> is wide: IRB and ethics committee fees vary by country and institution; biostatistician and CRC rates vary by market; trial duration and multi-site design multiply costs. In many LMIC settings, Stage A and Stage B can together be done for <strong>$13,000–$40,000 at local rates</strong>. Stage C is typically an order of magnitude more - not because it is technically harder, but because it is a real clinical trial and demands real trial infrastructure.</p>
 
     <h3>On whether this cost is prohibitive</h3>
 
-    <p>Honestly, yes — if the pilot hospital is expected to carry it alone. A state-capacity-constrained teaching hospital is not the right payer for a $25,000 capex-plus-validation outlay in the first year. The deployment pattern assumes this cost is carried by the program, not the partner, structured in one of three ways:</p>
+    <p>Honestly, yes - if the pilot hospital is expected to carry it alone. A state-capacity-constrained teaching hospital is not the right payer for a $25,000 capex-plus-validation outlay in the first year. The deployment pattern assumes this cost is carried by the program, not the partner, structured in one of three ways:</p>
 
     <ol>
       <li><strong>Anthropic Beneficial Deployments funds the pilot directly</strong> as part of the reference-implementation program, amortized across the many partner sites the same pattern will deploy to.</li>
-      <li><strong>A foundation partner underwrites the pilot</strong> — the Gates Foundation, Wellcome, Grand Challenges, Rockefeller, PEPFAR-adjacent budgets, Gavi, national ministries of health with AI-readiness funding. For any specific partner hospital, one or more of these is usually the right source.</li>
-      <li><strong>An implementation research grant funds Stage C specifically</strong> — NIH Fogarty, USAID, Wellcome implementation science, Bill & Melinda Gates — if and only if Stages A and B have succeeded and there is a defensible case for a trial.</li>
+      <li><strong>A foundation partner underwrites the pilot</strong>: the Gates Foundation, Wellcome, Grand Challenges, Rockefeller, PEPFAR-adjacent budgets, Gavi, national ministries of health with AI-readiness funding. For any specific partner hospital, one or more of these is usually the right source.</li>
+      <li><strong>An implementation research grant funds Stage C specifically</strong>: NIH Fogarty, USAID, Wellcome implementation science, Bill & Melinda Gates - if and only if Stages A and B have succeeded and there is a defensible case for a trial.</li>
     </ol>
 
-    <p>The right unit of analysis for cost is not "what does a hospital pay" but "what does the program spend per hospital to establish a working, validated deployment that is ready for scale-out." On that framing, even the high end of the range is a defensible per-site investment against the eventual scale — a hundred hospitals carrying a validated early-warning system is, in public-health economics terms, a very cheap intervention per averted death.</p>
+    <p>The right unit of analysis for cost is not "what does a hospital pay" but "what does the program spend per hospital to establish a working, validated deployment that is ready for scale-out." On that framing, even the high end of the range is a defensible per-site investment against the eventual scale - a hundred hospitals carrying a validated early-warning system is, in public-health economics terms, a very cheap intervention per averted death.</p>
 
-    <p>The harder question for the program is <strong>which cost lines can be compressed without compromising the integrity of the deployment.</strong> The engineering cost can be compressed by embedding local-university graduate students or ministry IT staff, at zero incremental labor cost, paired with a Beneficial Deployments architect for structural supervision. The validation cost cannot be meaningfully compressed without giving up the evidence base — and the evidence base is what makes the reference implementation worth copying.</p>
+    <p>The harder question for the program is <strong>which cost lines can be compressed without compromising the integrity of the deployment.</strong> The engineering cost can be compressed by embedding local-university graduate students or ministry IT staff, at zero incremental labor cost, paired with a Beneficial Deployments architect for structural supervision. The validation cost cannot be meaningfully compressed without giving up the evidence base - and the evidence base is what makes the reference implementation worth copying.</p>
 
     <div class="callout">
       <strong>The model is cheap. The data integration and the evidence are what the program pays for.</strong> That is the shape of every serious clinical AI deployment, and any pitch that hides it will not survive the first ministry-level review. In the companion memo's language: Year 1 is instrumentation and retrospective validation. Year 2 is live silent validation and the first interventional trial. The model itself is a line item; the evidence is the product.
@@ -769,14 +769,14 @@
 
     <ol>
       <li><strong>The privacy-forward, on-prem, federated architecture is not the default.</strong> The SaaS-ML default for a hospital early-warning system is to stream vitals to a vendor's cloud and return predictions. For a well-resourced US hospital with mature regulatory infrastructure, that is defensible. For a teaching hospital in a capacity-constrained setting, it is not. The architecture described here only exists because someone made the deliberate design choice to keep data on-prem, and that choice has to be institutionally backed. Anthropic's public commitments on safe deployment, RSP discipline, and interpretability are the institutional backing that makes this choice credible to a ministry-of-health partner in a first conversation.</li>
-      <li><strong>Interpretability is load-bearing, not decorative.</strong> A hospital early-warning system that cannot explain its surprise signal to a nurse in terms she can act on is not deployable, full stop. Anthropic's interpretability research — probing, feature attribution, causal analysis — is the research substrate that makes this system's "contribution attribution" honest rather than aesthetic.</li>
+      <li><strong>Interpretability is load-bearing, not decorative.</strong> A hospital early-warning system that cannot explain its surprise signal to a nurse in terms she can act on is not deployable, full stop. Anthropic's interpretability research (probing, feature attribution, causal analysis) is the research substrate that makes this system's "contribution attribution" honest rather than aesthetic.</li>
       <li><strong>The same reference implementation travels across ten hospitals, two ministries, and four mission partners.</strong> The pattern-spotting work of adapting the logging standard, the training procedure, the nursing-station UX, and the federated protocol across partners is ecosystem-level infrastructure work, which is exactly what Beneficial Deployments is explicitly chartered to do. No other frontier lab has a team chartered this way.</li>
     </ol>
 
     <h2>9. The one-line version</h2>
 
     <blockquote>
-      An on-prem GPU workstation ingests the bedside data the hospital already collects, continuously updates a compact physiological-trajectory model for every patient on the ward, ranks attention for the charge nurse, and calls Claude — not patient data, just latent summaries — for nurse-readable language and next-step suggestions. The nurse decides. The architecture is the point.
+      An on-prem GPU workstation ingests the bedside data the hospital already collects, continuously updates a compact physiological-trajectory model for every patient on the ward, ranks attention for the charge nurse, and calls Claude (not patient data, just latent summaries) for nurse-readable language and next-step suggestions. The nurse decides. The architecture is the point.
     </blockquote>
 
     <p>That is the use case. That is what converts the memo from vision to deployment.</p>
