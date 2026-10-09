@@ -246,6 +246,21 @@
   .flagship p { color: var(--ink-soft); max-width: 64ch; }
   .flag-plate { position: relative; width: 100%; height: 132px; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; margin: 0.9rem 0 1.3rem; background: linear-gradient(135deg, var(--paper-2), var(--paper-3)); }
   .flag-plate canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  /* Deep-dive panel inside a flagship: same tint + underwater hover as the Deep-dives index */
+  .dive { margin: 1.3rem 0 1.4rem; max-width: 72ch; border: 1px solid rgba(20, 84, 110, 0.32); border-radius: 3px; background: var(--tint-deepdives); overflow: hidden; }
+  .dive-label { display: block; padding: 0.85rem 1.2rem 0.55rem; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--acc-deepdives); }
+  .dive a { display: grid; grid-template-columns: 1fr auto; column-gap: 1.2rem; row-gap: 0.25rem; padding: 0.95rem 1.2rem; border-top: 1px solid rgba(20, 84, 110, 0.2); transition: background 0.3s var(--ease); }
+  .dive-title { font-family: var(--serif); font-size: 1.16rem; color: var(--ink); transition: color 0.25s; }
+  .dive-sub { font-size: 0.93rem; color: var(--ink-soft); line-height: 1.45; transition: color 0.25s; }
+  .dive-go { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--acc-deepdives); white-space: nowrap; transition: color 0.25s; }
+  .dive a:hover { background: linear-gradient(180deg, #0d2f3d, #07212c); }
+  .dive a:hover .dive-title { color: #eaf5f8; }
+  .dive a:hover .dive-sub { color: #aee0ea; }
+  .dive a:hover .dive-go { color: #58c5d8; }
+  @media (max-width: 560px) {
+    .dive a { grid-template-columns: 1fr; }
+    .dive-go { grid-column: 1; grid-row: auto; margin-top: 0.35rem; }
+  }
   .flag-plate .tick { position: absolute; width: 11px; height: 11px; border: 1px solid var(--blue); z-index: 2; }
   .flag-plate .tick.tl { top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
   .flag-plate .tick.tr { top: 8px; right: 8px; border-left: 0; border-bottom: 0; }
@@ -399,6 +414,7 @@
         <a href="#approach">Approach</a>
         <a href="#thinking">Thinking</a>
         <a href="#slf">SLF</a>
+        <a href="#deep-dives">Deep-dives</a>
         <a href="#writing">Writing</a>
         <a href="https://github.com/andrewcrenshaw?tab=repositories" class="src" target="_blank" rel="noopener">Source ↗</a>
       </div>
@@ -474,6 +490,19 @@
         </div>
         <h3>Lexenne <em>remember</em></h3>
         <p>I designed and built an agent-memory substrate: a lens-projected, provenance-tracked knowledge store where each session captures decisions and lessons that surface to the next, running on my own development fleet. Cross-session retrieval is live. The hard part is deciding what to keep, so the compounding-quality layer (forgetting, reweaving, and conflict resolution) is in active build.</p>
+        <div class="dive">
+          <span class="dive-label">Go deeper &middot; two deep-dives</span>
+          <a href="presentations/remember-technical-overview.html">
+            <span class="dive-title"><em>remember</em>: Technical Overview</span>
+            <span class="dive-sub">What is built and running, the learning loop step by step, how retrieval works, the knowledge graph, and the challenges still open.</span>
+            <span class="dive-go">Read &rarr;</span>
+          </a>
+          <a href="presentations/remember-compounding-knowledge.html">
+            <span class="dive-title"><em>remember</em>: Compounding Knowledge Across People and Agents</span>
+            <span class="dive-sub">Why institutional memory is lost by default, the compounding loop, and the substrate / lens / frame model behind it.</span>
+            <span class="dive-go">Read &rarr;</span>
+          </a>
+        </div>
         <details open>
           <summary><span class="chev">›</span> Model &amp; mechanics</summary>
           <div class="det-body">
@@ -484,9 +513,6 @@
             In active delivery: the compounding loop (reweaving, conflict resolution, and forgetting: pruning, supersession, stale-detection)
           </div>
         </details>
-        <div style="display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:1rem;">
-          <a href="presentations/remember-technical-overview.html" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Deep dive: <em>remember</em> →</a>
-        </div>
       </div>
 
       <!-- Flagship 2 -->
@@ -497,20 +523,25 @@
           <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
         </div>
         <h3>Lexenne <em>create</em></h3>
-        <p>I built a development operating system where twelve specialized agents plan, build, review, and ship code against a live backlog state machine. Agents claim work, hand off across phases without losing context, and nothing clears a phase without passing a mechanically-enforced review gate. It runs end to end on its own; I keep a single human-in-the-loop surface, deciding which work dispatches in what sequence, by design.</p>
+        <p>I built a development operating system where ten specialized agents plan, build, review, and ship code against a live backlog state machine. Agents claim work, hand off across phases without losing context, and nothing clears a phase without passing a mechanically-enforced review gate. It runs end to end on its own; I keep a single human-in-the-loop surface, deciding which work dispatches in what sequence, by design.</p>
+        <div class="dive">
+          <span class="dive-label">Go deeper &middot; architecture deep-dive</span>
+          <a href="presentations/create-harness-engineering.html">
+            <span class="dive-title"><em>create</em>: Harness Engineering for Agent-First Development</span>
+            <span class="dive-sub">The live state machine under the backlog, how work routes across specialist agents, bounded authority, TDD as infrastructure, and what months of production use have shown.</span>
+            <span class="dive-go">Read &rarr;</span>
+          </a>
+        </div>
         <details open>
           <summary><span class="chev">›</span> Stack &amp; mechanics</summary>
           <div class="det-body">
-            12 specialized agents, auto-routed and skill-aware, with collision detection and bounded authority<br />
+            10 specialized agents, auto-routed and skill-aware, with collision detection and bounded authority<br />
             TDD enforced mechanically (RED &rarr; GREEN &rarr; REFACTOR) against machine-verifiable acceptance criteria<br />
             Review gate: lint + 700-test suite + Eval + code review + pre-commit, run on every ticket before it can close<br />
             Persistent scratchpads and session memory survive context limits; phase handoffs run without a restart<br />
             TypeScript / Node.js &nbsp;·&nbsp; SQLite
           </div>
         </details>
-        <div style="display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:1rem;">
-          <a href="presentations/create-harness-engineering.html" style="font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;color:var(--blue);border-bottom:1px solid var(--line);padding-bottom:2px;">Deep dive: <em>create</em> architecture →</a>
-        </div>
       </div>
 
       <!-- Secondary grid -->
@@ -671,20 +702,34 @@
       <p class="reveal" style="font-family:ui-monospace,Menlo,monospace; font-size:0.85rem; color:var(--blue); margin-bottom:1.8rem; letter-spacing:0.01em;">render(substrate, lens, frame) &rarr; receipt</p>
 
       <div class="deep-links reveal">
-        <a href="https://doi.org/10.5281/zenodo.20571515" target="_blank" rel="noopener">The Governance Gap in Agentic Memory <span style="font-family:var(--mono);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);">&nbsp;&middot;&nbsp; Position paper &#8599;</span></a>
+        <a href="https://zenodo.org/records/20775891" target="_blank" rel="noopener">The Governance Gap in Agentic Memory <span style="font-family:var(--mono);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);">&nbsp;&middot;&nbsp; Position paper &#8599;</span></a>
         <a href="https://lexenne.com/slf/SPA-ARCHITECTURE.pdf" target="_blank" rel="noopener">SPA / SLF architecture <span style="font-family:var(--mono);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);">&nbsp;&middot;&nbsp; PDF &#8599;</span></a>
         <a href="https://lexenne.com/slf" target="_blank" rel="noopener">SLF at lexenne.com <span style="font-family:var(--mono);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);">&nbsp;&middot;&nbsp; Overview &#8599;</span></a>
       </div>
     </div>
   </section>
 
-  <!-- ========== 05 / 06 WRITING + TALKS ========== -->
+  <!-- ========== 05 / 06 DEEP-DIVES + WRITING ========== -->
   <section class="block" id="writing">
     <div class="wrap two-col">
+      <div class="tint-deepdives" id="deep-dives" style="scroll-margin-top:80px;">
+        <div class="sec-head reveal">
+          <h2>Deep-dives</h2>
+          <span class="sheet-no">05</span>
+        </div>
+        <div class="index-list">
+          <a href="presentations/remember-compounding-knowledge.html" class="index-row reveal"><span class="ix-no">01</span><span class="ix-title"><em>remember</em>: Compounding Knowledge Across People and Agents</span><span class="ix-tag">Strategy</span></a>
+          <a href="presentations/salesforce-ai-augmented-development.html" class="index-row reveal"><span class="ix-no">02</span><span class="ix-title">Salesforce AI-Augmented Development</span><span class="ix-tag">Strategy</span></a>
+          <a href="presentations/remember-technical-overview.html" class="index-row reveal"><span class="ix-no">03</span><span class="ix-title"><em>remember</em>: Technical Overview</span><span class="ix-tag">Architecture</span></a>
+          <a href="presentations/customer-contextualization-framework.html" class="index-row reveal"><span class="ix-no">04</span><span class="ix-title">Customer Contextualization Framework</span><span class="ix-tag">Strategy</span></a>
+          <a href="presentations/memory-landscape-2026.html" class="index-row reveal"><span class="ix-no">05</span><span class="ix-title">Memory, Context &amp; Graphs: The 2026 Landscape</span><span class="ix-tag">Research</span></a>
+          <a href="presentations/create-harness-engineering.html" class="index-row reveal"><span class="ix-no">06</span><span class="ix-title"><em>create</em>: Harness Engineering for Agent-First Development</span><span class="ix-tag">Architecture</span></a>
+        </div>
+      </div>
       <div class="tint-writing">
         <div class="sec-head reveal">
           <h2>Writing</h2>
-          <span class="sheet-no">05</span>
+          <span class="sheet-no">06</span>
         </div>
         <div class="index-list">
           <a href="writing/the-pair.html" class="index-row reveal"><span class="ix-no">01</span><span class="ix-title">The Pair &middot; a 7-part series</span><span class="ix-tag">Series</span></a>
@@ -696,20 +741,6 @@
           <a href="writing/enterprise-experience-is-the-missing-ingredient.html" class="index-row reveal"><span class="ix-no">07</span><span class="ix-title">Enterprise Experience Is the Missing Ingredient</span><span class="ix-tag">Essay</span></a>
           <a href="writing/building-an-ai-job-search-os.html" class="index-row reveal"><span class="ix-no">08</span><span class="ix-title">Building an AI Job Search OS from Scratch</span><span class="ix-tag">Build log</span></a>
           <a href="writing/local-inference-at-the-edge.html" class="index-row reveal"><span class="ix-no">09</span><span class="ix-title">Local Inference at the Edge: A Four-Machine Fleet</span><span class="ix-tag">Build log</span></a>
-        </div>
-      </div>
-      <div class="tint-deepdives" id="deep-dives" style="scroll-margin-top:80px;">
-        <div class="sec-head reveal">
-          <h2>Deep-dives</h2>
-          <span class="sheet-no">06</span>
-        </div>
-        <div class="index-list">
-          <a href="presentations/remember-compounding-knowledge.html" class="index-row reveal"><span class="ix-no">01</span><span class="ix-title"><em>remember</em>: Compounding Knowledge Across People and Agents</span><span class="ix-tag">Strategy</span></a>
-          <a href="presentations/salesforce-ai-augmented-development.html" class="index-row reveal"><span class="ix-no">02</span><span class="ix-title">Salesforce AI-Augmented Development</span><span class="ix-tag">Strategy</span></a>
-          <a href="presentations/remember-technical-overview.html" class="index-row reveal"><span class="ix-no">03</span><span class="ix-title"><em>remember</em>: Technical Overview</span><span class="ix-tag">Architecture</span></a>
-          <a href="presentations/customer-contextualization-framework.html" class="index-row reveal"><span class="ix-no">04</span><span class="ix-title">Customer Contextualization Framework</span><span class="ix-tag">Strategy</span></a>
-          <a href="presentations/memory-landscape-2026.html" class="index-row reveal"><span class="ix-no">05</span><span class="ix-title">Memory, Context &amp; Graphs: The 2026 Landscape</span><span class="ix-tag">Research</span></a>
-          <a href="presentations/create-harness-engineering.html" class="index-row reveal"><span class="ix-no">06</span><span class="ix-title"><em>create</em>: Harness Engineering for Agent-First Development</span><span class="ix-tag">Architecture</span></a>
         </div>
       </div>
     </div>
